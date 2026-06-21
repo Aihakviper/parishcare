@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { cn } from '../../../lib/cn'
+import { PAGE_TRANSITION } from '../../../lib/motion'
 
 interface SlideOverProps {
   children: ReactNode
@@ -36,7 +37,7 @@ export function SlideOver({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: reduceMotion ? 0 : 0.26 }}
+        transition={reduceMotion ? { duration: 0 } : PAGE_TRANSITION}
         onClick={close}
       />
       <motion.aside
@@ -50,7 +51,7 @@ export function SlideOver({
         initial={{ x: reduceMotion ? 0 : '100%' }}
         animate={{ x: 0 }}
         exit={{ x: reduceMotion ? 0 : '100%' }}
-        transition={{ duration: reduceMotion ? 0 : 0.26, ease: 'easeOut' }}
+        transition={reduceMotion ? { duration: 0 } : PAGE_TRANSITION}
       >
         <header className="flex items-start justify-between gap-3 p-5 border-b border-oxblood/20 bg-parchment-soft">
           <div>

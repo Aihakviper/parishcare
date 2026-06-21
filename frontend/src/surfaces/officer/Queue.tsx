@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { EyebrowLabel } from '../../components/ui/EyebrowLabel'
 import { useOfficerCases } from './hooks/useOfficerCases'
 import { QueueRow } from './components/QueueRow'
 import { countToHeadingWord } from '../../lib/officer/format'
+import { listStaggerVariants } from '../../lib/motion'
 import type { CaseStatus } from '../../lib/types/domain'
 
 function countByStatus(cases: { status: CaseStatus }[], status: CaseStatus) {
@@ -11,6 +13,7 @@ function countByStatus(cases: { status: CaseStatus }[], status: CaseStatus) {
 
 export function OfficerQueue() {
   const { cases, parish, loading } = useOfficerCases()
+  const reduceMotion = useReducedMotion()
 
   const pending = useMemo(() => countByStatus(cases, 'pending'), [cases])
   const verified = useMemo(() => countByStatus(cases, 'verified'), [cases])
@@ -87,13 +90,16 @@ export function OfficerQueue() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {cases.map((item, index) => (
-            <li key={item.id}>
-              <QueueRow item={item} index={index} />
-            </li>
+        <motion.ul
+          className="space-y-3 list-none m-0 p-0"
+          variants={reduceMotion ? undefined : listStaggerVariants}
+          initial={reduceMotion ? false : 'hidden'}
+          animate={reduceMotion ? undefined : 'visible'}
+        >
+          {cases.map((item) => (
+            <QueueRow key={item.id} item={item} />
           ))}
-        </ul>
+        </motion.ul>
       )}
     </div>
   )

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { EmptyState } from '../../components/ui/EmptyState'
 import { EyebrowLabel } from '../../components/ui/EyebrowLabel'
 import { Button } from '../../components/ui/Button'
 import { PriorityGauge } from '../officer/components/PriorityGauge'
@@ -97,12 +97,9 @@ export function PastorApprovals() {
 
   if (!welfareCase || !beneficiary) {
     return (
-      <p className="text-slate text-sm">
-        No escalated cases awaiting your decision.{' '}
-        <Link to="/pastor" className="text-oxblood underline">
-          Return to pulse
-        </Link>
-      </p>
+      <EmptyState>
+        No escalated cases await your pen. A quiet day for judgment.
+      </EmptyState>
     )
   }
 

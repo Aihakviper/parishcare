@@ -1,4 +1,3 @@
-import { motion, useReducedMotion } from 'framer-motion'
 import type { ScoreBreakdown } from '../../../lib/types/domain'
 
 const FACTORS: {
@@ -19,11 +18,9 @@ interface FactorBreakdownProps {
 }
 
 export function FactorBreakdown({ breakdown, recencyNote }: FactorBreakdownProps) {
-  const reduceMotion = useReducedMotion()
-
   return (
     <ul className="space-y-3">
-      {FACTORS.map((f, i) => {
+      {FACTORS.map((f) => {
         const raw = breakdown[f.key]
         const isPenalty = f.key === 'recency_penalty'
         const fillRatio = isPenalty
@@ -39,14 +36,8 @@ export function FactorBreakdown({ breakdown, recencyNote }: FactorBreakdownProps
                 {isPenalty && raw < 0 ? raw : `${raw}/${f.max}`}
               </span>
             </div>
-            <div className="font-mono text-sm tracking-widest text-oxblood">
-              <motion.span
-                initial={reduceMotion ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.08 }}
-              >
-                {'█'.repeat(filled)}
-              </motion.span>
+            <div className="font-mono text-sm tracking-widest text-oxblood" aria-hidden>
+              <span>{'█'.repeat(filled)}</span>
               <span className="text-hairline">{'░'.repeat(10 - filled)}</span>
             </div>
             {isPenalty && recencyNote && raw !== 0 && (

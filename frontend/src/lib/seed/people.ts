@@ -6,6 +6,7 @@ import type {
 } from '../types/domain'
 import { getParishById, parishes, PARISH_IKORODU, PARISH_YABA } from './parishes'
 import { createPrng, intBetween, pick } from './prng'
+import { koboFromNaira } from './money'
 
 const NEED_CATEGORIES: NeedCategory[] = [
   'school_fees',
@@ -90,7 +91,7 @@ function buildHistory(
     const useOther = rng() < 0.22 && otherParishes.length > 0
     const parish = useOther ? pick(rng, otherParishes) : getParishById(homeParishId)!
     const daysAgo = intBetween(rng, 3, 89)
-    const amountKobo = intBetween(rng, 5_000_00, 150_000_00) // ₦5k–₦150k
+    const amountKobo = koboFromNaira(rng, 5_000, 150_000, 500)
 
     entries.push({
       id: `hist-${beneficiaryId}-${i}`,
@@ -130,7 +131,7 @@ function buildNgozi(): Beneficiary {
           durationSeconds: 42,
           pastorName: 'Pastor M.O.',
           transcript:
-            'Sister Ngozi lost her husband to a road accident in March. Three children, eldest in SS2. Genuine. Praying.',
+            'Sister Ngozi lost her husband in a road accident this March. Three children — eldest in SS2 at Ikorodu Grammar. I visited the home myself. She is genuine, not asking beyond need. The Yaba parish helped with school fees last term; transport is the gap now. Please extend the same grace. Praying with her.',
         },
       },
     ],

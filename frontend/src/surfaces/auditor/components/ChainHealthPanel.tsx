@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import type { AuditDisplayEntry } from '../../../lib/auditor/present'
 import { formatAuditDate } from '../../../lib/auditor/present'
+import { EmptyState } from '../../../components/ui/EmptyState'
+import { PAGE_TRANSITION } from '../../../lib/motion'
 import { cn } from '../../../lib/cn'
 
 interface ChainHealthPanelProps {
@@ -29,36 +32,61 @@ function blockColor(type: AuditDisplayEntry['entryType']): string {
 
 export function ChainHealthPanel({ entries }: ChainHealthPanelProps) {
   const [active, setActive] = useState<AuditDisplayEntry | null>(null)
+  const reduceMotion = useReducedMotion()
+  const allowBlockAnimation = useRef(!reduceMotion)
+
+  useEffect(() => {
+    allowBlockAnimation.current = false
+  }, [])
+
   const blocks = entries.slice(-60)
   const earliest = entries[0]
   const latest = entries[entries.length - 1]
 
+  if (entries.length === 0) {
+    return (
+      <section className="frame p-5 sm:p-6">
+        <EmptyState>The chain is whole.</EmptyState>
+      </section>
+    )
+  }
+
   return (
-    <section className="frame p-5 sm:p-6">
+    <section className="frame p-5 sm:p-6" aria-label="Chain health visualization">
       <h2 className="font-semibold text-ink text-sm mb-1">Chain health</h2>
       <p className="text-slate text-xs mb-5">Last {blocks.length} entries · linked hash sequence</p>
 
       <div className="relative">
-        <div className="flex items-end gap-px overflow-x-auto pb-2 scrollbar-thin">
-          {blocks.map((entry, i) => (
-            <button
-              key={entry.id}
-              type="button"
-              className={cn(
-                'relative shrink-0 w-2.5 sm:w-3 rounded-sm transition-transform hover:scale-y-110 hover:z-10 focus:outline-none focus:ring-2 focus:ring-verdigris/50',
-                blockColor(entry.entryType),
-                i === blocks.length - 1 && 'ring-1 ring-verdigris ring-offset-1 ring-offset-bone',
-              )}
-              style={{ height: `${14 + (i % 5) * 2}px` }}
-              onMouseEnter={() => setActive(entry)}
-              onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(entry)}
-              onBlur={() => setActive(null)}
-              onClick={() => setActive((prev) => (prev?.id === entry.id ? null : entry))}
-              aria-label={`${entry.entryType} ${entry.hashShort}`}
-            />
-          ))}
-        </div>
+        <ol
+          className="flex items-end gap-px overflow-x-auto pb-2 scrollbar-thin list-none m-0 p-0"
+          aria-label="Recent audit chain blocks"
+        >
+          {blocks.map((entry, i) => {
+            const shouldAnimate = allowBlockAnimation.current
+            return (
+              <li key={entry.id} className="list-none">
+                <motion.button
+                  type="button"
+                  initial={shouldAnimate ? { scaleY: 0 } : false}
+                  animate={{ scaleY: 1 }}
+                  transition={{ ...PAGE_TRANSITION, delay: shouldAnimate ? i * 0.008 : 0 }}
+                  className={cn(
+                    'relative shrink-0 w-2.5 sm:w-3 rounded-sm origin-bottom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gilt',
+                    blockColor(entry.entryType),
+                    i === blocks.length - 1 && 'ring-1 ring-verdigris ring-offset-1 ring-offset-bone',
+                  )}
+                  style={{ height: `${14 + (i % 5) * 2}px` }}
+                  onMouseEnter={() => setActive(entry)}
+                  onMouseLeave={() => setActive(null)}
+                  onFocus={() => setActive(entry)}
+                  onBlur={() => setActive(null)}
+                  onClick={() => setActive((prev) => (prev?.id === entry.id ? null : entry))}
+                  aria-label={`${entry.entryType}, ${entry.hashShort}, ${formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}`}
+                />
+              </li>
+            )
+          })}
+        </ol>
 
         {active && (
           <div

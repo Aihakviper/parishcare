@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { PAGE_TRANSITION } from '../../lib/motion'
 
 interface Rect {
   top: number
@@ -63,7 +64,7 @@ export function TourSpotlight({ targetSelector, active }: TourSpotlightProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={PAGE_TRANSITION}
       className="fixed z-[90] pointer-events-none rounded-frame ring-2 ring-verdigris/60"
       style={{
         top: rect.top,

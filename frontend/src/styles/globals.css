@@ -4,15 +4,24 @@
 
 @layer base {
   html {
-    @apply antialiased;
+    @apply antialiased overflow-x-hidden;
   }
 
   body {
-    @apply bg-parchment text-ink font-sans text-base leading-relaxed;
+    @apply bg-parchment text-ink font-sans text-base leading-relaxed overflow-x-hidden;
   }
 
   ::selection {
     @apply bg-oxblood/15 text-ink;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-gilt;
+  }
+
+  button:focus:not(:focus-visible),
+  a:focus:not(:focus-visible) {
+    outline: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -82,5 +91,15 @@
   .tour-highlight {
     position: relative;
     z-index: 100 !important;
+  }
+
+  .table-scroll-fade {
+    @apply relative overflow-x-auto;
+  }
+
+  .table-scroll-fade::after {
+    content: '';
+    @apply pointer-events-none absolute top-0 right-0 bottom-0 w-8;
+    background: linear-gradient(to left, theme('colors.bone'), transparent);
   }
 }

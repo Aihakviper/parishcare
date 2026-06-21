@@ -4,8 +4,9 @@ import { isWithinInterval, parseISO } from 'date-fns'
 import { useAuditData } from './hooks/useAuditData'
 import { VERIFY_SNIPPET, type AuditDisplayEntry, type AuditEntryType } from '../../lib/auditor/present'
 import { formatAuditDateTime } from '../../lib/auditor/present'
-import { cn } from '../../lib/cn'
+import { EmptyState } from '../../components/ui/EmptyState'
 import { Button } from '../../components/ui/Button'
+import { cn } from '../../lib/cn'
 
 const ENTRY_TYPES: { value: AuditEntryType | 'all'; label: string }[] = [
   { value: 'all', label: 'All types' },
@@ -62,6 +63,7 @@ function ExplorerRow({
             'w-4 h-4 text-slate shrink-0 transition-transform',
             expanded && 'rotate-180',
           )}
+          aria-hidden
         />
         <span className="font-mono text-xs text-slate w-28 shrink-0">{entry.hashShort}</span>
         <span className="text-sm text-ink capitalize w-24 shrink-0">{entry.entryType}</span>
@@ -219,7 +221,7 @@ export function ChainExplorer() {
 
       <div className="frame p-4 mb-4 space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" aria-hidden />
           <input
             type="search"
             placeholder="Search hash, type, parish, role…"
@@ -294,7 +296,9 @@ export function ChainExplorer() {
         </div>
         <div className="max-h-[32rem] overflow-y-auto">
           {visible.length === 0 ? (
-            <p className="p-6 text-sm text-slate">No entries match your filters.</p>
+            <EmptyState className="py-12 text-base">
+              No entries match your filters. The chain behind them is still whole.
+            </EmptyState>
           ) : (
             visible
               .slice()

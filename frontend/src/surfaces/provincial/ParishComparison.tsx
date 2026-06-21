@@ -78,7 +78,7 @@ export function ParishComparison() {
         Every parish in {data.provinceLabel}
       </h1>
 
-      <div className="frame overflow-x-auto">
+      <div className="frame table-scroll-fade">
         <table className="w-full text-sm min-w-[720px]">
           <thead>
             <tr className="border-b border-hairline text-left">

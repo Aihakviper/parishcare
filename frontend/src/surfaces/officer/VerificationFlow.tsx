@@ -97,26 +97,18 @@ export function VerificationFlow() {
               <strong>{yaba?.name ?? 'RCCG House on the Rock - Yaba'}</strong>
             </p>
             {!vouchComplete ? (
-              <motion.div
-                className="p-4 border border-hairline rounded-frame bg-bone"
-                animate={reduceMotion ? {} : { opacity: [0.6, 1, 0.6] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
+              <div className="p-4 border border-hairline rounded-frame bg-bone">
                 <p className="mono-tag">Awaiting confirmation</p>
                 <p className="text-sm text-slate mt-2">
                   Awaiting confirmation… (avg. 6 minutes)
                 </p>
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 border border-verdigris/40 rounded-frame bg-verdigris/5"
-              >
+              <div className="p-4 border border-verdigris/40 rounded-frame bg-verdigris/5">
                 <p className="text-verdigris font-semibold text-sm">
                   Vouch received. Continue.
                 </p>
-              </motion.div>
+              </div>
             )}
             {vouchComplete && (
               <Button onClick={handleContinue} className="w-full">

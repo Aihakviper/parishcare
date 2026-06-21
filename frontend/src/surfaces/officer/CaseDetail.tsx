@@ -88,7 +88,7 @@ export function CaseDetail() {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-          <section className="lg:col-span-5 frame p-5 sm:p-6">
+          <section className="lg:col-span-5 frame p-5 sm:p-6 order-1">
             <div
               className="w-20 h-20 bg-oxblood rounded-sm flex items-center justify-center text-bone display text-2xl font-semibold mb-4"
               aria-hidden
@@ -167,7 +167,7 @@ export function CaseDetail() {
             </button>
           </section>
 
-          <section className="lg:col-span-4">
+          <section className="lg:col-span-4 order-2">
             <EyebrowLabel>II · Today&apos;s ask</EyebrowLabel>
             <p className="display-tight text-2xl sm:text-3xl font-semibold text-ink mt-2">
               {formatRequestLine(
@@ -194,7 +194,7 @@ export function CaseDetail() {
             </label>
           </section>
 
-          <section className="lg:col-span-3 frame p-5">
+          <section className="lg:col-span-3 frame p-5 order-3">
             <EyebrowLabel>III · Steward&apos;s read</EyebrowLabel>
             <div className="mt-4">
               <PriorityGauge score={welfareCase.priorityScore} />

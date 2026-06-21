@@ -6,6 +6,7 @@ import { TourSpotlight } from './TourSpotlight'
 import { useTourDriver } from './useTourDriver'
 import { useTourStore } from '../../store/tour'
 import { TOUR_STEPS } from '../../lib/tour/steps'
+import { PAGE_TRANSITION } from '../../lib/motion'
 
 export function StoryTour() {
   const active = useTourStore((s) => s.active)
@@ -32,8 +33,8 @@ export function StoryTour() {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="pointer-events-auto absolute bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md"
+            transition={PAGE_TRANSITION}
+            className="pointer-events-auto absolute bottom-0 left-0 right-0 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md px-4 pb-4 sm:px-0 sm:pb-0"
           >
             <div className="frame bg-bone/98 backdrop-blur-md shadow-frame border-oxblood/15 p-5 sm:p-6">
               {showFinal ? (

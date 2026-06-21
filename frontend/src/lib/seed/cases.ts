@@ -8,6 +8,7 @@ import type {
 import { HERO_BENEFICIARY_ID, people } from './people'
 import { parishes, PARISH_IKORODU } from './parishes'
 import { createPrng, intBetween, pick } from './prng'
+import { koboFromNaira } from './money'
 
 const STATUSES: CaseStatus[] = [
   'pending',
@@ -174,7 +175,7 @@ function buildHeroCase(): WelfareCase {
       durationSeconds: 42,
       pastorName: 'Pastor M.O.',
       transcript:
-        'Sister Ngozi lost her husband to a road accident in March. Three children, eldest in SS2. Genuine. Praying.',
+        'Sister Ngozi lost her husband in a road accident this March. Three children — eldest in SS2 at Ikorodu Grammar. I visited the home myself. She is genuine, not asking beyond need. The Yaba parish helped with school fees last term; transport is the gap now. Please extend the same grace. Praying with her.',
     },
   }
 }
@@ -197,7 +198,7 @@ function generateCases(count: number): WelfareCase[] {
     const parishId = parishSlots[i % parishSlots.length]
     const needCategory = beneficiary.needCategory
     const status = weightedStatus(rng)
-    const amountRequestedKobo = intBetween(rng, 3_000_00, 120_000_00)
+    const amountRequestedKobo = koboFromNaira(rng, 3_000, 120_000, 500)
     const { breakdown, total } = buildScore(rng, beneficiary)
     const createdAt = randomCreatedAt(rng)
     const riskFlags = buildRiskFlags(rng, beneficiary, amountRequestedKobo, parishId)
@@ -256,11 +257,12 @@ function generateCases(count: number): WelfareCase[] {
     }
 
     if (rng() < 0.08) {
+      const durationSeconds = intBetween(rng, 20, 45)
       welfareCase.pastoralVoiceNote = {
-        durationSeconds: intBetween(rng, 28, 95),
+        durationSeconds,
         pastorName: parishes.find((p) => p.id === parishId)!.pastorName,
         transcript:
-          'Member of good standing. Welfare team has visited the home. Recommend care.',
+          'Member of good standing. Welfare team has visited the home twice. Need is genuine — recommend care within parish guidelines.',
       }
     }
 

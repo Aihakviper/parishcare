@@ -1,7 +1,10 @@
+import { useEffect, useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { formatNaira } from '../../../lib/formatters'
+import { PAGE_TRANSITION } from '../../../lib/motion'
 import type { ParishAggregate } from '../../../lib/provincial/aggregates'
 import { strainedNote } from '../../../lib/provincial/aggregates'
+import { EmptyState } from '../../../components/ui/EmptyState'
 import { cn } from '../../../lib/cn'
 
 interface GraceMapProps {
@@ -11,6 +14,19 @@ interface GraceMapProps {
 
 export function GraceMap({ parishes, maxDisbursed }: GraceMapProps) {
   const reduceMotion = useReducedMotion()
+  const allowBarAnimation = useRef(!reduceMotion)
+
+  useEffect(() => {
+    allowBarAnimation.current = false
+  }, [])
+
+  if (parishes.length === 0) {
+    return (
+      <div className="frame p-4 sm:p-5">
+        <EmptyState>No families nearby unreached. Rare and good.</EmptyState>
+      </div>
+    )
+  }
 
   return (
     <div className="frame p-4 sm:p-5">
@@ -38,15 +54,20 @@ export function GraceMap({ parishes, maxDisbursed }: GraceMapProps) {
                   {parish.casesThisMonth} cases · {formatNaira(parish.disbursedKobo)}
                 </span>
               </div>
-              <div className="h-2 bg-hairline rounded-sm overflow-hidden">
+              <div className="h-2 bg-hairline rounded-sm overflow-hidden" role="presentation">
                 <motion.div
                   className={cn(
                     'h-full rounded-sm',
                     parish.strained ? 'bg-oxblood' : 'bg-verdigris',
                   )}
-                  initial={{ width: reduceMotion ? `${widthPct}%` : 0 }}
+                  initial={
+                    allowBarAnimation.current ? { width: 0 } : { width: `${widthPct}%` }
+                  }
                   animate={{ width: `${widthPct}%` }}
-                  transition={{ duration: reduceMotion ? 0 : 0.5, delay: i * 0.05 }}
+                  transition={{
+                    ...PAGE_TRANSITION,
+                    delay: allowBarAnimation.current ? i * 0.04 : 0,
+                  }}
                 />
               </div>
               {note && (

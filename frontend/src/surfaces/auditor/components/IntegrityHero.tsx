@@ -1,5 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { Check } from 'lucide-react'
+import { Check, Loader2 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { EyebrowLabel } from '../../../components/ui/EyebrowLabel'
 import { Button } from '../../../components/ui/Button'
@@ -53,52 +52,24 @@ export function IntegrityHero({
           </Button>
         </div>
 
-        <div className="relative flex items-center justify-center w-28 h-28 shrink-0">
-          <AnimatePresence mode="wait">
-            {checking ? (
-              <motion.div
-                key="checking"
-                className="absolute inset-0 rounded-full border-2 border-verdigris/30"
-                animate={{ scale: [1, 1.35, 1], opacity: [0.6, 0, 0.6] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            ) : (
-              <>
-                <motion.div
-                  key="pulse"
-                  className="absolute inset-0 rounded-full bg-verdigris/10"
-                  initial={{ scale: 0.85, opacity: 0.5 }}
-                  animate={{ scale: 1.15, opacity: 0 }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }}
-                />
-                <motion.div
-                  key="pulse-delay"
-                  className="absolute inset-2 rounded-full bg-verdigris/10"
-                  initial={{ scale: 0.9, opacity: 0.4 }}
-                  animate={{ scale: 1.2, opacity: 0 }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    ease: 'easeOut',
-                    delay: 0.8,
-                  }}
-                />
-              </>
-            )}
-          </AnimatePresence>
-          <motion.div
-            animate={checking ? { rotate: 360 } : { rotate: 0 }}
-            transition={checking ? { duration: 1.2, repeat: Infinity, ease: 'linear' } : {}}
-          >
+        <div
+          className="relative flex items-center justify-center w-28 h-28 shrink-0"
+          aria-live="polite"
+          aria-label={checking ? 'Verifying chain integrity' : valid ? 'Chain verified intact' : 'Chain integrity failed'}
+        >
+          {checking ? (
+            <Loader2
+              className="w-14 h-14 text-verdigris animate-spin"
+              style={{ animationDuration: '1.2s' }}
+              aria-hidden
+            />
+          ) : (
             <Check
-              className={cn(
-                'relative z-10',
-                valid ? 'text-verdigris' : 'text-oxblood',
-              )}
+              className={cn(valid ? 'text-verdigris' : 'text-oxblood')}
               style={{ width: '4rem', height: '4rem', strokeWidth: 2 }}
               aria-hidden
             />
-          </motion.div>
+          )}
         </div>
       </div>
     </header>
