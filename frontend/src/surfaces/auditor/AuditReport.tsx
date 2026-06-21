@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns'
-import { FileDown, Printer } from 'lucide-react'
+import { FaFileArrowDown, FaPrint } from 'react-icons/fa6'
 import { Button } from '../../components/ui/Button'
 import { mockApi } from '../../lib/mock-api'
 import {
@@ -88,13 +88,13 @@ export function AuditReport() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="flex-1 text-sm bg-bone border border-hairline rounded-frame px-3 py-2"
+                className="flex-1 text-sm bg-bone border border-hairline rounded-xl px-3 py-2"
               />
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="flex-1 text-sm bg-bone border border-hairline rounded-frame px-3 py-2"
+                className="flex-1 text-sm bg-bone border border-hairline rounded-xl px-3 py-2"
               />
             </div>
           </div>
@@ -105,14 +105,14 @@ export function AuditReport() {
               type="text"
               value={trusteeName}
               onChange={(e) => setTrusteeName(e.target.value)}
-              className="w-full text-sm bg-bone border border-hairline rounded-frame px-3 py-2"
+              className="w-full text-sm bg-bone border border-hairline rounded-xl px-3 py-2"
               placeholder="Trustee name"
             />
           </div>
 
           <div>
             <label className="mono-tag block mb-1.5">Parishes in scope</label>
-            <div className="max-h-40 overflow-y-auto border border-hairline rounded-frame p-2 space-y-1 bg-bone">
+            <div className="max-h-40 overflow-y-auto border border-hairline rounded-xl p-2 space-y-1 bg-bone">
               {parishOptions.map((p) => (
                 <label
                   key={p.id}
@@ -143,10 +143,10 @@ export function AuditReport() {
         <div className="frame p-6 sm:p-8 bg-bone">
           {report ? (
             <article className="display">
-              <p className="text-oxblood text-xs font-semibold tracking-widest uppercase mb-2">
+              <p className="text-verdigris text-xs font-semibold tracking-widest uppercase mb-2">
                 Preview
               </p>
-              <h2 className="text-2xl font-semibold text-oxblood tracking-wide">
+              <h2 className="text-2xl font-semibold text-ink tracking-wide">
                 {report.title}
               </h2>
               <p className="text-slate mt-2 text-base">
@@ -156,7 +156,7 @@ export function AuditReport() {
                 Prepared for: {report.preparedFor}
               </p>
               <div className="gilt-rule my-6" />
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-oxblood mb-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-verdigris mb-3">
                 Findings
               </h3>
               <ul className="space-y-2 text-ink text-base leading-relaxed">
@@ -174,7 +174,7 @@ export function AuditReport() {
                   variant="secondary"
                   onClick={() => openPrintableReport(renderReportHtml(report))}
                 >
-                  <Printer className="w-4 h-4" aria-hidden />
+                  <FaPrint className="w-4 h-4" aria-hidden />
                   Print / save as PDF
                 </Button>
                 <Button
@@ -183,7 +183,7 @@ export function AuditReport() {
                   className="border border-hairline"
                   onClick={() => downloadReportStub(report)}
                 >
-                  <FileDown className="w-4 h-4" aria-hidden />
+                  <FaFileArrowDown className="w-4 h-4" aria-hidden />
                   Download report
                 </Button>
               </div>

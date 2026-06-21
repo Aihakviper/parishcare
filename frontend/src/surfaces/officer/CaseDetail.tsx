@@ -35,20 +35,21 @@ export function CaseDetail() {
 
   const heroVoiceHistory = beneficiary?.disbursementHistory.find((h) => h.voiceNote)
 
-  useEffect(() => {
-    if (!heroVoiceHistory?.voiceNote) return
-    if (tourActive && tourStep === 2) {
-      setActiveVoiceId(heroVoiceHistory.id)
-    }
-  }, [tourActive, tourStep, heroVoiceHistory])
+  const tourAutoVoiceId =
+    heroVoiceHistory?.voiceNote &&
+    ((tourActive && tourStep === 2) ||
+      pendingAction === 'play-voice' ||
+      pendingAction === 'open-voice')
+      ? heroVoiceHistory.id
+      : null
+
+  const displayedVoiceId = activeVoiceId ?? tourAutoVoiceId
 
   useEffect(() => {
-    if (!heroVoiceHistory?.voiceNote) return
     if (pendingAction === 'play-voice' || pendingAction === 'open-voice') {
-      setActiveVoiceId(heroVoiceHistory.id)
       clearPendingAction()
     }
-  }, [pendingAction, heroVoiceHistory, clearPendingAction])
+  }, [pendingAction, clearPendingAction])
 
   if (loading) {
     return <p className="text-slate text-sm py-12">Opening case file…</p>
@@ -58,7 +59,7 @@ export function CaseDetail() {
     return (
       <p className="text-slate">
         Case not found.{' '}
-        <Link to="/officer" className="text-oxblood underline">
+        <Link to="/officer" className="text-verdigris underline">
           Return to queue
         </Link>
       </p>
@@ -82,7 +83,7 @@ export function CaseDetail() {
       <div className="pb-28">
         <Link
           to="/officer"
-          className="text-sm text-slate hover:text-oxblood mb-4 inline-block"
+          className="text-sm text-slate hover:text-verdigris mb-4 inline-block"
         >
           ← Today&apos;s queue
         </Link>
@@ -90,7 +91,7 @@ export function CaseDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           <section className="lg:col-span-5 frame p-5 sm:p-6 order-1">
             <div
-              className="w-20 h-20 bg-oxblood rounded-sm flex items-center justify-center text-bone display text-2xl font-semibold mb-4"
+              className="w-20 h-20 bg-verdigris rounded-xl flex items-center justify-center text-bone display text-2xl font-semibold mb-4 shadow-card"
               aria-hidden
             >
               {initials(beneficiary.name)}
@@ -132,22 +133,20 @@ export function CaseDetail() {
                         <button
                           type="button"
                           onClick={() =>
-                            setActiveVoiceId(activeVoiceId === h.id ? null : h.id)
+                            setActiveVoiceId(displayedVoiceId === h.id ? null : h.id)
                           }
-                          className="text-xs text-oxblood font-medium mt-1 hover:underline"
+                          className="text-xs text-verdigris font-medium mt-1 hover:underline"
                         >
                           Hear pastor&apos;s note
                         </button>
                       )}
-                      {h.voiceNote && activeVoiceId === h.id && (
+                      {h.voiceNote && displayedVoiceId === h.id && (
                         <div data-tour="voice-note">
                           <VoiceNotePlayer
                             note={h.voiceNote}
                             className="mt-2"
                             autoPlay={
-                              tourActive &&
-                              tourStep === 2 &&
-                              activeVoiceId === h.id
+                              tourAutoVoiceId === h.id
                             }
                           />
                         </div>
@@ -161,7 +160,7 @@ export function CaseDetail() {
             <button
               type="button"
               onClick={() => navigate(`/officer/case/${id}/verify`)}
-              className="mt-5 w-full text-sm font-semibold text-verdigris border border-verdigris/40 rounded-frame py-2.5 hover:bg-verdigris/5 transition-colors"
+              className="mt-5 w-full text-sm font-semibold text-verdigris border border-verdigris/40 rounded-xl py-2.5 hover:bg-verdigris/5 transition-colors"
             >
               Begin verification
             </button>
@@ -189,7 +188,7 @@ export function CaseDetail() {
                 onChange={(e) => setOfficerNotes(e.target.value)}
                 placeholder="What did you observe?"
                 rows={4}
-                className="mt-2 w-full border border-hairline bg-bone rounded-frame px-3 py-2.5 text-sm text-ink resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+                className="mt-2 w-full border border-hairline bg-bone rounded-xl px-3 py-2.5 text-sm text-ink resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
               />
             </label>
           </section>
@@ -210,7 +209,7 @@ export function CaseDetail() {
                 {welfareCase.riskFlags.map((flag: RiskFlag) => (
                   <li
                     key={flag}
-                    className="text-xs text-oxblood border-l-2 border-oxblood pl-2 py-1"
+                    className="text-xs text-verdigris border-l-2 border-seafoam pl-2 py-1"
                   >
                     {flag === 'cross_parish_recent' && firstNetwork
                       ? riskFlagMessage(flag, {

@@ -64,7 +64,7 @@ export function VerificationFlow() {
               type="tel"
               readOnly
               value={redactPhone(beneficiary.phone)}
-              className="w-full font-mono text-sm border border-hairline bg-bone rounded-frame px-3 py-2.5"
+              className="w-full font-mono text-sm border border-hairline bg-bone rounded-xl px-3 py-2.5"
             />
             <label className="flex items-start gap-2 text-sm text-ink cursor-pointer">
               <input
@@ -96,14 +96,14 @@ export function VerificationFlow() {
               <strong>{yaba?.name ?? 'RCCG House on the Rock - Yaba'}</strong>
             </p>
             {!vouchComplete ? (
-              <div className="p-4 border border-hairline rounded-frame bg-bone">
+              <div className="p-4 border border-hairline rounded-xl bg-bone">
                 <p className="mono-tag">Awaiting confirmation</p>
                 <p className="text-sm text-slate mt-2">
                   Awaiting confirmation… (avg. 6 minutes)
                 </p>
               </div>
             ) : (
-              <div className="p-4 border border-verdigris/40 rounded-frame bg-verdigris/5">
+              <div className="p-4 border border-verdigris/40 rounded-xl bg-verdigris/5">
                 <p className="text-verdigris font-semibold text-sm">
                   Vouch received. Continue.
                 </p>
@@ -119,7 +119,7 @@ export function VerificationFlow() {
 
         {step === 3 && (
           <div className="space-y-5">
-            <div className="p-4 border border-verdigris/40 rounded-frame bg-verdigris/5 text-center">
+            <div className="p-4 border border-verdigris/40 rounded-xl bg-verdigris/5 text-center">
               <p className="text-verdigris font-semibold">Verification complete.</p>
             </div>
             <p className="italic-serif text-sm text-slate text-center border-t border-hairline pt-4">

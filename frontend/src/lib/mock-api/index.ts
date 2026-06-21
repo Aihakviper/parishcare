@@ -210,7 +210,7 @@ export const mockApi = {
       const now = new Date().toISOString()
       const actor = getStaffById(input.actorId)
 
-      let updated: WelfareCase = { ...existing, updatedAt: now }
+      const updated: WelfareCase = { ...existing, updatedAt: now }
 
       if (input.decision === 'escalate') {
         updated.status = 'escalated'

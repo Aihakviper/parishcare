@@ -33,12 +33,12 @@ export function PastorPulse() {
 
   return (
     <div>
-      <header className="mb-8">
-        <EyebrowLabel>III · Parish pulse</EyebrowLabel>
-        <h1 className="display-tight text-2xl sm:text-3xl font-semibold text-ink mt-2">
+      <header className="hero-spotlight mb-10 sm:mb-12">
+        <EyebrowLabel className="text-seafoam">III · Parish pulse</EyebrowLabel>
+        <h1 className="mt-3">
           {parish.name.replace(/^RCCG\s*/, 'RCCG ')}
         </h1>
-        <p className="mono-tag mt-2">
+        <p className="mono-tag mt-3">
           {parish.pastorName} · {parish.province}
         </p>
       </header>
@@ -69,7 +69,7 @@ export function PastorPulse() {
           {awaitingPastor && (
             <Link
               to="/pastor/approvals"
-              className="mt-6 inline-flex w-full items-center justify-center px-4 py-2.5 bg-oxblood text-bone text-sm font-semibold rounded-frame hover:bg-oxblood-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+              className="mt-6 inline-flex w-full items-center justify-center px-6 py-3 bg-verdigris text-bone text-sm font-semibold rounded-pill hover:bg-ink transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
             >
               Review escalated case
             </Link>

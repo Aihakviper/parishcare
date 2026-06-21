@@ -21,22 +21,26 @@ export function TourSpotlight({ targetSelector, active }: TourSpotlightProps) {
 
   useEffect(() => {
     if (!active || !targetSelector) {
-      setRect(null)
+      document.querySelectorAll('.tour-highlight').forEach((n) => {
+        n.classList.remove('tour-highlight')
+      })
       return
     }
 
     const update = () => {
       const el = document.querySelector(targetSelector)
       if (!el) {
-        setRect(null)
+        window.requestAnimationFrame(() => setRect(null))
         return
       }
       const r = el.getBoundingClientRect()
-      setRect({
-        top: r.top - PAD,
-        left: r.left - PAD,
-        width: r.width + PAD * 2,
-        height: r.height + PAD * 2,
+      window.requestAnimationFrame(() => {
+        setRect({
+          top: r.top - PAD,
+          left: r.left - PAD,
+          width: r.width + PAD * 2,
+          height: r.height + PAD * 2,
+        })
       })
       el.classList.add('tour-highlight')
     }
@@ -65,13 +69,13 @@ export function TourSpotlight({ targetSelector, active }: TourSpotlightProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={PAGE_TRANSITION}
-      className="fixed z-[90] pointer-events-none rounded-frame ring-2 ring-verdigris/60"
+      className="fixed z-[90] pointer-events-none rounded-xl ring-2 ring-seafoam/40"
       style={{
         top: rect.top,
         left: rect.left,
         width: rect.width,
         height: rect.height,
-        boxShadow: '0 0 0 9999px rgba(245, 240, 229, 0.72)',
+        boxShadow: '0 0 0 9999px rgba(250, 250, 248, 0.88)',
       }}
       aria-hidden
     />

@@ -13,10 +13,12 @@ export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerPr
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    if (autoPlay) {
+    if (!autoPlay) return
+    const t = window.setTimeout(() => {
       setProgress(0)
       setPlaying(true)
-    }
+    }, 0)
+    return () => window.clearTimeout(t)
   }, [autoPlay])
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerPr
   return (
     <div
       className={cn(
-        'bg-parchment-soft border border-hairline rounded-frame p-4',
+        'bg-verdigris-light/60 border border-hairline/80 rounded-xl p-4',
         className,
       )}
     >
@@ -64,7 +66,7 @@ export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerPr
           type="button"
           onClick={toggle}
           aria-label={playLabel}
-          className="w-11 h-11 rounded-full bg-oxblood text-bone text-xs font-bold shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+          className="w-11 h-11 rounded-full bg-seafoam text-bone text-xs font-bold shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam hover:bg-seafoam-deep transition-colors"
         >
           {playing ? 'Pause' : progress > 0 && progress < 100 ? 'Resume' : 'Play'}
         </button>
@@ -77,13 +79,13 @@ export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerPr
             aria-valuemax={100}
             aria-label="Playback progress"
           >
-            <div className="h-full bg-oxblood transition-[width] duration-100" style={{ width: `${progress}%` }} />
+            <div className="h-full bg-verdigris transition-[width] duration-100" style={{ width: `${progress}%` }} />
           </div>
           <p className="font-mono text-xs text-slate mt-1">{durationLabel}</p>
         </div>
       </div>
       {(playing || progress > 0) && (
-        <p className="mt-4 text-sm text-ink italic border-l-2 border-gilt pl-3">
+        <p className="mt-4 text-sm text-ink italic border-l-2 border-seafoam/50 pl-3">
           &ldquo;{note.transcript}&rdquo;
         </p>
       )}

@@ -36,7 +36,7 @@ export function FactorBreakdown({ breakdown, recencyNote }: FactorBreakdownProps
                 {isPenalty && raw < 0 ? raw : `${raw}/${f.max}`}
               </span>
             </div>
-            <div className="font-mono text-sm tracking-widest text-oxblood" aria-hidden>
+            <div className="font-mono text-sm tracking-widest text-verdigris" aria-hidden>
               <span>{'█'.repeat(filled)}</span>
               <span className="text-hairline">{'░'.repeat(10 - filled)}</span>
             </div>

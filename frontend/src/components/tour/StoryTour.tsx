@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Pause, Play, X } from 'lucide-react'
+import { FaPause, FaPlay, FaXmark } from 'react-icons/fa6'
 import { Button } from '../ui/Button'
 import { EyebrowLabel } from '../ui/EyebrowLabel'
 import { TourSpotlight } from './TourSpotlight'
@@ -36,7 +36,7 @@ export function StoryTour() {
             transition={PAGE_TRANSITION}
             className="pointer-events-auto absolute bottom-0 left-0 right-0 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md px-4 pb-4 sm:px-0 sm:pb-0"
           >
-            <div className="frame bg-bone/98 backdrop-blur-md shadow-frame border-oxblood/15 p-5 sm:p-6">
+            <div className="frame bg-bone/98 backdrop-blur-md shadow-lift p-5 sm:p-6 rounded-xl">
               {showFinal ? (
                 <>
                   <EyebrowLabel>Steward</EyebrowLabel>
@@ -46,7 +46,7 @@ export function StoryTour() {
                   <p className="italic-serif text-base text-slate mt-3 leading-relaxed">
                     Not a new system. The oldest one, given the tools it deserves.
                   </p>
-                  <p className="italic-serif text-sm text-gilt mt-4">— Acts 6:3</p>
+                  <p className="italic-serif text-sm text-seafoam mt-4">— Acts 6:3</p>
                   <div className="flex flex-wrap gap-2 mt-5">
                     <Button type="button" onClick={restartTour}>
                       Restart tour
@@ -70,7 +70,7 @@ export function StoryTour() {
                       className="p-1 text-slate hover:text-ink shrink-0"
                       aria-label="Exit tour"
                     >
-                      <X className="w-4 h-4" aria-hidden />
+                      <FaXmark className="w-4 h-4" aria-hidden />
                     </button>
                   </div>
                   <p className="display text-base sm:text-lg text-ink mt-2 leading-snug">
@@ -91,11 +91,11 @@ export function StoryTour() {
                       <Button type="button" variant="secondary" onClick={togglePaused}>
                         {paused ? (
                           <>
-                            <Play className="w-3.5 h-3.5" aria-hidden /> Resume
+                            <FaPlay className="w-3.5 h-3.5" aria-hidden /> Resume
                           </>
                         ) : (
                           <>
-                            <Pause className="w-3.5 h-3.5" aria-hidden /> Pause
+                            <FaPause className="w-3.5 h-3.5" aria-hidden /> Pause
                           </>
                         )}
                       </Button>
@@ -129,7 +129,7 @@ export function StoryTourButton() {
     <button
       type="button"
       onClick={() => startTour()}
-      className="fixed bottom-4 right-4 z-[80] px-5 py-3 bg-oxblood text-bone rounded-full shadow-frame text-sm font-semibold hover:bg-oxblood-deep transition-colors min-h-[44px]"
+      className="fixed bottom-4 right-4 z-[80] px-6 py-3.5 bg-seafoam text-bone rounded-pill shadow-lift text-sm font-semibold hover:bg-seafoam-deep transition-colors min-h-[48px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
     >
       ▶ Watch the story
     </button>

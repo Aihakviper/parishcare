@@ -23,7 +23,7 @@ export function ProvincialLayout() {
               cn(
                 'px-3 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors',
                 isActive
-                  ? 'border-oxblood text-oxblood'
+                  ? 'border-verdigris text-verdigris'
                   : 'border-transparent text-slate hover:text-ink',
               )
             }

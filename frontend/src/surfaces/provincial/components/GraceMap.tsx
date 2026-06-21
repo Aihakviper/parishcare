@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { formatNaira } from '../../../lib/formatters'
 import { PAGE_TRANSITION } from '../../../lib/motion'
@@ -14,11 +13,7 @@ interface GraceMapProps {
 
 export function GraceMap({ parishes, maxDisbursed }: GraceMapProps) {
   const reduceMotion = useReducedMotion()
-  const allowBarAnimation = useRef(!reduceMotion)
-
-  useEffect(() => {
-    allowBarAnimation.current = false
-  }, [])
+  const animateBars = !reduceMotion
 
   if (parishes.length === 0) {
     return (
@@ -61,12 +56,12 @@ export function GraceMap({ parishes, maxDisbursed }: GraceMapProps) {
                     parish.strained ? 'bg-oxblood' : 'bg-verdigris',
                   )}
                   initial={
-                    allowBarAnimation.current ? { width: 0 } : { width: `${widthPct}%` }
+                    animateBars ? { width: 0 } : { width: `${widthPct}%` }
                   }
                   animate={{ width: `${widthPct}%` }}
                   transition={{
                     ...PAGE_TRANSITION,
-                    delay: allowBarAnimation.current ? i * 0.04 : 0,
+                    delay: animateBars ? i * 0.04 : 0,
                   }}
                 />
               </div>

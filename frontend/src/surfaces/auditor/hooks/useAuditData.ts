@@ -60,8 +60,32 @@ export function useAuditData(): AuditData {
   }, [])
 
   useEffect(() => {
-    load()
-  }, [load])
+    let cancelled = false
+    void (async () => {
+      try {
+        const [auditChain, cases, parishes] = await Promise.all([
+          mockApi.getAuditChain(),
+          mockApi.listCases(),
+          mockApi.listParishes(),
+        ])
+        if (cancelled) return
+        const parishByCase = new Map(
+          cases.map((c) => [c.id, c.parishId]),
+        )
+        setChain(auditChain)
+        setDisplayed(presentAuditChain(auditChain, parishByCase, parishes))
+        const result = await mockApi.verifyChainIntegrity()
+        if (cancelled) return
+        setIntegrity(result)
+        setLastCheckedAt(new Date())
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return {
     chain,

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronDown, Search, ShieldCheck } from 'lucide-react'
+import { FaChevronDown, FaMagnifyingGlass, FaShieldHalved } from 'react-icons/fa6'
 import { isWithinInterval, parseISO } from 'date-fns'
 import { useAuditData } from './hooks/useAuditData'
 import { VERIFY_SNIPPET, type AuditDisplayEntry, type AuditEntryType } from '../../lib/auditor/present'
@@ -58,7 +58,7 @@ function ExplorerRow({
         onClick={onToggle}
         className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-parchment-soft/60 transition-colors"
       >
-        <ChevronDown
+        <FaChevronDown
           className={cn(
             'w-4 h-4 text-slate shrink-0 transition-transform',
             expanded && 'rotate-180',
@@ -72,7 +72,7 @@ function ExplorerRow({
         </span>
         <span className="text-xs text-slate shrink-0">{entry.timeAgo}</span>
         {entry.verified && (
-          <ShieldCheck className="w-4 h-4 text-verdigris shrink-0" aria-label="Verified link" />
+          <FaShieldHalved className="w-4 h-4 text-verdigris shrink-0" aria-label="Verified link" />
         )}
       </button>
 
@@ -107,7 +107,7 @@ function ExplorerRow({
               <dt className="mono-tag mb-1">Payload (redacted)</dt>
               <dd>
                 <pre
-                  className="font-mono text-[0.7rem] bg-bone border border-hairline rounded-frame p-3 overflow-x-auto text-ink"
+                  className="font-mono text-[0.7rem] bg-bone border border-hairline rounded-xl p-3 overflow-x-auto text-ink"
                   style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
                 >
                   {JSON.stringify(entry.redactedPayload, null, 2)}
@@ -131,7 +131,7 @@ function ExplorerRow({
 
           {showVerify && (
             <pre
-              className="mt-3 font-mono text-[0.68rem] bg-ink text-bone rounded-frame p-4 overflow-x-auto leading-relaxed"
+              className="mt-3 font-mono text-[0.68rem] bg-ink text-bone rounded-xl p-4 overflow-x-auto leading-relaxed"
               style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
             >
               {VERIFY_SNIPPET.replace(
@@ -221,7 +221,7 @@ export function ChainExplorer() {
 
       <div className="frame p-4 mb-4 space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" aria-hidden />
+          <FaMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" aria-hidden />
           <input
             type="search"
             placeholder="Search hash, type, parish, role…"
@@ -230,14 +230,14 @@ export function ChainExplorer() {
               setQuery(e.target.value)
               setHashJump('')
             }}
-            className="w-full pl-10 pr-3 py-2.5 text-sm bg-bone border border-hairline rounded-frame focus:outline-none focus:border-verdigris/50"
+            className="w-full pl-10 pr-3 py-2.5 text-sm bg-bone border border-hairline rounded-xl focus:outline-none focus:border-verdigris/50"
           />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as AuditEntryType | 'all')}
-            className="text-sm bg-bone border border-hairline rounded-frame px-2 py-2"
+            className="text-sm bg-bone border border-hairline rounded-xl px-2 py-2"
           >
             {ENTRY_TYPES.map((t) => (
               <option key={t.value} value={t.value}>
@@ -248,7 +248,7 @@ export function ChainExplorer() {
           <select
             value={parishFilter}
             onChange={(e) => setParishFilter(e.target.value)}
-            className="text-sm bg-bone border border-hairline rounded-frame px-2 py-2"
+            className="text-sm bg-bone border border-hairline rounded-xl px-2 py-2"
           >
             <option value="all">All parishes</option>
             {parishes.map((p) => (
@@ -261,14 +261,14 @@ export function ChainExplorer() {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="text-sm bg-bone border border-hairline rounded-frame px-2 py-2"
+            className="text-sm bg-bone border border-hairline rounded-xl px-2 py-2"
             aria-label="From date"
           />
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="text-sm bg-bone border border-hairline rounded-frame px-2 py-2"
+            className="text-sm bg-bone border border-hairline rounded-xl px-2 py-2"
             aria-label="To date"
           />
         </div>
@@ -278,7 +278,7 @@ export function ChainExplorer() {
             <span className="font-mono text-verdigris">{hashJump.slice(0, 12)}…</span>
             <button
               type="button"
-              className="ml-2 text-oxblood underline"
+              className="ml-2 text-verdigris underline"
               onClick={() => setHashJump('')}
             >
               Clear

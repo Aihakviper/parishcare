@@ -6,7 +6,7 @@ const tones: Record<Tone, string> = {
   default: 'border-hairline text-slate bg-parchment-soft',
   success: 'border-verdigris/30 text-verdigris bg-verdigris/5',
   warning: 'border-gilt/40 text-gilt bg-gilt/10',
-  accent: 'border-oxblood/30 text-oxblood bg-oxblood/5',
+  accent: 'border-seafoam/30 text-verdigris bg-verdigris-light',
 }
 
 export function Badge({

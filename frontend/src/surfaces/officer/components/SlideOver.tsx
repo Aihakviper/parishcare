@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { FaXmark } from 'react-icons/fa6'
 import { useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { cn } from '../../../lib/cn'
@@ -45,7 +45,7 @@ export function SlideOver({
         aria-modal
         aria-labelledby="slideover-title"
         className={cn(
-          'relative w-full max-w-[480px] h-full bg-parchment border-l border-hairline flex flex-col shadow-frame',
+          'relative w-full max-w-[480px] h-full bg-bone border-l border-hairline/80 flex flex-col shadow-lift',
           className,
         )}
         initial={{ x: reduceMotion ? 0 : '100%' }}
@@ -53,9 +53,9 @@ export function SlideOver({
         exit={{ x: reduceMotion ? 0 : '100%' }}
         transition={reduceMotion ? { duration: 0 } : PAGE_TRANSITION}
       >
-        <header className="flex items-start justify-between gap-3 p-5 border-b border-oxblood/20 bg-parchment-soft">
+        <header className="flex items-start justify-between gap-3 p-5 border-b border-hairline/60 bg-verdigris-light/40">
           <div>
-            <p className="eyebrow text-oxblood">Officer</p>
+            <p className="eyebrow text-verdigris">Officer</p>
             <h2 id="slideover-title" className="display-tight text-xl font-semibold text-ink mt-1">
               {title}
             </h2>
@@ -64,10 +64,10 @@ export function SlideOver({
           <button
             type="button"
             onClick={close}
-            className="p-2 text-slate hover:text-ink rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+            className="p-2 text-slate hover:text-ink rounded-pill focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
             aria-label="Close panel"
           >
-            <X className="w-5 h-5" />
+            <FaXmark className="w-5 h-5" />
           </button>
         </header>
         <div className="flex-1 overflow-y-auto p-5">{children}</div>

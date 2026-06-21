@@ -22,7 +22,7 @@ export function RoleToast() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={PAGE_TRANSITION}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] max-w-[calc(100vw-2rem)] px-4 py-2.5 bg-ink text-bone text-sm font-medium rounded-frame shadow-frame text-center"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] max-w-[calc(100vw-2rem)] px-4 py-2.5 bg-ink text-bone text-sm font-medium rounded-pill shadow-frame text-center"
           role="status"
           aria-live="polite"
         >

@@ -10,30 +10,27 @@ interface BudgetDonutProps {
 
 export function BudgetDonut({ percentUsed, label = 'Budget used' }: BudgetDonutProps) {
   const reduceMotion = useReducedMotion()
-  const hasAnimated = useRef(false)
-  const [displayPct, setDisplayPct] = useState(reduceMotion ? percentUsed : 0)
-  const [animDone, setAnimDone] = useState(reduceMotion)
+  const isFirstRender = useRef(true)
+  const [displayPct, setDisplayPct] = useState(() => (reduceMotion ? percentUsed : 0))
+  const [animDone, setAnimDone] = useState(() => Boolean(reduceMotion))
 
   useEffect(() => {
-    if (hasAnimated.current) {
-      setDisplayPct(percentUsed)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      if (!reduceMotion) {
+        const show = window.setTimeout(() => setDisplayPct(percentUsed), 60)
+        const done = window.setTimeout(() => setAnimDone(true), 780)
+        return () => {
+          window.clearTimeout(show)
+          window.clearTimeout(done)
+        }
+      }
       return
     }
-    hasAnimated.current = true
-    if (reduceMotion) {
-      setDisplayPct(percentUsed)
-      setAnimDone(true)
-      return
-    }
-    const show = window.setTimeout(() => setDisplayPct(percentUsed), 60)
-    const done = window.setTimeout(() => setAnimDone(true), 780)
-    return () => {
-      window.clearTimeout(show)
-      window.clearTimeout(done)
-    }
+    setDisplayPct(percentUsed)
   }, [percentUsed, reduceMotion])
 
-  const data = [{ name: 'used', value: displayPct, fill: '#5B1A1A' }]
+  const data = [{ name: 'used', value: displayPct, fill: '#2A6B5A' }]
 
   return (
     <div
@@ -53,7 +50,7 @@ export function BudgetDonut({ percentUsed, label = 'Budget used' }: BudgetDonutP
           endAngle={-270}
         >
           <RadialBar
-            background={{ fill: '#EFE9DA' }}
+            background={{ fill: '#E8F5F1' }}
             dataKey="value"
             cornerRadius={4}
             max={100}
@@ -63,7 +60,7 @@ export function BudgetDonut({ percentUsed, label = 'Budget used' }: BudgetDonutP
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span className="display-tight text-2xl font-semibold text-oxblood tabular-nums">
+        <span className="display-tight text-2xl font-semibold text-verdigris tabular-nums">
           {displayPct}%
         </span>
         <span className="mono-tag text-[0.55rem] text-center leading-tight px-1">

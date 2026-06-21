@@ -20,7 +20,7 @@ export function PatternsPanel({ patterns }: PatternsPanelProps) {
               <p className="italic-serif text-sm text-slate leading-relaxed">{p.text}</p>
               <button
                 type="button"
-                className="text-xs text-oxblood font-medium mt-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+                className="text-xs text-verdigris font-medium mt-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
                 onClick={() => {}}
               >
                 → Open the data

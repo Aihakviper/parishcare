@@ -35,7 +35,7 @@ export function OfficerQueue() {
           The queue is clear. Take fifteen minutes.
         </p>
         <p className="display text-base sm:text-lg text-ink mt-8 text-left leading-relaxed">
-          <span className="float-left display text-5xl text-oxblood mr-3 mt-1 leading-none">
+          <span className="float-left display text-5xl text-verdigris mr-3 mt-1 leading-none">
             W
           </span>
           hen the waiting bench is empty, it is not idleness — it is the rare gift of a parish
@@ -48,20 +48,16 @@ export function OfficerQueue() {
 
   return (
     <div data-tour="officer-queue">
-      <header className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div>
-            <EyebrowLabel>I · Today&apos;s care</EyebrowLabel>
-            <h1 className="display-tight text-2xl sm:text-3xl font-semibold text-ink mt-2">
-              {countToHeadingWord(pending || cases.length)} families need a hand.
-            </h1>
-          </div>
-          <p className="mono-tag sm:text-right shrink-0">
-            Officer · {officerName} · RCCG {parishShort}
-          </p>
-        </div>
+      <header className="mb-10 sm:mb-12 text-center sm:text-left">
+        <EyebrowLabel className="text-seafoam">I · Today&apos;s care</EyebrowLabel>
+        <h1 className="display-tight text-3xl sm:text-4xl font-semibold text-ink mt-3 leading-tight">
+          {countToHeadingWord(pending || cases.length)} families need a hand.
+        </h1>
+        <p className="text-sm text-slate mt-3 max-w-xl sm:max-w-none mx-auto sm:mx-0">
+          Officer · {officerName} · RCCG {parishShort}
+        </p>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4 pt-4 border-t border-hairline text-sm text-slate">
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 mt-6 pt-6 border-t border-hairline/60 text-sm text-slate">
           <span>
             <strong className="text-ink">{pending}</strong> pending
           </span>
@@ -72,7 +68,7 @@ export function OfficerQueue() {
             <strong className="text-ink">{escalated}</strong> escalated
           </span>
           <span className="text-hairline hidden sm:inline">|</span>
-          <span className="mono-tag normal-case">sorted by priority ▼</span>
+          <span className="mono-tag normal-case text-slate/80">sorted by priority ▼</span>
         </div>
       </header>
 
@@ -82,7 +78,7 @@ export function OfficerQueue() {
             The queue is clear. Take fifteen minutes.
           </p>
           <p className="display text-base text-ink mt-6 text-left leading-relaxed">
-            <span className="float-left display text-5xl text-oxblood mr-3 mt-1 leading-none">
+            <span className="float-left display text-5xl text-verdigris mr-3 mt-1 leading-none">
               W
             </span>
             hen the waiting bench is empty, it is not idleness — it is the rare gift of a parish

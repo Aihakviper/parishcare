@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppLayout } from './layout'
-import { getRole, type StewardRole } from '../lib/roles'
+import type { StewardRole } from '../lib/roles'
 import { useSessionStore } from '../store/session'
 import { OfficerRoutes } from '../surfaces/officer/routes'
 import { PastorRoutes } from '../surfaces/pastor/routes'
@@ -47,8 +47,4 @@ export function AppRoutes() {
       </Routes>
     </>
   )
-}
-
-export function roleHomePath(role: StewardRole): string {
-  return getRole(role).homePath
 }

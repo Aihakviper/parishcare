@@ -18,7 +18,7 @@ interface QueueRowProps {
 }
 
 const bandStyles = {
-  high: 'bg-oxblood/10 text-oxblood border-oxblood/30',
+  high: 'bg-verdigris-light text-verdigris border-verdigris/25',
   medium: 'bg-gilt/15 text-gilt border-gilt/40',
   low: 'bg-parchment-soft text-slate border-hairline',
 }
@@ -37,9 +37,9 @@ export function QueueRow({ item }: QueueRowProps) {
         type="button"
         onClick={() => navigate(`/officer/case/${item.id}`)}
         className={cn(
-          'w-full text-left bg-bone border border-hairline rounded-frame p-4 sm:p-5',
-          'hover:border-gilt transition-colors',
-          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt',
+          'w-full text-left bg-bone border border-hairline/70 rounded-xl p-4 sm:p-5 shadow-card',
+          'hover:shadow-lift hover:border-seafoam/25 transition-all duration-200',
+          'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam',
         )}
       >
         <div className="flex gap-4">

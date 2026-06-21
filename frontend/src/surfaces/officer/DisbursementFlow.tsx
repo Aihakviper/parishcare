@@ -24,7 +24,7 @@ export function DisbursementFlow() {
     amount: number
   } | null>(null)
 
-  const idempotencyKey = `idem-${id}-${Date.now().toString(36)}`
+  const [idempotencyKey] = useState(() => `idem-${id}-${crypto.randomUUID()}`)
 
   if (!welfareCase) return null
 
@@ -63,7 +63,7 @@ export function DisbursementFlow() {
             <p className="display-tight text-xl text-verdigris font-semibold">
               {formatNaira(success.amount)} sent.
             </p>
-            <div className="p-4 border border-hairline rounded-frame bg-bone">
+            <div className="p-4 border border-hairline rounded-xl bg-bone">
               <p className="mono-tag">Audit chain</p>
               <motion.div
                 className="mt-2 h-px bg-verdigris origin-left"
@@ -80,7 +80,7 @@ export function DisbursementFlow() {
             </Button>
           </div>
         ) : blockedByMakerChecker ? (
-          <div className="p-4 border border-oxblood/30 rounded-frame bg-oxblood/5">
+          <div className="p-4 border border-oxblood/30 rounded-xl bg-oxblood/5">
             <p className="text-sm text-ink">
               This case was approved by you. A different officer must execute the
               payment.
@@ -92,7 +92,7 @@ export function DisbursementFlow() {
           </p>
         ) : (
           <div className="space-y-5">
-            <div className="p-4 border border-hairline rounded-frame">
+            <div className="p-4 border border-hairline rounded-xl">
               <p className="mono-tag">Amount</p>
               <p className="display-tight text-2xl font-semibold mt-1">
                 {formatNaira(amount)}

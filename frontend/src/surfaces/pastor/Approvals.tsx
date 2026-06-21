@@ -44,7 +44,26 @@ export function PastorApprovals() {
   }
 
   useEffect(() => {
-    load()
+    let cancelled = false
+    void (async () => {
+      try {
+        const c = await mockApi.getCase(HERO_CASE_ID)
+        if (!c || cancelled) return
+        setWelfareCase(c)
+        const [b, parishes] = await Promise.all([
+          mockApi.getBeneficiary(c.beneficiaryId),
+          mockApi.listParishes(),
+        ])
+        if (cancelled) return
+        setBeneficiary(b)
+        setParish(parishes.find((p) => p.id === c.parishId) ?? null)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -53,9 +72,11 @@ export function PastorApprovals() {
       clearPendingAction()
       return
     }
-    setReason(SAMPLE_REASON)
-    setAcknowledged(true)
-    const t = window.setTimeout(() => {
+    const prep = window.setTimeout(() => {
+      setReason(SAMPLE_REASON)
+      setAcknowledged(true)
+    }, 0)
+    const approve = window.setTimeout(() => {
       void (async () => {
         setBusy(true)
         try {
@@ -72,7 +93,10 @@ export function PastorApprovals() {
         }
       })()
     }, 600)
-    return () => window.clearTimeout(t)
+    return () => {
+      window.clearTimeout(prep)
+      window.clearTimeout(approve)
+    }
   }, [pendingAction, welfareCase, parish, clearPendingAction])
 
   const handleApprove = async () => {
@@ -185,7 +209,7 @@ export function PastorApprovals() {
                 rows={4}
                 placeholder="Why are you approving or declining?"
                 disabled={welfareCase.status !== 'escalated' || (tourActive && busy)}
-                className="mt-1.5 w-full border border-hairline bg-bone rounded-frame px-3 py-2.5 text-sm resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+                className="mt-1.5 w-full border border-hairline bg-bone rounded-xl px-3 py-2.5 text-sm resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
               />
             </label>
             <label className="flex items-start gap-2 mt-4 text-sm text-ink cursor-pointer">

@@ -15,14 +15,14 @@ export function ProvincialDashboard() {
 
   return (
     <div>
-      <header className="mb-8">
-        <EyebrowLabel>
+      <header className="mb-10 sm:mb-12 text-center">
+        <EyebrowLabel className="text-seafoam">
           I · {data.provinceLabel} · {data.periodLabel}
         </EyebrowLabel>
-        <h1 className="display-tight text-2xl sm:text-3xl font-semibold text-ink mt-2">
+        <h1 className="display-tight text-3xl sm:text-4xl font-semibold text-ink mt-3 leading-tight max-w-2xl mx-auto">
           Where the body is moving.
         </h1>
-        <div className="mt-5">
+        <div className="mt-6 flex justify-center">
           <HeroStats data={data} />
         </div>
       </header>

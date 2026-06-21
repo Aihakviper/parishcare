@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import type { AuditDisplayEntry } from '../../../lib/auditor/present'
@@ -18,7 +18,7 @@ function blockColor(type: AuditDisplayEntry['entryType']): string {
     case 'approval':
       return 'bg-verdigris/90'
     case 'voucher':
-      return 'bg-gilt'
+      return 'bg-seafoam'
     case 'verification':
       return 'bg-verdigris/75'
     case 'escalation':
@@ -33,11 +33,7 @@ function blockColor(type: AuditDisplayEntry['entryType']): string {
 export function ChainHealthPanel({ entries }: ChainHealthPanelProps) {
   const [active, setActive] = useState<AuditDisplayEntry | null>(null)
   const reduceMotion = useReducedMotion()
-  const allowBlockAnimation = useRef(!reduceMotion)
-
-  useEffect(() => {
-    allowBlockAnimation.current = false
-  }, [])
+  const animateBlocks = !reduceMotion
 
   const blocks = entries.slice(-60)
   const earliest = entries[0]
@@ -62,7 +58,7 @@ export function ChainHealthPanel({ entries }: ChainHealthPanelProps) {
           aria-label="Recent audit chain blocks"
         >
           {blocks.map((entry, i) => {
-            const shouldAnimate = allowBlockAnimation.current
+            const shouldAnimate = animateBlocks
             return (
               <li key={entry.id} className="list-none">
                 <motion.button
@@ -71,7 +67,7 @@ export function ChainHealthPanel({ entries }: ChainHealthPanelProps) {
                   animate={{ scaleY: 1 }}
                   transition={{ ...PAGE_TRANSITION, delay: shouldAnimate ? i * 0.008 : 0 }}
                   className={cn(
-                    'relative shrink-0 w-2.5 sm:w-3 rounded-sm origin-bottom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gilt',
+                    'relative shrink-0 w-2.5 sm:w-3 rounded-sm origin-bottom focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-seafoam',
                     blockColor(entry.entryType),
                     i === blocks.length - 1 && 'ring-1 ring-verdigris ring-offset-1 ring-offset-bone',
                   )}

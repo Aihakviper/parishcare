@@ -8,30 +8,27 @@ interface PriorityGaugeProps {
 
 export function PriorityGauge({ score }: PriorityGaugeProps) {
   const reduceMotion = useReducedMotion()
-  const hasAnimated = useRef(false)
-  const [displayScore, setDisplayScore] = useState(reduceMotion ? score : 0)
-  const [animDone, setAnimDone] = useState(reduceMotion)
+  const isFirstRender = useRef(true)
+  const [displayScore, setDisplayScore] = useState(() => (reduceMotion ? score : 0))
+  const [animDone, setAnimDone] = useState(() => Boolean(reduceMotion))
 
   useEffect(() => {
-    if (hasAnimated.current) {
-      setDisplayScore(score)
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      if (!reduceMotion) {
+        const show = window.setTimeout(() => setDisplayScore(score), 60)
+        const done = window.setTimeout(() => setAnimDone(true), 780)
+        return () => {
+          window.clearTimeout(show)
+          window.clearTimeout(done)
+        }
+      }
       return
     }
-    hasAnimated.current = true
-    if (reduceMotion) {
-      setDisplayScore(score)
-      setAnimDone(true)
-      return
-    }
-    const show = window.setTimeout(() => setDisplayScore(score), 60)
-    const done = window.setTimeout(() => setAnimDone(true), 780)
-    return () => {
-      window.clearTimeout(show)
-      window.clearTimeout(done)
-    }
+    setDisplayScore(score)
   }, [score, reduceMotion])
 
-  const data = [{ name: 'priority', value: displayScore, fill: '#5B1A1A' }]
+  const data = [{ name: 'priority', value: displayScore, fill: '#2A6B5A' }]
 
   return (
     <div className="relative w-36 h-36 mx-auto" role="img" aria-label={`Priority score ${score} out of 100`}>
@@ -47,7 +44,7 @@ export function PriorityGauge({ score }: PriorityGaugeProps) {
           endAngle={-270}
         >
           <RadialBar
-            background={{ fill: '#EFE9DA' }}
+            background={{ fill: '#E8F5F1' }}
             dataKey="value"
             cornerRadius={4}
             max={100}
@@ -57,7 +54,7 @@ export function PriorityGauge({ score }: PriorityGaugeProps) {
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span className="display-tight text-3xl font-semibold text-oxblood tabular-nums">
+        <span className="display-tight text-3xl font-semibold text-verdigris tabular-nums">
           {displayScore}
         </span>
         <span className="mono-tag text-[0.6rem]">/ 100</span>

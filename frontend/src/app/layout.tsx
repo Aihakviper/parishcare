@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { FaBars, FaXmark } from 'react-icons/fa6'
 import { getRole, ROLES } from '../lib/roles'
 import { PAGE_TRANSITION } from '../lib/motion'
 import { useSessionStore } from '../store/session'
 import { RoleSwitcher } from '../components/ui/RoleSwitcher'
+import { StewardMark } from '../components/ui/StewardMark'
 import { StoryTour, StoryTourButton } from '../components/tour/StoryTour'
 import { RoleToast } from '../components/ui/RoleToast'
 import { cn } from '../lib/cn'
@@ -30,79 +31,66 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
-      <header className="sticky top-0 z-50 border-b border-hairline bg-bone/90 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between gap-3 py-3 sm:py-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 bg-oxblood rounded-sm flex items-center justify-center"
-                aria-hidden
-              >
-                <span className="display text-xl sm:text-2xl text-bone leading-none">
-                  S
-                </span>
-              </div>
-              <div className="min-w-0">
-                <p className="eyebrow text-gilt">Steward</p>
-                <p className="display-tight text-base sm:text-lg font-semibold text-ink truncate">
-                  The ledger of grace, kept honest.
-                </p>
-              </div>
-            </div>
+      <header className="sticky top-0 z-50 bg-bone/95 backdrop-blur-md shadow-card border-b border-hairline/60">
+        <div className="max-w-content mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between gap-4 py-4 sm:py-5">
+            <NavLink to="/officer" className="flex items-center gap-3 min-w-0 group">
+              <StewardMark />
+              <span className="display-tight text-lg sm:text-xl font-semibold text-ink tracking-tight group-hover:text-verdigris transition-colors">
+                Steward
+              </span>
+            </NavLink>
+
+            <nav
+              aria-label="Surfaces"
+              className="hidden md:flex items-center gap-1"
+            >
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => {
+                    const target = ROLES.find((r) => r.homePath === item.to)
+                    if (target) setRole(target.id)
+                  }}
+                  className={() =>
+                    cn(
+                      'px-4 py-2 text-sm font-medium rounded-pill transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam',
+                      item.active
+                        ? 'bg-verdigris-light text-verdigris'
+                        : 'text-slate hover:text-ink hover:bg-parchment-soft',
+                    )
+                  }
+                >
+                  {item.short}
+                </NavLink>
+              ))}
+            </nav>
 
             <div className="flex items-center gap-2 shrink-0">
               <RoleSwitcher className="hidden sm:flex" />
               <button
                 type="button"
-                className="sm:hidden p-2.5 rounded-frame border border-hairline bg-bone text-ink min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+                className="md:hidden p-2.5 rounded-pill border border-hairline bg-bone text-ink min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
                 onClick={() => setMobileNavOpen((o) => !o)}
                 aria-expanded={mobileNavOpen}
                 aria-controls="mobile-surface-nav"
                 aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
               >
                 {mobileNavOpen ? (
-                  <X className="w-5 h-5" aria-hidden />
+                  <FaXmark className="w-5 h-5" aria-hidden />
                 ) : (
-                  <Menu className="w-5 h-5" aria-hidden />
+                  <FaBars className="w-5 h-5" aria-hidden />
                 )}
               </button>
             </div>
           </div>
 
-          {/* Mobile role pills */}
           <div className="sm:hidden pb-3">
             <RoleSwitcher />
           </div>
-
-          {/* Desktop surface nav */}
-          <nav
-            aria-label="Surfaces"
-            className="hidden sm:flex gap-1 overflow-x-auto pb-0 -mb-px scrollbar-none"
-          >
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => {
-                  const target = ROLES.find((r) => r.homePath === item.to)
-                  if (target) setRole(target.id)
-                }}
-                className={() =>
-                  cn(
-                    'px-3 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt',
-                    item.active
-                      ? 'border-oxblood text-oxblood'
-                      : 'border-transparent text-slate hover:text-ink',
-                  )
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
         </div>
 
-        {/* Mobile hamburger drawer */}
         <AnimatePresence>
           {mobileNavOpen && (
             <motion.nav
@@ -111,10 +99,10 @@ export function AppLayout() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={PAGE_TRANSITION}
-              className="sm:hidden border-t border-hairline bg-bone overflow-hidden"
+              className="md:hidden border-t border-hairline/60 bg-bone overflow-hidden"
               aria-label="Surfaces"
             >
-              <ul className="max-w-6xl mx-auto px-4 py-2">
+              <ul className="max-w-content mx-auto px-4 py-2">
                 {navItems.map((item) => (
                   <li key={item.to}>
                     <NavLink
@@ -126,8 +114,8 @@ export function AppLayout() {
                       }}
                       className={() =>
                         cn(
-                          'block py-3 text-sm font-medium border-b border-hairline/60 last:border-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt',
-                          item.active ? 'text-oxblood' : 'text-slate',
+                          'block py-3.5 text-sm font-medium border-b border-hairline/50 last:border-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam',
+                          item.active ? 'text-verdigris' : 'text-slate',
                         )
                       }
                     >
@@ -141,16 +129,16 @@ export function AppLayout() {
         </AnimatePresence>
       </header>
 
-      <div className="bg-parchment-soft border-b border-hairline">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2">
-          <p className="italic-serif text-xs sm:text-sm text-slate max-w-3xl">
+      <div className="border-b border-hairline/40 bg-verdigris-light/30">
+        <div className="max-w-content mx-auto px-4 sm:px-6 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <p className="italic-serif text-xs sm:text-sm text-slate">
             {ANCHOR_VERSE}
           </p>
-          <p className="mono-tag mt-1">{current.contextLabel}</p>
+          <p className="mono-tag text-[0.62rem] sm:text-right">{current.contextLabel}</p>
         </div>
       </div>
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 min-w-0">
+      <main className="flex-1 max-w-content w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 min-w-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={`${role}-${location.pathname}`}
@@ -164,12 +152,12 @@ export function AppLayout() {
         </AnimatePresence>
       </main>
 
-      <footer className="border-t border-hairline bg-parchment-soft mt-auto">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 text-center sm:text-left">
+      <footer className="border-t border-hairline/60 bg-bone mt-auto">
+        <div className="max-w-content mx-auto px-4 sm:px-6 py-8 text-center">
           <p className="text-xs text-slate font-medium tracking-wide">
             Built for the Kingdom Hackathon · 2026
           </p>
-          <p className="italic-serif text-xs sm:text-sm text-slate mt-2 max-w-xl">
+          <p className="italic-serif text-sm text-slate mt-3 max-w-md mx-auto leading-relaxed">
             {ANCHOR_VERSE}
           </p>
         </div>

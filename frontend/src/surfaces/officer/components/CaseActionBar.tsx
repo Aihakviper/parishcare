@@ -60,7 +60,10 @@ export function CaseActionBar({
       clearPendingAction()
       return
     }
-    void handleEscalate()
+    const t = window.setTimeout(() => {
+      void handleEscalate()
+    }, 0)
+    return () => window.clearTimeout(t)
   }, [pendingAction, welfareCase.status, handleEscalate, clearPendingAction])
 
   const handleApprove = async () => {
@@ -110,7 +113,7 @@ export function CaseActionBar({
               value={declineReason}
               onChange={(e) => setDeclineReason(e.target.value)}
               placeholder="Written reason for declining"
-              className="flex-1 border border-hairline rounded-frame px-3 py-2 text-sm"
+              className="flex-1 border border-hairline rounded-xl px-3 py-2 text-sm"
             />
             <Button variant="secondary" onClick={handleDecline} disabled={busy}>
               Confirm decline
@@ -137,7 +140,7 @@ export function CaseActionBar({
               {!approveCheck.allowed && canDo(role, 'approve').allowed && (
                 <div
                   role="tooltip"
-                  className="pointer-events-none absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-3 bg-ink text-bone text-xs rounded-frame shadow-frame z-10"
+                  className="pointer-events-none absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-3 bg-ink text-bone text-xs rounded-xl shadow-frame z-10"
                 >
                   {formatNaira(amount)} exceeds your {formatNaira(LIMITS.OFFICER_APPROVE_MAX)}{' '}
                   limit. Escalate to your pastor.
