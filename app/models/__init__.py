@@ -1,4 +1,13 @@
-"""SQLAlchemy domain models.
+from app.models.beneficiary import Beneficiary, PhoneHistory
+from app.models.enums import UserRole, VerificationStatus
+from app.models.parish import Parish
+from app.models.user import User
 
-User, role, parish, and beneficiary models will be added in the next phase.
-"""
+__all__ = [
+    "Beneficiary",
+    "Parish",
+    "PhoneHistory",
+    "User",
+    "UserRole",
+    "VerificationStatus",
+]

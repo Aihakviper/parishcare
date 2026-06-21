@@ -1,5 +1,10 @@
-from sqlalchemy import MetaData
-from sqlalchemy.orm import DeclarativeBase
+from datetime import datetime
+from typing import Optional
+from uuid import UUID, uuid4
+
+from sqlalchemy import DateTime, MetaData, func
+from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
@@ -14,5 +19,30 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
-# Import model modules here once they are introduced so Alembic can discover
-# their metadata.
+class UUIDPrimaryKeyMixin:
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+    )
+
+
+class TimestampMixin:
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+class SoftDeleteMixin:
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
