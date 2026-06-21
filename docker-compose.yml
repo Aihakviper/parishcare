@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      PARISHCARE_APP_NAME: ${PARISHCARE_APP_NAME:-ParishCare MercyFlow API}
+      PARISHCARE_APP_ENV: ${PARISHCARE_APP_ENV:-development}
+      PARISHCARE_DEBUG: ${PARISHCARE_DEBUG:-true}
+      PARISHCARE_API_V1_PREFIX: ${PARISHCARE_API_V1_PREFIX:-/api/v1}
+      PARISHCARE_DATABASE_URL: ${PARISHCARE_DATABASE_URL:-postgresql+asyncpg://parishcare:change-me@db:5432/parishcare}
+      PARISHCARE_JWT_SECRET_KEY: ${PARISHCARE_JWT_SECRET_KEY:-replace-with-a-long-random-secret}
+      PARISHCARE_JWT_ALGORITHM: ${PARISHCARE_JWT_ALGORITHM:-HS256}
+      PARISHCARE_ACCESS_TOKEN_EXPIRE_MINUTES: ${PARISHCARE_ACCESS_TOKEN_EXPIRE_MINUTES:-15}
+      PARISHCARE_REFRESH_TOKEN_EXPIRE_DAYS: ${PARISHCARE_REFRESH_TOKEN_EXPIRE_DAYS:-7}
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-parishcare}
+      POSTGRES_USER: ${POSTGRES_USER:-parishcare}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-parishcare} -d ${POSTGRES_DB:-parishcare}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
