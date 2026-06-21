@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-parchment text-ink font-sans text-base leading-relaxed;
+  }
+
+  ::selection {
+    @apply bg-oxblood/15 text-ink;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .display {
+    font-family: theme('fontFamily.display');
+    font-variation-settings: 'opsz' 144, 'SOFT' 50;
+    font-optical-sizing: auto;
+  }
+
+  .display-tight {
+    font-family: theme('fontFamily.display');
+    font-variation-settings: 'opsz' 144, 'SOFT' 0;
+    letter-spacing: -0.018em;
+    font-optical-sizing: auto;
+  }
+
+  .italic-serif {
+    font-family: theme('fontFamily.display');
+    font-style: italic;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100;
+    font-optical-sizing: auto;
+  }
+
+  .eyebrow {
+    @apply font-sans font-semibold text-[0.7rem] uppercase tracking-wider-em text-slate;
+  }
+
+  .mono-tag {
+    @apply font-mono text-[0.68rem] tracking-[0.06em] uppercase text-slate;
+  }
+
+  .gilt-rule {
+    @apply relative h-px w-full bg-hairline;
+  }
+
+  .gilt-rule::before {
+    content: '';
+    @apply absolute left-0 top-0 h-px w-14 bg-gilt;
+  }
+
+  .frame {
+    @apply bg-bone border border-hairline rounded-frame;
+  }
+
+  .frame-bar {
+    @apply flex items-center gap-3 bg-parchment-soft border-b border-hairline px-4 py-2.5 rounded-t-frame;
+  }
+
+  .frame-bar::before {
+    content: '···';
+    @apply font-mono text-[0.5rem] tracking-[0.3em] text-hairline;
+    letter-spacing: 0.3em;
+  }
+
+  .tour-highlight {
+    position: relative;
+    z-index: 100 !important;
+  }
+}
