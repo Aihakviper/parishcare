@@ -64,8 +64,8 @@ export function SlideOver({
           <button
             type="button"
             onClick={close}
-            className="p-2 text-slate hover:text-ink rounded-sm"
-            aria-label="Close"
+            className="p-2 text-slate hover:text-ink rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
+            aria-label="Close panel"
           >
             <X className="w-5 h-5" />
           </button>

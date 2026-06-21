@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SlideOver } from './components/SlideOver'
 import { Button } from '../../components/ui/Button'
@@ -13,7 +13,6 @@ type Step = 1 | 2 | 3
 export function VerificationFlow() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const reduceMotion = useReducedMotion()
   const { welfareCase, beneficiary } = useCaseDetail(id)
   const [step, setStep] = useState<Step>(1)
   const [sendVouch, setSendVouch] = useState(true)
@@ -119,11 +118,7 @@ export function VerificationFlow() {
         )}
 
         {step === 3 && (
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-5"
-          >
+          <div className="space-y-5">
             <div className="p-4 border border-verdigris/40 rounded-frame bg-verdigris/5 text-center">
               <p className="text-verdigris font-semibold">Verification complete.</p>
             </div>
@@ -134,7 +129,7 @@ export function VerificationFlow() {
             <Button onClick={close} className="w-full">
               Return to case
             </Button>
-          </motion.div>
+          </div>
         )}
       </SlideOver>
     </AnimatePresence>

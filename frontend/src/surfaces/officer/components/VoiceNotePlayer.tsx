@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
 import type { PastoralVoiceNote } from '../../../lib/types/domain'
 import { cn } from '../../../lib/cn'
 
@@ -9,12 +8,9 @@ interface VoiceNotePlayerProps {
   autoPlay?: boolean
 }
 
-const BAR_COUNT = 12
-
 export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerProps) {
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
-  const reduceMotion = useReducedMotion()
 
   useEffect(() => {
     if (autoPlay) {
@@ -49,6 +45,11 @@ export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerPr
   const mins = Math.floor(note.durationSeconds / 60)
   const secs = note.durationSeconds % 60
   const durationLabel = `${mins}:${String(secs).padStart(2, '0')}`
+  const playLabel = playing
+    ? 'Pause voice note'
+    : progress > 0 && progress < 100
+      ? 'Resume voice note'
+      : 'Play voice note'
 
   return (
     <div
@@ -62,47 +63,29 @@ export function VoiceNotePlayer({ note, className, autoPlay }: VoiceNotePlayerPr
         <button
           type="button"
           onClick={toggle}
-          className="w-11 h-11 rounded-full bg-oxblood text-bone text-xs font-bold shrink-0"
+          aria-label={playLabel}
+          className="w-11 h-11 rounded-full bg-oxblood text-bone text-xs font-bold shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
         >
           {playing ? 'Pause' : progress > 0 && progress < 100 ? 'Resume' : 'Play'}
         </button>
         <div className="flex-1">
-          {playing && !reduceMotion ? (
-            <div className="flex items-end gap-0.5 h-6" aria-hidden>
-              {Array.from({ length: BAR_COUNT }).map((_, i) => (
-                <motion.span
-                  key={i}
-                  className="w-1 bg-oxblood/80 rounded-full"
-                  animate={{ height: ['30%', '100%', '40%'] }}
-                  transition={{
-                    duration: 0.55 + (i % 4) * 0.1,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    delay: i * 0.05,
-                  }}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="h-1.5 bg-hairline rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-oxblood"
-                style={{ width: `${progress}%` }}
-                layout={!reduceMotion}
-              />
-            </div>
-          )}
+          <div
+            className="h-1.5 bg-hairline rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={Math.round(progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Playback progress"
+          >
+            <div className="h-full bg-oxblood transition-[width] duration-100" style={{ width: `${progress}%` }} />
+          </div>
           <p className="font-mono text-xs text-slate mt-1">{durationLabel}</p>
         </div>
       </div>
       {(playing || progress > 0) && (
-        <motion.p
-          initial={reduceMotion ? false : { opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-4 text-sm text-ink italic border-l-2 border-gilt pl-3"
-        >
+        <p className="mt-4 text-sm text-ink italic border-l-2 border-gilt pl-3">
           &ldquo;{note.transcript}&rdquo;
-        </motion.p>
+        </p>
       )}
     </div>
   )

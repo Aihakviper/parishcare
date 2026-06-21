@@ -189,7 +189,7 @@ export function CaseDetail() {
                 onChange={(e) => setOfficerNotes(e.target.value)}
                 placeholder="What did you observe?"
                 rows={4}
-                className="mt-2 w-full border border-hairline bg-bone rounded-frame px-3 py-2.5 text-sm text-ink resize-none focus:outline focus:outline-2 focus:outline-offset-0 focus:outline-oxblood/30"
+                className="mt-2 w-full border border-hairline bg-bone rounded-frame px-3 py-2.5 text-sm text-ink resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
               />
             </label>
           </section>

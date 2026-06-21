@@ -174,7 +174,7 @@ export function AuditReport() {
                   variant="secondary"
                   onClick={() => openPrintableReport(renderReportHtml(report))}
                 >
-                  <Printer className="w-4 h-4" />
+                  <Printer className="w-4 h-4" aria-hidden />
                   Print / save as PDF
                 </Button>
                 <Button
@@ -183,7 +183,7 @@ export function AuditReport() {
                   className="border border-hairline"
                   onClick={() => downloadReportStub(report)}
                 >
-                  <FileDown className="w-4 h-4" />
+                  <FileDown className="w-4 h-4" aria-hidden />
                   Download report
                 </Button>
               </div>

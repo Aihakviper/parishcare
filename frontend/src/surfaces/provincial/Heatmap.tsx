@@ -4,6 +4,7 @@ import { useProvincialData } from './hooks/useProvincialData'
 import { formatNaira } from '../../lib/formatters'
 import type { ParishAggregate } from '../../lib/provincial/aggregates'
 import { cn } from '../../lib/cn'
+import { EmptyState } from '../../components/ui/EmptyState'
 
 /** Stylized dot positions on a simple Lagos State silhouette (viewBox 0 0 400 320). */
 const DOT_POSITIONS: Record<string, { x: number; y: number }> = {
@@ -38,6 +39,17 @@ export function Heatmap() {
   }
 
   const mapped = data.graceMap.filter((p: ParishAggregate) => DOT_POSITIONS[p.id])
+
+  if (mapped.length === 0) {
+    return (
+      <div>
+        <EyebrowLabel>III · Geographic view</EyebrowLabel>
+        <div className="frame p-6 mt-4">
+          <EmptyState>No families nearby unreached. Rare and good.</EmptyState>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>

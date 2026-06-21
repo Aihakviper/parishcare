@@ -70,7 +70,7 @@ export function StoryTour() {
                       className="p-1 text-slate hover:text-ink shrink-0"
                       aria-label="Exit tour"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4" aria-hidden />
                     </button>
                   </div>
                   <p className="display text-base sm:text-lg text-ink mt-2 leading-snug">
@@ -91,11 +91,11 @@ export function StoryTour() {
                       <Button type="button" variant="secondary" onClick={togglePaused}>
                         {paused ? (
                           <>
-                            <Play className="w-3.5 h-3.5" /> Resume
+                            <Play className="w-3.5 h-3.5" aria-hidden /> Resume
                           </>
                         ) : (
                           <>
-                            <Pause className="w-3.5 h-3.5" /> Pause
+                            <Pause className="w-3.5 h-3.5" aria-hidden /> Pause
                           </>
                         )}
                       </Button>

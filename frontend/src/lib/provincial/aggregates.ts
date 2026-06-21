@@ -1,4 +1,5 @@
 import type { CaseStatus, NeedCategory, Parish } from '../types/domain'
+import { roundKobo } from '../seed/money'
 import { PARISH_IKORODU, PARISH_YABA } from '../seed/parishes'
 
 /** Provincial coordinator jurisdiction — aggregates only, no PII. */
@@ -128,7 +129,7 @@ export function buildProvincialAggregates(
 
   const parishAggregates: ParishAggregate[] = jurisdiction.map((parish) => {
     const parishCases = recentCases.filter((c) => c.parishId === parish.id)
-    const disbursed = effectiveDisbursed(parish)
+    const disbursed = roundKobo(effectiveDisbursed(parish))
     const rate = burnRate(disbursed, parish.monthlyBudgetKobo)
     const avgScore =
       parishCases.length > 0
@@ -150,7 +151,7 @@ export function buildProvincialAggregates(
       province: parish.province,
       monthlyBudgetKobo: parish.monthlyBudgetKobo,
       disbursedKobo: disbursed,
-      budgetRemainingKobo: Math.max(0, parish.monthlyBudgetKobo - disbursed),
+      budgetRemainingKobo: roundKobo(Math.max(0, parish.monthlyBudgetKobo - disbursed)),
       burnRate: rate,
       strained: isStrained(parish.id, rate),
       casesThisMonth: parishCases.length,

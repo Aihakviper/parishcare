@@ -131,7 +131,7 @@ export function PastorApprovals() {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <section className="lg:col-span-5 frame p-5">
+        <section className="lg:col-span-5 frame p-5 order-1">
           <p className="mono-tag">Beneficiary</p>
           <h2 className="display-tight text-2xl font-semibold text-ink mt-1">
             {beneficiary.name}
@@ -153,7 +153,7 @@ export function PastorApprovals() {
           </p>
         </section>
 
-        <section className="lg:col-span-4 frame p-5">
+        <section className="lg:col-span-4 frame p-5 order-2">
           <EyebrowLabel>Steward&apos;s read</EyebrowLabel>
           <div className="mt-4" data-tour="pastor-score">
             <PriorityGauge score={welfareCase.priorityScore} />
@@ -174,7 +174,7 @@ export function PastorApprovals() {
           )}
         </section>
 
-        <section className="lg:col-span-3">
+        <section className="lg:col-span-3 order-3">
           <div className="frame p-5" data-tour="pastor-approve-form">
             <p className="mono-tag">Decision</p>
             <label className="block mt-3">
@@ -185,7 +185,7 @@ export function PastorApprovals() {
                 rows={4}
                 placeholder="Why are you approving or declining?"
                 disabled={welfareCase.status !== 'escalated' || (tourActive && busy)}
-                className="mt-1.5 w-full border border-hairline bg-bone rounded-frame px-3 py-2.5 text-sm resize-none focus:outline focus:outline-2 focus:outline-oxblood/30"
+                className="mt-1.5 w-full border border-hairline bg-bone rounded-frame px-3 py-2.5 text-sm resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt"
               />
             </label>
             <label className="flex items-start gap-2 mt-4 text-sm text-ink cursor-pointer">

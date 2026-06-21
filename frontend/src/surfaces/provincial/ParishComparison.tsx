@@ -4,6 +4,7 @@ import { EyebrowLabel } from '../../components/ui/EyebrowLabel'
 import { useProvincialData } from './hooks/useProvincialData'
 import { Sparkline } from './components/Sparkline'
 import { formatNaira } from '../../lib/formatters'
+import { EmptyState } from '../../components/ui/EmptyState'
 import type { ParishAggregate } from '../../lib/provincial/aggregates'
 import { cn } from '../../lib/cn'
 
@@ -79,6 +80,11 @@ export function ParishComparison() {
       </h1>
 
       <div className="frame table-scroll-fade">
+        {sorted.length === 0 ? (
+          <EmptyState className="py-12">
+            Every parish in the province has reported. A good week.
+          </EmptyState>
+        ) : (
         <table className="w-full text-sm min-w-[720px]">
           <thead>
             <tr className="border-b border-hairline text-left">
@@ -174,6 +180,7 @@ export function ParishComparison() {
             })}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   )

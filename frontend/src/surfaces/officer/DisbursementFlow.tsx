@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { PAGE_TRANSITION } from '../../lib/motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SlideOver } from './components/SlideOver'
 import { Button } from '../../components/ui/Button'
@@ -58,11 +59,7 @@ export function DisbursementFlow() {
     <AnimatePresence>
       <SlideOver title="Disbursement" subtitle="Execute payment" onClose={close}>
         {success ? (
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <p className="display-tight text-xl text-verdigris font-semibold">
               {formatNaira(success.amount)} sent.
             </p>
@@ -70,9 +67,9 @@ export function DisbursementFlow() {
               <p className="mono-tag">Audit chain</p>
               <motion.div
                 className="mt-2 h-px bg-verdigris origin-left"
-                initial={{ scaleX: 0 }}
+                initial={{ scaleX: reduceMotion ? 1 : 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: reduceMotion ? 0 : 0.6 }}
+                transition={reduceMotion ? { duration: 0 } : PAGE_TRANSITION}
               />
               <p className="font-mono text-xs text-ink mt-3 break-all">
                 Chain entry {truncateHash(success.hash)} recorded.
@@ -81,7 +78,7 @@ export function DisbursementFlow() {
             <Button onClick={close} className="w-full">
               Done
             </Button>
-          </motion.div>
+          </div>
         ) : blockedByMakerChecker ? (
           <div className="p-4 border border-oxblood/30 rounded-frame bg-oxblood/5">
             <p className="text-sm text-ink">

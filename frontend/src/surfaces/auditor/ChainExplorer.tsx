@@ -72,7 +72,7 @@ function ExplorerRow({
         </span>
         <span className="text-xs text-slate shrink-0">{entry.timeAgo}</span>
         {entry.verified && (
-          <ShieldCheck className="w-4 h-4 text-verdigris shrink-0" aria-label="Verified" />
+          <ShieldCheck className="w-4 h-4 text-verdigris shrink-0" aria-label="Verified link" />
         )}
       </button>
 
@@ -294,18 +294,20 @@ export function ChainExplorer() {
           </span>
           <span className="font-mono text-[0.65rem] text-slate">SHA-256 linked chain</span>
         </div>
-        <div className="max-h-[32rem] overflow-y-auto">
+        <ul className="max-h-[32rem] overflow-y-auto list-none m-0 p-0" aria-label="Audit chain entries">
           {visible.length === 0 ? (
+            <li className="list-none">
             <EmptyState className="py-12 text-base">
               No entries match your filters. The chain behind them is still whole.
             </EmptyState>
+            </li>
           ) : (
             visible
               .slice()
               .reverse()
               .map((entry) => (
+                <li key={entry.id} className="list-none">
                 <ExplorerRow
-                  key={entry.id}
                   entry={entry}
                   expanded={expandedId === entry.id}
                   onToggle={() =>
@@ -313,9 +315,10 @@ export function ChainExplorer() {
                   }
                   onHashSelect={handleHashSelect}
                 />
+                </li>
               ))
           )}
-        </div>
+        </ul>
       </div>
     </div>
   )
