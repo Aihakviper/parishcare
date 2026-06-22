@@ -63,4 +63,6 @@ from app.schemas.marketplace import (
     JobResponse,
     JobTransition,
     ReviewCreate,
+    PublicArtisanResponse,
+    PublicJobFeedResponse,
 )

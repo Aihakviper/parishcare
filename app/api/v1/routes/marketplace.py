@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import get_current_user
@@ -21,7 +21,11 @@ from app.schemas.marketplace import (
     JobResponse,
     JobTransition,
     ReviewCreate,
+    PublicArtisanResponse,
+    PublicJobFeedResponse,
 )
+from app.models.enums import ArtisanTier
+from app.services.discovery import DiscoveryService
 from app.services.marketplace import MarketplaceService, present_job
 from app.utils.crypto import PIICipher
 
@@ -43,6 +47,75 @@ def job_response(job) -> JobResponse:
     return JobResponse.model_validate(
         present_job(job, PIICipher(settings.pii_encryption_key))
     )
+
+
+@router.get(
+    "/public/artisans",
+    response_model=list[PublicArtisanResponse],
+    summary="Discover verified artisans without exposing private contact data",
+)
+async def discover_artisans(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    query: str | None = None,
+    trade: str | None = None,
+    tier: ArtisanTier | None = None,
+    service_area: str | None = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> list[PublicArtisanResponse]:
+    discovery = DiscoveryService(session)
+    artisans = await discovery.list_artisans(
+        query=query,
+        trade=trade,
+        tier=tier,
+        service_area=service_area,
+        limit=limit,
+    )
+    return [
+        PublicArtisanResponse.model_validate(
+            discovery.present_artisan(artisan)
+        )
+        for artisan in artisans
+    ]
+
+
+@router.get(
+    "/public/artisans/{artisan_id}",
+    response_model=PublicArtisanResponse,
+    summary="Get one verified artisan's public profile",
+)
+async def public_artisan_profile(
+    artisan_id: UUID,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+) -> PublicArtisanResponse:
+    discovery = DiscoveryService(session)
+    return PublicArtisanResponse.model_validate(
+        discovery.present_artisan(
+            await discovery.get_artisan(artisan_id)
+        )
+    )
+
+
+@router.get(
+    "/public/jobs/feed",
+    response_model=list[PublicJobFeedResponse],
+    summary="List anonymized open job requests for artisans",
+)
+async def public_job_feed(
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    trade: str | None = None,
+    service_area: str | None = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> list[PublicJobFeedResponse]:
+    discovery = DiscoveryService(session)
+    jobs = await discovery.job_feed(
+        trade=trade,
+        service_area=service_area,
+        limit=limit,
+    )
+    return [
+        PublicJobFeedResponse.model_validate(discovery.present_job(job))
+        for job in jobs
+    ]
 
 
 @router.post(

@@ -116,3 +116,31 @@ class DisputeResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PublicArtisanResponse(BaseModel):
+    id: UUID
+    name: str
+    trade: str
+    serviceArea: str
+    tier: ArtisanTier
+    trustScore: int
+    completedJobs: int
+    averageRating: float
+    ninVerified: bool
+    availableNow: bool
+    responseMinutes: int
+    photoUrl: str | None
+    workPhotos: list[str]
+    languages: list[str]
+
+
+class PublicJobFeedResponse(BaseModel):
+    id: UUID
+    trade: str
+    description: str
+    serviceArea: str
+    status: JobStatus
+    budgetKobo: int | None
+    distanceKm: float
+    createdAt: datetime

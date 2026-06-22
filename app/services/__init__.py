@@ -22,6 +22,8 @@ from app.services.welfare_request import WelfareRequestService
 from app.services.verification import VerificationService
 from app.services.whatsapp import WhatsAppService
 from app.services.marketplace import MarketplaceService
+from app.services.discovery import DiscoveryService
+from app.services.demo_seed import DemoSeedService
 
 __all__ = [
     "AuthenticationError",
@@ -44,4 +46,6 @@ __all__ = [
     "VerificationService",
     "WhatsAppService",
     "MarketplaceService",
+    "DiscoveryService",
+    "DemoSeedService",
 ]

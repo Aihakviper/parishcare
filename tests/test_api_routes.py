@@ -99,6 +99,9 @@ def test_openapi_exposes_auth_and_management_routes() -> None:
     assert "/api/v1/jobs/{job_id}/reviews" in paths
     assert "/api/v1/jobs/{job_id}/disputes" in paths
     assert "/api/v1/disputes/{dispute_id}/resolve" in paths
+    assert "/api/v1/public/artisans" in paths
+    assert "/api/v1/public/artisans/{artisan_id}" in paths
+    assert "/api/v1/public/jobs/feed" in paths
 
 
 def test_login_returns_token_pair() -> None:
