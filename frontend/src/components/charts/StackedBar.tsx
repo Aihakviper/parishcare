@@ -1,4 +1,4 @@
-/** Chart primitives — implemented in later prompts. */
+/** Simple stacked bar placeholder */
 export function StackedBar() {
   return null
 }

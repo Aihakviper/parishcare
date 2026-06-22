@@ -1,66 +1,77 @@
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
-import { AppLayout } from './layout'
-import type { StewardRole } from '../lib/roles'
+import { ResidentLayout } from './layout-resident'
+import { ArtisanLayout } from './layout-artisan'
+import { ConsoleLayout } from './layout-console'
+import { MarketingLanding } from '../surfaces/marketing/Landing'
+import { ResidentHome } from '../surfaces/resident/Home'
+import { ArtisanHome } from '../surfaces/artisan/Home'
+import { ConsoleOverview } from '../surfaces/console/Overview'
 import { useSessionStore } from '../store/session'
-import { OfficerRoutes } from '../surfaces/officer/routes'
-import { PastorRoutes } from '../surfaces/pastor/routes'
-import { ProvincialRoutes } from '../surfaces/provincial/routes'
-import { AuditorRoutes } from '../surfaces/auditor/routes'
-import { usesBackendApi } from '../lib/api/config'
-import { getRole } from '../lib/roles'
+import type { StewardRole } from '../lib/roles'
 
 function roleFromPath(pathname: string): StewardRole | null {
-  if (pathname.startsWith('/officer')) return 'officer'
-  if (pathname.startsWith('/pastor')) return 'pastor'
-  if (pathname.startsWith('/provincial')) return 'provincial'
-  if (pathname.startsWith('/auditor')) return 'auditor'
+  if (pathname.startsWith('/resident')) return 'resident'
+  if (pathname.startsWith('/artisan')) return 'artisan'
+  if (pathname.startsWith('/console')) return 'console'
   return null
 }
 
 function RoleSync() {
   const location = useLocation()
-  const navigate = useNavigate()
-  const setRole = useSessionStore((s) => s.setRole)
-  const role = useSessionStore((s) => s.role)
+  const syncRole = useSessionStore((s) => s.syncRole)
 
   useEffect(() => {
     const fromPath = roleFromPath(location.pathname)
     if (!fromPath) return
-    if (usesBackendApi) {
-      if (fromPath !== role) {
-        navigate(getRole(role).homePath, { replace: true })
-      }
-      return
+    if (fromPath !== useSessionStore.getState().role) {
+      syncRole(fromPath)
     }
-    const current = useSessionStore.getState().role
-    if (fromPath !== current) {
-      setRole(fromPath)
-    }
-  }, [location.pathname, navigate, role, setRole])
+  }, [location.pathname, syncRole])
 
   return null
 }
+
+function Placeholder({ title }: { title: string }) {
+  return (
+    <p className="italic-serif text-slate py-12 text-center">
+      {title} — coming in the next prompt.
+    </p>
+  )
+}
+
 export function AppRoutes() {
-  const homePath = getRole(useSessionStore((state) => state.role)).homePath
   return (
     <>
       <RoleSync />
       <Routes>
-        <Route path="/" element={<Navigate to={homePath} replace />} />
-        <Route element={<AppLayout />}>
-          <Route path="officer/*" element={<OfficerRoutes />} />
-          <Route path="pastor/*" element={<PastorRoutes />} />
-          <Route path="provincial/*" element={<ProvincialRoutes />} />
-          <Route path="auditor/*" element={<AuditorRoutes />} />
+        <Route path="/" element={<Navigate to="/marketing" replace />} />
+        <Route path="/marketing" element={<MarketingLanding />} />
+
+        <Route element={<ResidentLayout />}>
+          <Route path="resident" element={<ResidentHome />} />
+          <Route path="resident/discover" element={<Placeholder title="Discover" />} />
+          <Route path="resident/jobs" element={<Placeholder title="My jobs" />} />
+          <Route path="resident/me" element={<Placeholder title="Profile" />} />
         </Route>
-        <Route path="*" element={<Navigate to={homePath} replace />} />
+
+        <Route element={<ArtisanLayout />}>
+          <Route path="artisan" element={<ArtisanHome />} />
+          <Route path="artisan/jobs/:id" element={<Placeholder title="Active job" />} />
+          <Route path="artisan/earnings" element={<Placeholder title="Earnings" />} />
+          <Route path="artisan/standing" element={<Placeholder title="Standing" />} />
+          <Route path="artisan/profile" element={<Placeholder title="Profile" />} />
+        </Route>
+
+        <Route element={<ConsoleLayout />}>
+          <Route path="console" element={<ConsoleOverview />} />
+          <Route path="console/artisans" element={<Placeholder title="Artisan registry" />} />
+          <Route path="console/jobs" element={<Placeholder title="All jobs" />} />
+          <Route path="console/disputes" element={<Placeholder title="Disputes" />} />
+          <Route path="console/patterns" element={<Placeholder title="Patterns" />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/marketing" replace />} />
       </Routes>
     </>
   )

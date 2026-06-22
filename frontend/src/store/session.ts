@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { StewardRole } from '../lib/roles'
+import { roleToastMessage } from '../lib/roles'
 
 interface RoleToast {
   message: string
@@ -12,23 +13,26 @@ interface SessionState {
   demoMode: boolean
   roleToast: RoleToast
   setRole: (role: StewardRole, toastMessage?: string) => void
+  syncRole: (role: StewardRole) => void
   setParishId: (id: string) => void
   setDemoMode: (on: boolean) => void
   hideRoleToast: () => void
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
-  role: 'officer',
-  parishId: 'parish-ikorodu-central',
+  role: 'resident',
+  parishId: '',
   demoMode: true,
   roleToast: { message: '', visible: false },
   setRole: (role, toastMessage) =>
-    set((state) => ({
+    set({
       role,
-      roleToast: toastMessage
-        ? { message: toastMessage, visible: true }
-        : state.roleToast,
-    })),
+      roleToast: {
+        message: toastMessage ?? roleToastMessage(role),
+        visible: true,
+      },
+    }),
+  syncRole: (role) => set({ role }),
   setParishId: (parishId) => set({ parishId }),
   setDemoMode: (demoMode) => set({ demoMode }),
   hideRoleToast: () =>

@@ -1,4 +1,4 @@
-/** Chart primitives — implemented in later prompts. */
+/** Simple trend line placeholder */
 export function TrendLine() {
   return null
 }

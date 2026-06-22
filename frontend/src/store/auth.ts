@@ -7,7 +7,9 @@ import type { StewardRole } from '../lib/roles'
 import { useSessionStore } from './session'
 
 function frontendRole(role: BackendUser['role']): StewardRole {
-  return role === 'hq' ? 'provincial' : role
+  if (role === 'officer') return 'resident'
+  if (role === 'pastor') return 'artisan'
+  return 'console'
 }
 
 function applyUserContext(user: BackendUser): void {
