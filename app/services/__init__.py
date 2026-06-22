@@ -7,6 +7,7 @@ from app.services.auth import (
 from app.services.errors import (
     ResourceConflictError,
     ResourceNotFoundError,
+    ServiceValidationError,
     ServiceError,
 )
 from app.services.parish import ParishService
@@ -20,6 +21,7 @@ __all__ = [
     "ParishService",
     "ResourceConflictError",
     "ResourceNotFoundError",
+    "ServiceValidationError",
     "ServiceError",
     "UserService",
 ]

@@ -17,7 +17,11 @@ from app.models.parish import Parish
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.services.audit import AuditService
-from app.services.errors import ResourceConflictError, ResourceNotFoundError
+from app.services.errors import (
+    ResourceConflictError,
+    ResourceNotFoundError,
+    ServiceValidationError,
+)
 from app.utils.crypto import LookupHasher, PIICipher, normalize_email
 
 USER_NAME_CONTEXT = "users.name"
@@ -128,7 +132,9 @@ class UserService:
                 else user.mfa_enabled
             )
             if effective_role in PAYMENT_CAPABLE_ROLES and not effective_mfa:
-                raise ValueError("Payment-capable roles require MFA")
+                raise ServiceValidationError(
+                    "Payment-capable roles require MFA"
+                )
 
             before_state = _audit_state(user)
             if "name" in data.model_fields_set:
@@ -214,9 +220,11 @@ def _validate_assignment(
     parish_id: UUID | None,
 ) -> None:
     if role in PAYMENT_CAPABLE_ROLES and parish_id is None:
-        raise ValueError("Parish roles require a parish")
+        raise ServiceValidationError("Parish roles require a parish")
     if role in {UserRole.HQ, UserRole.AUDITOR} and parish_id is not None:
-        raise ValueError("HQ and auditor users cannot belong to a parish")
+        raise ServiceValidationError(
+            "HQ and auditor users cannot belong to a parish"
+        )
 
 
 def _audit_state(user: User) -> dict[str, object]:

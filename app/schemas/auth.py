@@ -1,7 +1,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.enums import UserRole
 
@@ -11,6 +11,10 @@ class TokenPair(BaseModel):
     refresh_token: str
     token_type: Literal["bearer"] = "bearer"
     expires_in: int
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str = Field(min_length=1)
 
 
 class TokenClaims(BaseModel):

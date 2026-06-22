@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
@@ -55,3 +56,15 @@ class UserUpdate(BaseModel):
         ):
             raise ValueError("Updated user fields cannot be null")
         return self
+
+
+class UserResponse(BaseModel):
+    id: UUID
+    name: str
+    email: EmailStr
+    role: UserRole
+    parish_id: UUID | None
+    mfa_enabled: bool
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
