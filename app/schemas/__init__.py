@@ -8,6 +8,7 @@ from app.schemas.beneficiary import (
     BeneficiaryResponse,
 )
 from app.schemas.errors import ErrorDetail, ErrorResponse
+from app.schemas.disbursement import DisbursementCreate, DisbursementResponse
 from app.schemas.parish import ParishCreate, ParishResponse, ParishUpdate
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from app.schemas.welfare_request import (
@@ -31,6 +32,8 @@ __all__ = [
     "BeneficiaryResponse",
     "ErrorDetail",
     "ErrorResponse",
+    "DisbursementCreate",
+    "DisbursementResponse",
     "ParishCreate",
     "ParishResponse",
     "ParishUpdate",

@@ -10,6 +10,7 @@ def test_phase_two_tables_are_registered() -> None:
     assert set(Base.metadata.tables) == {
         "audit_logs",
         "beneficiaries",
+        "disbursements",
         "parishes",
         "phone_history",
         "users",

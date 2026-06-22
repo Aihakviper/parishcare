@@ -1,10 +1,12 @@
 from app.core.config import Settings, settings
 from app.models.beneficiary import Beneficiary
+from app.models.disbursement import Disbursement
 from app.models.parish import Parish
 from app.models.user import User
 from app.models.welfare_request import WelfareRequest
 from app.schemas.parish import ParishResponse
 from app.schemas.beneficiary import BeneficiaryResponse
+from app.schemas.disbursement import DisbursementResponse
 from app.schemas.user import UserResponse
 from app.schemas.welfare_request import WelfareRequestResponse
 from app.services.parish import CONTACT_NAME_CONTEXT, CONTACT_PHONE_CONTEXT
@@ -12,6 +14,7 @@ from app.services.beneficiary import (
     BENEFICIARY_NAME_CONTEXT,
     BENEFICIARY_PHONE_CONTEXT,
 )
+from app.services.disbursement import DISBURSEMENT_NOTES_CONTEXT
 from app.services.user import USER_EMAIL_CONTEXT, USER_NAME_CONTEXT
 from app.services.welfare_request import (
     DECISION_REASON_CONTEXT,
@@ -67,6 +70,39 @@ def present_beneficiary(
         verification_status=beneficiary.verification_status,
         created_at=beneficiary.created_at,
         updated_at=beneficiary.updated_at,
+    )
+
+
+def present_disbursement(
+    disbursement: Disbursement,
+    *,
+    idempotent_replay: bool,
+    config: Settings = settings,
+) -> DisbursementResponse:
+    cipher = PIICipher(config.pii_encryption_key)
+    return DisbursementResponse(
+        id=disbursement.id,
+        welfare_request_id=disbursement.welfare_request_id,
+        amount_kobo=disbursement.amount_kobo,
+        payment_method=disbursement.payment_method,
+        approved_by=disbursement.approved_by,
+        paid_by=disbursement.paid_by,
+        idempotency_key=disbursement.idempotency_key,
+        rail_reference=disbursement.rail_reference,
+        settlement_status=disbursement.settlement_status,
+        paid_at=disbursement.paid_at,
+        receipt_url=disbursement.receipt_url,
+        notes=(
+            cipher.decrypt(
+                disbursement.notes_encrypted,
+                context=DISBURSEMENT_NOTES_CONTEXT,
+            )
+            if disbursement.notes_encrypted
+            else None
+        ),
+        idempotent_replay=idempotent_replay,
+        created_at=disbursement.created_at,
+        updated_at=disbursement.updated_at,
     )
 
 

@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     verification_voucher_audience: str = Field(min_length=1)
     verification_delivery_channel: Literal["mock"]
 
+    maker_checker_threshold_kobo: int = Field(gt=0)
+    mock_payment_provider_name: str = Field(min_length=1, max_length=50)
+    mock_payment_receipt_base_url: str = Field(min_length=1, max_length=500)
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

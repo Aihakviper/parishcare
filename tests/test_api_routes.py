@@ -11,6 +11,7 @@ from app.db.session import get_db_session
 from app.main import app
 from app.models.enums import UserRole
 from app.models.beneficiary import Beneficiary
+from app.models.disbursement import Disbursement
 from app.models.parish import Parish
 from app.models.user import User
 from app.models.welfare_request import WelfareRequest
@@ -24,6 +25,8 @@ from app.services.beneficiary import (
 )
 from app.models.enums import (
     PriorityBand,
+    PaymentMethod,
+    SettlementStatus,
     VerificationStatus,
     WelfareRequestStatus,
     WelfareRequestType,
@@ -34,6 +37,7 @@ from app.services.verification import (
     VerificationResponseResult,
     VerificationStartResult,
 )
+from app.services.disbursement import DisbursementResult
 from app.utils.crypto import PIICipher
 
 client = TestClient(app)
@@ -83,6 +87,7 @@ def test_openapi_exposes_auth_and_management_routes() -> None:
     assert "/api/v1/welfare-requests/{request_id}/risk-review" in paths
     assert "/api/v1/welfare-requests/{request_id}/verify" in paths
     assert "/api/v1/verification-vouchers/respond" in paths
+    assert "/api/v1/disbursements" in paths
 
 
 def test_login_returns_token_pair() -> None:
@@ -526,3 +531,124 @@ def test_public_voucher_confirmation_response() -> None:
     assert response.status_code == 200
     assert response.json()["outcome"] == "confirmed"
     assert response.json()["welfare_request_status"] == "verified"
+
+
+def build_disbursement(
+    *,
+    welfare_request_id,
+    approved_by,
+    paid_by,
+    idempotency_key,
+) -> Disbursement:
+    cipher = PIICipher(settings.pii_encryption_key)
+    now = datetime.now(timezone.utc)
+    return Disbursement(
+        id=uuid4(),
+        welfare_request_id=welfare_request_id,
+        amount_kobo=1_500_000,
+        payment_method=PaymentMethod.MOCK,
+        approved_by=approved_by,
+        paid_by=paid_by,
+        idempotency_key=idempotency_key,
+        request_fingerprint="f" * 64,
+        rail_reference="mercyflow-mock-reference",
+        settlement_status=SettlementStatus.SETTLED,
+        paid_at=now,
+        receipt_url="https://mock.invalid/receipts/reference",
+        notes_encrypted=cipher.encrypt(
+            "Mock transfer completed",
+            context="disbursements.notes",
+        ),
+        created_at=now,
+        updated_at=now,
+    )
+
+
+def test_execute_disbursement_returns_created_then_replay_status() -> None:
+    parish_id = uuid4()
+    actor = build_actor(UserRole.OFFICER, parish_id)
+    app.dependency_overrides[get_current_user] = lambda: actor
+    request_id = uuid4()
+    idempotency_key = uuid4()
+    disbursement = build_disbursement(
+        welfare_request_id=request_id,
+        approved_by=uuid4(),
+        paid_by=actor.id,
+        idempotency_key=idempotency_key,
+    )
+
+    with patch(
+        "app.api.v1.routes.disbursements.DisbursementService.execute",
+        new=AsyncMock(
+            side_effect=[
+                DisbursementResult(disbursement, False),
+                DisbursementResult(disbursement, True),
+            ]
+        ),
+    ):
+        created = client.post(
+            "/api/v1/disbursements",
+            headers={"Idempotency-Key": str(idempotency_key)},
+            json={
+                "welfare_request_id": str(request_id),
+                "amount_kobo": 1_500_000,
+                "notes": "Mock transfer completed",
+            },
+        )
+        replay = client.post(
+            "/api/v1/disbursements",
+            headers={"Idempotency-Key": str(idempotency_key)},
+            json={
+                "welfare_request_id": str(request_id),
+                "amount_kobo": 1_500_000,
+                "notes": "Mock transfer completed",
+            },
+        )
+
+    assert created.status_code == 201
+    assert created.json()["idempotent_replay"] is False
+    assert created.json()["amount_kobo"] == 1_500_000
+    assert created.json()["notes"] == "Mock transfer completed"
+    assert replay.status_code == 200
+    assert replay.json()["idempotent_replay"] is True
+    assert replay.json()["id"] == created.json()["id"]
+
+
+def test_disbursement_requires_valid_idempotency_key() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+
+    response = client.post(
+        "/api/v1/disbursements",
+        headers={"Idempotency-Key": "not-a-uuid"},
+        json={
+            "welfare_request_id": str(uuid4()),
+            "amount_kobo": 1_500_000,
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+
+
+def test_disbursement_amount_rejects_float() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+
+    response = client.post(
+        "/api/v1/disbursements",
+        headers={"Idempotency-Key": str(uuid4())},
+        json={
+            "welfare_request_id": str(uuid4()),
+            "amount_kobo": 1_500_000.50,
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"

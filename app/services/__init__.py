@@ -6,6 +6,7 @@ from app.services.auth import (
 )
 from app.services.bootstrap import BootstrapService
 from app.services.beneficiary import BeneficiaryService
+from app.services.disbursement import DisbursementService
 from app.services.errors import (
     ResourceConflictError,
     ResourceNotFoundError,
@@ -26,6 +27,7 @@ __all__ = [
     "AuditService",
     "BootstrapService",
     "BeneficiaryService",
+    "DisbursementService",
     "MFARequiredError",
     "ParishService",
     "ResourceConflictError",

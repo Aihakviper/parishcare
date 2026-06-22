@@ -47,3 +47,13 @@ class VerificationChannel(StrEnum):
     MOCK = "mock"
     WHATSAPP = "whatsapp"
     SMS = "sms"
+
+
+class PaymentMethod(StrEnum):
+    MOCK = "mock"
+
+
+class SettlementStatus(StrEnum):
+    PENDING = "pending"
+    SETTLED = "settled"
+    FAILED = "failed"

@@ -46,6 +46,9 @@ def build_test_settings(**overrides: object) -> Settings:
         "verification_voucher_issuer": "test-verification-issuer",
         "verification_voucher_audience": "test-verification-audience",
         "verification_delivery_channel": "mock",
+        "maker_checker_threshold_kobo": 500_000,
+        "mock_payment_provider_name": "mercyflow-mock",
+        "mock_payment_receipt_base_url": "https://mock.invalid/receipts",
     }
     values.update(overrides)
     return Settings(_env_file=None, **values)

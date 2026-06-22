@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from app.models.beneficiary import Beneficiary
     from app.models.user import User
     from app.models.verification import VerificationRequest
+    from app.models.disbursement import Disbursement
 
 
 class WelfareRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -154,4 +155,8 @@ class WelfareRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     verification_requests: Mapped[list[VerificationRequest]] = relationship(
         back_populates="welfare_request"
+    )
+    disbursement: Mapped[Optional[Disbursement]] = relationship(
+        back_populates="welfare_request",
+        uselist=False,
     )
