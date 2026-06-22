@@ -2,23 +2,15 @@ services:
   api:
     build:
       context: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    environment:
-      PARISHCARE_APP_NAME: ${PARISHCARE_APP_NAME:-ParishCare MercyFlow API}
-      PARISHCARE_APP_ENV: ${PARISHCARE_APP_ENV:-development}
-      PARISHCARE_DEBUG: ${PARISHCARE_DEBUG:-true}
-      PARISHCARE_API_V1_PREFIX: ${PARISHCARE_API_V1_PREFIX:-/api/v1}
-      PARISHCARE_DATABASE_URL: ${PARISHCARE_DATABASE_URL:-postgresql+asyncpg://parishcare:change-me@db:5432/parishcare}
-      PARISHCARE_JWT_SECRET_KEY: ${PARISHCARE_JWT_SECRET_KEY:-replace-with-a-long-random-secret}
-      PARISHCARE_JWT_ALGORITHM: ${PARISHCARE_JWT_ALGORITHM:-HS256}
-      PARISHCARE_JWT_ISSUER: ${PARISHCARE_JWT_ISSUER:-parishcare-mercyflow}
-      PARISHCARE_JWT_AUDIENCE: ${PARISHCARE_JWT_AUDIENCE:-parishcare-api}
-      PARISHCARE_ACCESS_TOKEN_EXPIRE_MINUTES: ${PARISHCARE_ACCESS_TOKEN_EXPIRE_MINUTES:-15}
-      PARISHCARE_REFRESH_TOKEN_EXPIRE_DAYS: ${PARISHCARE_REFRESH_TOKEN_EXPIRE_DAYS:-7}
-      PARISHCARE_PII_ENCRYPTION_KEY: ${PARISHCARE_PII_ENCRYPTION_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
-      PARISHCARE_PII_LOOKUP_KEY: ${PARISHCARE_PII_LOOKUP_KEY:-AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=}
+    command: >
+      uvicorn app.main:app
+      --host ${PARISHCARE_API_HOST:?PARISHCARE_API_HOST is required}
+      --port ${PARISHCARE_API_PORT:?PARISHCARE_API_PORT is required}
+      --reload
+    env_file:
+      - .env
     ports:
-      - "8000:8000"
+      - "${PARISHCARE_API_PORT:?PARISHCARE_API_PORT is required}:${PARISHCARE_API_PORT:?PARISHCARE_API_PORT is required}"
     volumes:
       - .:/app
     depends_on:
@@ -27,16 +19,14 @@ services:
 
   db:
     image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-parishcare}
-      POSTGRES_USER: ${POSTGRES_USER:-parishcare}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    env_file:
+      - .env
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:?POSTGRES_PORT is required}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-parishcare} -d ${POSTGRES_DB:-parishcare}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5

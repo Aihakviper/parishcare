@@ -8,6 +8,7 @@ from app.models.enums import UserRole, VerificationStatus
 
 def test_phase_two_tables_are_registered() -> None:
     assert set(Base.metadata.tables) == {
+        "audit_logs",
         "beneficiaries",
         "parishes",
         "phone_history",

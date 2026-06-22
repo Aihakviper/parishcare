@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import pytest
+from pydantic import ValidationError
 
 from app.core.config import Settings
 from app.core.security import (
@@ -12,15 +13,17 @@ from app.core.security import (
     verify_password,
 )
 from app.models.enums import UserRole
+from tests.settings import build_test_settings
 
 
-def build_settings() -> Settings:
-    return Settings(
-        _env_file=None,
-        jwt_secret_key="test-jwt-secret-that-is-at-least-32-characters",
-        jwt_issuer="test-issuer",
-        jwt_audience="test-audience",
-    )
+def test_settings_require_environment_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for field_name in Settings.model_fields:
+        monkeypatch.delenv(f"PARISHCARE_{field_name.upper()}", raising=False)
+
+    with pytest.raises(ValidationError, match="Field required"):
+        Settings(_env_file=None)
 
 
 def test_argon2_password_hashing() -> None:
@@ -37,7 +40,7 @@ def test_password_minimum_length() -> None:
 
 
 def test_create_and_decode_token_pair() -> None:
-    config = build_settings()
+    config = build_test_settings()
     user_id = uuid4()
 
     tokens = create_token_pair(
@@ -64,7 +67,7 @@ def test_create_and_decode_token_pair() -> None:
 
 
 def test_decode_rejects_wrong_token_type() -> None:
-    config = build_settings()
+    config = build_test_settings()
     tokens = create_token_pair(
         subject=uuid4(),
         role=UserRole.AUDITOR,
@@ -81,4 +84,4 @@ def test_decode_rejects_wrong_token_type() -> None:
 
 def test_settings_reject_invalid_encryption_key() -> None:
     with pytest.raises(ValueError, match="exactly 32 bytes"):
-        Settings(_env_file=None, pii_encryption_key="dG9vLXNob3J0")
+        build_test_settings(pii_encryption_key="dG9vLXNob3J0")

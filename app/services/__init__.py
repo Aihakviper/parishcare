@@ -1,3 +1,4 @@
+from app.services.audit import AuditService
 from app.services.auth import (
     AuthenticationError,
     AuthenticationService,
@@ -7,5 +8,6 @@ from app.services.auth import (
 __all__ = [
     "AuthenticationError",
     "AuthenticationService",
+    "AuditService",
     "MFARequiredError",
 ]

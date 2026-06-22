@@ -21,6 +21,7 @@ from app.models.enums import UserRole
 from app.models.types import database_enum
 
 if TYPE_CHECKING:
+    from app.models.audit import AuditLog
     from app.models.parish import Parish
 
 
@@ -63,3 +64,4 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     )
 
     parish: Mapped[Optional[Parish]] = relationship(back_populates="users")
+    audit_logs: Mapped[list[AuditLog]] = relationship(back_populates="actor")

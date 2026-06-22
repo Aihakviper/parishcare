@@ -13,6 +13,7 @@ from app.services.auth import (
     MFARequiredError,
 )
 from app.utils.crypto import LookupHasher, normalize_email
+from tests.settings import build_test_settings
 
 
 class ScalarResult:
@@ -21,15 +22,6 @@ class ScalarResult:
 
     def scalar_one_or_none(self) -> User | None:
         return self._value
-
-
-def build_settings() -> Settings:
-    return Settings(
-        _env_file=None,
-        jwt_secret_key="test-jwt-secret-that-is-at-least-32-characters",
-        jwt_issuer="test-issuer",
-        jwt_audience="test-audience",
-    )
 
 
 def build_user(
@@ -54,7 +46,7 @@ def build_user(
 
 @pytest.mark.asyncio
 async def test_authenticate_and_issue_tokens() -> None:
-    config = build_settings()
+    config = build_test_settings()
     user = build_user(config)
     session = AsyncMock()
     session.execute.return_value = ScalarResult(user)
@@ -72,7 +64,7 @@ async def test_authenticate_and_issue_tokens() -> None:
 
 @pytest.mark.asyncio
 async def test_authenticate_rejects_invalid_credentials() -> None:
-    config = build_settings()
+    config = build_test_settings()
     session = AsyncMock()
     session.execute.return_value = ScalarResult(None)
     service = AuthenticationService(session, config=config)
@@ -83,7 +75,7 @@ async def test_authenticate_rejects_invalid_credentials() -> None:
 
 @pytest.mark.asyncio
 async def test_authenticate_rejects_empty_email_generically() -> None:
-    config = build_settings()
+    config = build_test_settings()
     session = AsyncMock()
     service = AuthenticationService(session, config=config)
 
@@ -95,7 +87,7 @@ async def test_authenticate_rejects_empty_email_generically() -> None:
 
 @pytest.mark.asyncio
 async def test_payment_role_requires_mfa_before_initial_tokens() -> None:
-    config = build_settings()
+    config = build_test_settings()
     user = build_user(
         config,
         role=UserRole.OFFICER,
@@ -121,7 +113,7 @@ async def test_payment_role_requires_mfa_before_initial_tokens() -> None:
 
 @pytest.mark.asyncio
 async def test_refresh_rechecks_user_state() -> None:
-    config = build_settings()
+    config = build_test_settings()
     user = build_user(config)
     session = AsyncMock()
     session.execute.return_value = ScalarResult(user)
