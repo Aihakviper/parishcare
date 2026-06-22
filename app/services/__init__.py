@@ -4,10 +4,22 @@ from app.services.auth import (
     AuthenticationService,
     MFARequiredError,
 )
+from app.services.errors import (
+    ResourceConflictError,
+    ResourceNotFoundError,
+    ServiceError,
+)
+from app.services.parish import ParishService
+from app.services.user import UserService
 
 __all__ = [
     "AuthenticationError",
     "AuthenticationService",
     "AuditService",
     "MFARequiredError",
+    "ParishService",
+    "ResourceConflictError",
+    "ResourceNotFoundError",
+    "ServiceError",
+    "UserService",
 ]
