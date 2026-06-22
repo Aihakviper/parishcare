@@ -106,4 +106,57 @@
   .tier-steward {
     @apply tier-pill bg-gilt/15 text-ink border-gilt/40;
   }
+
+  /* Guild-inspired marketing polish */
+  .nav-pill {
+    @apply bg-bone/95 backdrop-blur-md rounded-pill border border-hairline/80 shadow-nav;
+  }
+
+  .trust-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-pill bg-bone border border-hairline text-xs font-medium text-slate;
+  }
+
+  .btn-pill {
+    @apply inline-flex items-center justify-center gap-2 min-h-[44px] font-semibold rounded-pill transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt;
+  }
+
+  .btn-pill-primary {
+    @apply bg-verdigris text-bone hover:bg-oxblood border border-verdigris hover:border-oxblood shadow-frame;
+  }
+
+  .btn-pill-secondary {
+    @apply bg-parchment-soft text-ink border border-hairline hover:border-verdigris/40 hover:shadow-frame;
+  }
+
+  .role-tabs {
+    @apply flex p-1 rounded-pill bg-bone border border-hairline shadow-frame;
+  }
+
+  .role-tab {
+    @apply flex-1 px-3 py-2.5 text-sm font-semibold rounded-pill text-slate transition-colors min-h-[44px];
+  }
+
+  .role-tab-active {
+    @apply bg-ink text-bone;
+  }
+
+  .check-circle {
+    @apply flex items-center justify-center w-6 h-6 rounded-full bg-verdigris/15 text-verdigris;
+  }
+
+  .testimonial-card {
+    @apply rounded-card text-bone relative overflow-hidden;
+    background: linear-gradient(145deg, theme('colors.verdigris') 0%, theme('colors.oxblood-deep') 100%);
+  }
+
+  .testimonial-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
 }

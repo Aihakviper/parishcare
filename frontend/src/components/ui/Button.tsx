@@ -9,9 +9,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-oxblood text-bone hover:bg-oxblood-deep border border-oxblood shadow-frame',
+    'bg-verdigris text-bone hover:bg-oxblood border border-verdigris hover:border-oxblood shadow-frame',
   secondary:
-    'bg-bone text-ink border border-hairline hover:border-oxblood/30 hover:shadow-frame',
+    'bg-bone text-ink border border-hairline hover:border-verdigris/40 hover:shadow-frame',
   ghost: 'bg-transparent text-slate hover:text-ink border border-transparent',
 }
 

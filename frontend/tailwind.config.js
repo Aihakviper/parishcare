@@ -29,10 +29,13 @@ export default {
       },
       borderRadius: {
         frame: '6px',
+        pill: '9999px',
+        card: '24px',
       },
       boxShadow: {
         frame: '0 2px 12px rgba(28, 28, 28, 0.06)',
         lift: '0 4px 20px rgba(28, 28, 28, 0.08)',
+        nav: '0 2px 24px rgba(28, 28, 28, 0.07)',
       },
       keyframes: {
         'bayo-breathe': {

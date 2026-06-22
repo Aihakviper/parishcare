@@ -1,19 +1,19 @@
 export function TranscriptBubble({
-  speaker,
-  children,
+  role,
+  text,
 }: {
-  speaker: 'bayo' | 'user'
-  children: React.ReactNode
+  role: 'bayo' | 'user'
+  text: string
 }) {
   return (
     <p
       className={
-        speaker === 'bayo'
+        role === 'bayo'
           ? 'italic-serif text-gilt text-sm leading-relaxed'
-          : 'text-ink text-sm leading-relaxed'
+          : 'text-ink text-sm leading-relaxed pl-2 border-l-2 border-hairline'
       }
     >
-      {children}
+      {text}
     </p>
   )
 }

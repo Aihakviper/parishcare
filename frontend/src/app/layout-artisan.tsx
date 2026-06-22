@@ -6,11 +6,12 @@ import { RoleSwitcher } from '../components/ui/RoleSwitcher'
 import { RoleToast } from '../components/ui/RoleToast'
 import { BayoFab, BayoPanel } from '../components/voice/BayoPanel'
 import { PAGE_TRANSITION } from '../lib/motion'
+import { HERO_IDS } from '../hooks/useCampData'
 import { cn } from '../lib/cn'
 
 const nav = [
   { to: '/artisan', icon: FaHouse, label: 'Home' },
-  { to: '/artisan/jobs/hero', icon: FaBriefcase, label: 'Active' },
+  { to: `/artisan/jobs/${HERO_IDS.jobId}`, icon: FaBriefcase, label: 'Active' },
   { to: '/artisan/earnings', icon: FaWallet, label: 'Earnings' },
   { to: '/artisan/standing', icon: FaChartLine, label: 'Standing' },
   { to: '/artisan/profile', icon: FaUser, label: 'Me' },
