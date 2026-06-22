@@ -32,7 +32,8 @@ def test_role_permission_matrix() -> None:
     assert Permission.PARISH_CREATE in ROLE_PERMISSIONS[UserRole.HQ]
     assert Permission.PARISH_CREATE not in ROLE_PERMISSIONS[UserRole.PASTOR]
     assert Permission.USER_CREATE in ROLE_PERMISSIONS[UserRole.PASTOR]
-    assert ROLE_PERMISSIONS[UserRole.OFFICER] == frozenset()
+    assert Permission.BENEFICIARY_CREATE in ROLE_PERMISSIONS[UserRole.OFFICER]
+    assert Permission.BENEFICIARY_LOOKUP in ROLE_PERMISSIONS[UserRole.OFFICER]
     assert ROLE_PERMISSIONS[UserRole.AUDITOR] == {
         Permission.AUDIT_VERIFY
     }

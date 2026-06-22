@@ -1,9 +1,15 @@
 from app.core.config import Settings, settings
+from app.models.beneficiary import Beneficiary
 from app.models.parish import Parish
 from app.models.user import User
 from app.schemas.parish import ParishResponse
+from app.schemas.beneficiary import BeneficiaryResponse
 from app.schemas.user import UserResponse
 from app.services.parish import CONTACT_NAME_CONTEXT, CONTACT_PHONE_CONTEXT
+from app.services.beneficiary import (
+    BENEFICIARY_NAME_CONTEXT,
+    BENEFICIARY_PHONE_CONTEXT,
+)
 from app.services.user import USER_EMAIL_CONTEXT, USER_NAME_CONTEXT
 from app.utils.crypto import PIICipher
 
@@ -29,6 +35,30 @@ def present_parish(
         ),
         created_at=parish.created_at,
         updated_at=parish.updated_at,
+    )
+
+
+def present_beneficiary(
+    beneficiary: Beneficiary,
+    *,
+    config: Settings = settings,
+) -> BeneficiaryResponse:
+    cipher = PIICipher(config.pii_encryption_key)
+    return BeneficiaryResponse(
+        id=beneficiary.id,
+        name=cipher.decrypt(
+            beneficiary.name_encrypted,
+            context=BENEFICIARY_NAME_CONTEXT,
+        ),
+        phone=cipher.decrypt(
+            beneficiary.phone_encrypted,
+            context=BENEFICIARY_PHONE_CONTEXT,
+        ),
+        home_parish_id=beneficiary.home_parish_id,
+        dependents_count=beneficiary.dependents_count,
+        verification_status=beneficiary.verification_status,
+        created_at=beneficiary.created_at,
+        updated_at=beneficiary.updated_at,
     )
 
 

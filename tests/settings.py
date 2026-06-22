@@ -20,6 +20,8 @@ def build_test_settings(**overrides: object) -> Settings:
         "refresh_token_expire_days": 7,
         "pii_encryption_key": TEST_KEY,
         "pii_lookup_key": TEST_KEY,
+        "beneficiary_name_similarity_threshold": 0.88,
+        "beneficiary_duplicate_candidate_limit": 50,
     }
     values.update(overrides)
     return Settings(_env_file=None, **values)

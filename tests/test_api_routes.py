@@ -10,11 +10,16 @@ from app.core.config import settings
 from app.db.session import get_db_session
 from app.main import app
 from app.models.enums import UserRole
+from app.models.beneficiary import Beneficiary
 from app.models.parish import Parish
 from app.models.user import User
 from app.schemas.auth import TokenPair
 from app.services.auth import MFARequiredError
 from app.services.errors import ResourceConflictError
+from app.services.beneficiary import (
+    BeneficiaryLookupResult,
+    BeneficiaryRegistrationResult,
+)
 from app.utils.crypto import PIICipher
 
 client = TestClient(app)
@@ -52,6 +57,8 @@ def test_openapi_exposes_auth_and_management_routes() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/refresh" in paths
     assert "/api/v1/auth/me" in paths
+    assert "/api/v1/beneficiaries" in paths
+    assert "/api/v1/beneficiaries/lookup" in paths
     assert "/api/v1/parishes" in paths
     assert "/api/v1/parishes/{parish_id}" in paths
     assert "/api/v1/users" in paths
@@ -209,3 +216,76 @@ def test_request_validation_uses_consistent_error_shape() -> None:
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "validation_error"
     assert response.json()["error"]["details"]
+
+
+def test_register_beneficiary_route_returns_duplicate_warning() -> None:
+    parish_id = uuid4()
+    actor = build_actor(UserRole.OFFICER, parish_id)
+    app.dependency_overrides[get_current_user] = lambda: actor
+    cipher = PIICipher(settings.pii_encryption_key)
+    now = datetime.now(timezone.utc)
+    beneficiary = Beneficiary(
+        id=uuid4(),
+        name_encrypted=cipher.encrypt(
+            "Amina Ibrahim",
+            context="beneficiaries.name",
+        ),
+        name_normalised="amina ibrahim",
+        phone_encrypted=cipher.encrypt(
+            "+2348012345678",
+            context="beneficiaries.phone",
+        ),
+        phone_hash="c" * 64,
+        home_parish_id=parish_id,
+        dependents_count=2,
+        verification_status="unverified",
+        created_at=now,
+        updated_at=now,
+    )
+    with patch(
+        "app.api.v1.routes.beneficiaries.BeneficiaryService.register",
+        new=AsyncMock(
+            return_value=BeneficiaryRegistrationResult(
+                beneficiary=beneficiary,
+                possible_duplicate_count=1,
+            )
+        ),
+    ):
+        response = client.post(
+            "/api/v1/beneficiaries",
+            json={
+                "name": "Amina Ibrahim",
+                "phone": "+234 801-234-5678",
+                "home_parish_id": str(parish_id),
+                "dependents_count": 2,
+            },
+        )
+
+    assert response.status_code == 201
+    assert response.json()["possible_duplicate"] is True
+    assert response.json()["beneficiary"]["phone"] == "+2348012345678"
+
+
+def test_cross_parish_lookup_route_returns_no_identity() -> None:
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        uuid4(),
+    )
+    with patch(
+        "app.api.v1.routes.beneficiaries.BeneficiaryService.lookup",
+        new=AsyncMock(
+            return_value=BeneficiaryLookupResult(
+                outcome="restricted_match",
+                beneficiary=None,
+                verification_status="verified",
+            )
+        ),
+    ):
+        response = client.post(
+            "/api/v1/beneficiaries/lookup",
+            json={"phone": "+2348012345678"},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["outcome"] == "restricted_match"
+    assert response.json()["beneficiary"] is None

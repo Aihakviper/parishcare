@@ -2,6 +2,8 @@ import base64
 import hashlib
 import hmac
 import secrets
+import re
+import unicodedata
 from binascii import Error as Base64Error
 
 from cryptography.exceptions import InvalidTag
@@ -106,3 +108,17 @@ def normalize_phone(phone: str) -> str:
     if not normalized.startswith("+") or not normalized[1:].isdigit():
         raise ValueError("Phone must use E.164 format")
     return normalized
+
+
+def normalize_person_name(name: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", name.strip().casefold())
+    without_diacritics = "".join(
+        character
+        for character in decomposed
+        if not unicodedata.combining(character)
+    )
+    normalized = re.sub(r"[^a-z0-9]+", " ", without_diacritics).strip()
+    normalized = re.sub(r"\s+", " ", normalized)
+    if len(normalized) < 2:
+        raise ValueError("Name must contain at least two searchable characters")
+    return " ".join(sorted(normalized.split()))

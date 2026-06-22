@@ -24,6 +24,8 @@ class Settings(BaseSettings):
 
     pii_encryption_key: str
     pii_lookup_key: str
+    beneficiary_name_similarity_threshold: float = Field(ge=0, le=1)
+    beneficiary_duplicate_candidate_limit: int = Field(gt=0, le=500)
 
     model_config = SettingsConfigDict(
         env_file=".env",

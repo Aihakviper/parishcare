@@ -6,6 +6,8 @@ from app.models.user import User
 
 
 class Permission(StrEnum):
+    BENEFICIARY_CREATE = "beneficiary:create"
+    BENEFICIARY_LOOKUP = "beneficiary:lookup"
     PARISH_CREATE = "parish:create"
     PARISH_UPDATE = "parish:update"
     USER_CREATE = "user:create"
@@ -14,9 +16,16 @@ class Permission(StrEnum):
 
 
 ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
-    UserRole.OFFICER: frozenset(),
+    UserRole.OFFICER: frozenset(
+        {
+            Permission.BENEFICIARY_CREATE,
+            Permission.BENEFICIARY_LOOKUP,
+        }
+    ),
     UserRole.PASTOR: frozenset(
         {
+            Permission.BENEFICIARY_CREATE,
+            Permission.BENEFICIARY_LOOKUP,
             Permission.PARISH_UPDATE,
             Permission.USER_CREATE,
             Permission.USER_UPDATE,
