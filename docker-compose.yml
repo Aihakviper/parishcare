@@ -9,6 +9,8 @@ services:
       --reload
     env_file:
       - .env
+    environment:
+      PARISHCARE_DATABASE_URL: ${PARISHCARE_DOCKER_DATABASE_URL:?PARISHCARE_DOCKER_DATABASE_URL is required}
     ports:
       - "${PARISHCARE_API_PORT:?PARISHCARE_API_PORT is required}:${PARISHCARE_API_PORT:?PARISHCARE_API_PORT is required}"
     volumes:
