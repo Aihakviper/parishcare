@@ -1,24 +1,23 @@
 import { create } from 'zustand'
 
 interface DemoState {
-  tourStep: number
-  tourActive: boolean
-  overrides: Record<string, unknown>
-  setTourStep: (step: number) => void
+  active: boolean
+  step: number
+  paused: boolean
+  completed: boolean
   startTour: () => void
-  endTour: () => void
-  setOverride: (key: string, value: unknown) => void
-  clearOverrides: () => void
+  nextStep: () => void
+  togglePaused: () => void
+  finishTour: () => void
 }
 
 export const useDemoStore = create<DemoState>((set) => ({
-  tourStep: 0,
-  tourActive: false,
-  overrides: {},
-  setTourStep: (tourStep) => set({ tourStep }),
-  startTour: () => set({ tourActive: true, tourStep: 0 }),
-  endTour: () => set({ tourActive: false, tourStep: 0 }),
-  setOverride: (key, value) =>
-    set((s) => ({ overrides: { ...s.overrides, [key]: value } })),
-  clearOverrides: () => set({ overrides: {} }),
+  active: false,
+  step: 0,
+  paused: false,
+  completed: false,
+  startTour: () => set({ active: true, step: 0, paused: false, completed: false }),
+  nextStep: () => set((s) => ({ step: s.step + 1 })),
+  togglePaused: () => set((s) => ({ paused: !s.paused })),
+  finishTour: () => set({ active: false, completed: true }),
 }))

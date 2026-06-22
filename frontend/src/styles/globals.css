@@ -8,19 +8,16 @@
   }
 
   body {
-    @apply bg-bone text-ink font-sans text-base leading-relaxed overflow-x-hidden;
-    background-image:
-      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(59, 184, 150, 0.07), transparent 55%),
-      radial-gradient(ellipse 80% 50% at 100% 0%, rgba(42, 107, 90, 0.04), transparent 45%);
+    @apply bg-parchment text-ink font-sans text-base leading-relaxed overflow-x-hidden;
   }
 
   ::selection {
-    background-color: theme('colors.seafoam / 25%');
+    background-color: theme('colors.gilt / 25%');
     color: theme('colors.ink');
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-seafoam;
+    @apply outline-2 outline-offset-2 outline-gilt;
   }
 
   button:focus:not(:focus-visible),
@@ -50,7 +47,7 @@
   .display-tight {
     font-family: theme('fontFamily.display');
     font-variation-settings: 'opsz' 144, 'SOFT' 0;
-    letter-spacing: -0.022em;
+    letter-spacing: -0.018em;
     font-optical-sizing: auto;
   }
 
@@ -62,7 +59,7 @@
   }
 
   .eyebrow {
-    @apply font-sans font-semibold text-[0.68rem] uppercase tracking-wider-em text-slate;
+    @apply font-sans font-semibold text-[0.7rem] uppercase tracking-wider-em text-slate;
   }
 
   .mono-tag {
@@ -75,78 +72,38 @@
 
   .gilt-rule::before {
     content: '';
-    @apply absolute left-1/2 -translate-x-1/2 top-0 h-px w-16;
-    background-color: theme('colors.seafoam / 50%');
+    @apply absolute left-0 top-0 h-px w-14 bg-gilt;
   }
 
   .frame {
-    @apply bg-bone rounded-xl shadow-card;
-    border: 1px solid theme('colors.hairline / 80%');
+    @apply bg-bone rounded-frame shadow-frame;
+    border: 1px solid theme('colors.hairline');
   }
 
   .frame-bar {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-t-xl;
-    background-color: theme('colors.parchment-soft / 60%');
-    border-bottom: 1px solid theme('colors.hairline / 60%');
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-t-frame;
+    background-color: theme('colors.parchment-soft');
+    border-bottom: 1px solid theme('colors.hairline');
   }
 
   .frame-bar::before {
-    content: none;
+    content: '•••';
+    @apply mono-tag text-[0.55rem] tracking-[0.2em] text-slate/70;
   }
 
-  .hero-spotlight {
-    @apply text-center max-w-2xl mx-auto;
+  .tier-pill {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border;
   }
 
-  .hero-spotlight h1 {
-    @apply display-tight text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-ink leading-[1.12] tracking-tight;
+  .tier-verified {
+    @apply tier-pill bg-oxblood/10 text-oxblood border-oxblood/30;
   }
 
-  .hero-spotlight .hero-lead {
-    @apply text-base sm:text-lg text-slate mt-4 leading-relaxed max-w-xl mx-auto;
+  .tier-trusted {
+    @apply tier-pill bg-verdigris/10 text-verdigris border-verdigris/30;
   }
 
-  .btn-pill {
-    @apply rounded-pill px-6 py-3 text-sm font-semibold;
-  }
-
-  .tour-highlight {
-    position: relative;
-    z-index: 100 !important;
-  }
-
-  .table-scroll-fade {
-    @apply relative overflow-x-auto;
-  }
-
-  .table-scroll-fade::after {
-    content: '';
-    @apply pointer-events-none absolute top-0 right-0 bottom-0 w-8;
-    background: linear-gradient(to left, theme('colors.bone'), transparent);
-  }
-}
-
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: theme('colors.hairline') transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: theme('colors.hairline');
-    border-radius: 9999px;
-  }
-
-  .scrollbar-none {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
+  .tier-steward {
+    @apply tier-pill bg-gilt/15 text-ink border-gilt/40;
   }
 }
