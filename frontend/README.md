@@ -1,5 +1,22 @@
 # React + TypeScript + Vite
 
+## Backend connection
+
+Copy `.env.example` to `.env` and configure:
+
+```env
+VITE_DATA_SOURCE=api
+VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+```
+
+Use `VITE_DATA_SOURCE=mock` to run the original seeded hackathon demo.
+Vite environment variables are public, so never put passwords, tokens, API
+secrets, or the demo MFA code in this file.
+
+The live officer/pastor flow uses the FastAPI backend for login, request
+queues, beneficiary/parish reads, verification, decisions, and idempotent
+mock disbursements.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

@@ -9,14 +9,20 @@ interface RoleToast {
 
 interface SessionState {
   role: StewardRole
+  parishId: string
+  demoMode: boolean
   roleToast: RoleToast
   setRole: (role: StewardRole, toastMessage?: string) => void
   syncRole: (role: StewardRole) => void
+  setParishId: (id: string) => void
+  setDemoMode: (on: boolean) => void
   hideRoleToast: () => void
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
   role: 'resident',
+  parishId: '',
+  demoMode: true,
   roleToast: { message: '', visible: false },
   setRole: (role, toastMessage) =>
     set({
@@ -27,6 +33,8 @@ export const useSessionStore = create<SessionState>((set) => ({
       },
     }),
   syncRole: (role) => set({ role }),
+  setParishId: (parishId) => set({ parishId }),
+  setDemoMode: (demoMode) => set({ demoMode }),
   hideRoleToast: () =>
     set((s) => ({ roleToast: { ...s.roleToast, visible: false } })),
 }))
