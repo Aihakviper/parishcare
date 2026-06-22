@@ -8,19 +8,16 @@
   }
 
   body {
-    @apply bg-bone text-ink font-sans text-base leading-relaxed overflow-x-hidden;
-    background-image:
-      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(59, 184, 150, 0.07), transparent 55%),
-      radial-gradient(ellipse 80% 50% at 100% 0%, rgba(42, 107, 90, 0.04), transparent 45%);
+    @apply bg-parchment text-ink font-sans text-base leading-relaxed overflow-x-hidden;
   }
 
   ::selection {
-    background-color: theme('colors.seafoam / 25%');
+    background-color: theme('colors.gilt / 25%');
     color: theme('colors.ink');
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-seafoam;
+    @apply outline-2 outline-offset-2 outline-gilt;
   }
 
   button:focus:not(:focus-visible),
@@ -50,7 +47,7 @@
   .display-tight {
     font-family: theme('fontFamily.display');
     font-variation-settings: 'opsz' 144, 'SOFT' 0;
-    letter-spacing: -0.022em;
+    letter-spacing: -0.018em;
     font-optical-sizing: auto;
   }
 
@@ -62,7 +59,7 @@
   }
 
   .eyebrow {
-    @apply font-sans font-semibold text-[0.68rem] uppercase tracking-wider-em text-slate;
+    @apply font-sans font-semibold text-[0.7rem] uppercase tracking-wider-em text-slate;
   }
 
   .mono-tag {
@@ -75,78 +72,91 @@
 
   .gilt-rule::before {
     content: '';
-    @apply absolute left-1/2 -translate-x-1/2 top-0 h-px w-16;
-    background-color: theme('colors.seafoam / 50%');
+    @apply absolute left-0 top-0 h-px w-14 bg-gilt;
   }
 
   .frame {
-    @apply bg-bone rounded-xl shadow-card;
-    border: 1px solid theme('colors.hairline / 80%');
+    @apply bg-bone rounded-frame shadow-frame;
+    border: 1px solid theme('colors.hairline');
   }
 
   .frame-bar {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-t-xl;
-    background-color: theme('colors.parchment-soft / 60%');
-    border-bottom: 1px solid theme('colors.hairline / 60%');
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-t-frame;
+    background-color: theme('colors.parchment-soft');
+    border-bottom: 1px solid theme('colors.hairline');
   }
 
   .frame-bar::before {
-    content: none;
+    content: '•••';
+    @apply mono-tag text-[0.55rem] tracking-[0.2em] text-slate/70;
   }
 
-  .hero-spotlight {
-    @apply text-center max-w-2xl mx-auto;
+  .tier-pill {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full border;
   }
 
-  .hero-spotlight h1 {
-    @apply display-tight text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-ink leading-[1.12] tracking-tight;
+  .tier-verified {
+    @apply tier-pill bg-oxblood/10 text-oxblood border-oxblood/30;
   }
 
-  .hero-spotlight .hero-lead {
-    @apply text-base sm:text-lg text-slate mt-4 leading-relaxed max-w-xl mx-auto;
+  .tier-trusted {
+    @apply tier-pill bg-verdigris/10 text-verdigris border-verdigris/30;
+  }
+
+  .tier-steward {
+    @apply tier-pill bg-gilt/15 text-ink border-gilt/40;
+  }
+
+  /* Guild-inspired marketing polish */
+  .nav-pill {
+    @apply bg-bone/95 backdrop-blur-md rounded-pill border border-hairline/80 shadow-nav;
+  }
+
+  .trust-badge {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-pill bg-bone border border-hairline text-xs font-medium text-slate;
   }
 
   .btn-pill {
-    @apply rounded-pill px-6 py-3 text-sm font-semibold;
+    @apply inline-flex items-center justify-center gap-2 min-h-[44px] font-semibold rounded-pill transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gilt;
   }
 
-  .tour-highlight {
-    position: relative;
-    z-index: 100 !important;
+  .btn-pill-primary {
+    @apply bg-verdigris text-bone hover:bg-oxblood border border-verdigris hover:border-oxblood shadow-frame;
   }
 
-  .table-scroll-fade {
-    @apply relative overflow-x-auto;
+  .btn-pill-secondary {
+    @apply bg-parchment-soft text-ink border border-hairline hover:border-verdigris/40 hover:shadow-frame;
   }
 
-  .table-scroll-fade::after {
+  .role-tabs {
+    @apply flex p-1 rounded-pill bg-bone border border-hairline shadow-frame;
+  }
+
+  .role-tab {
+    @apply flex-1 px-3 py-2.5 text-sm font-semibold rounded-pill text-slate transition-colors min-h-[44px];
+  }
+
+  .role-tab-active {
+    @apply bg-ink text-bone;
+  }
+
+  .check-circle {
+    @apply flex items-center justify-center w-6 h-6 rounded-full bg-verdigris/15 text-verdigris;
+  }
+
+  .testimonial-card {
+    @apply rounded-card text-bone relative overflow-hidden;
+    background: linear-gradient(145deg, theme('colors.verdigris') 0%, theme('colors.oxblood-deep') 100%);
+  }
+
+  .testimonial-card::before {
     content: '';
-    @apply pointer-events-none absolute top-0 right-0 bottom-0 w-8;
-    background: linear-gradient(to left, theme('colors.bone'), transparent);
-  }
-}
-
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: theme('colors.hairline') transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: theme('colors.hairline');
-    border-radius: 9999px;
-  }
-
-  .scrollbar-none {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
   }
 }

@@ -6,6 +6,10 @@ class UserRole(StrEnum):
     PASTOR = "pastor"
     HQ = "hq"
     AUDITOR = "auditor"
+    RESIDENT = "resident"
+    ARTISAN = "artisan"
+    CAMP_ADMIN = "camp_admin"
+    MEDIATOR = "mediator"
 
 
 class VerificationStatus(StrEnum):
@@ -57,3 +61,60 @@ class SettlementStatus(StrEnum):
     PENDING = "pending"
     SETTLED = "settled"
     FAILED = "failed"
+
+
+class Trade(StrEnum):
+    PLUMBER = "plumber"
+    ELECTRICIAN = "electrician"
+    GENERATOR_TECHNICIAN = "generator_technician"
+    TAILOR = "tailor"
+    MECHANIC = "mechanic"
+    CARPENTER = "carpenter"
+    PAINTER = "painter"
+    CLEANER = "cleaner"
+    SECURITY = "security"
+
+
+class ArtisanTier(StrEnum):
+    UNVERIFIED = "unverified"
+    VERIFIED = "verified"
+    TRUSTED = "trusted"
+    STEWARD = "steward"
+
+
+class JobStatus(StrEnum):
+    REQUESTED = "requested"
+    QUOTED = "quoted"
+    ACCEPTED = "accepted"
+    EN_ROUTE = "en_route"
+    WORKING = "working"
+    COMPLETED = "completed"
+    DISPUTED = "disputed"
+    CLOSED = "closed"
+
+
+class EscrowStatus(StrEnum):
+    PENDING = "pending"
+    HELD = "held"
+    RELEASED = "released"
+    REFUNDED = "refunded"
+    FROZEN = "frozen"
+
+
+class JobEventType(StrEnum):
+    STATUS_CHANGE = "status_change"
+    PHOTO_UPLOADED = "photo_uploaded"
+    VOICE_NOTE = "voice_note"
+    PAYMENT = "payment"
+    MESSAGE = "message"
+
+
+class DisputeStatus(StrEnum):
+    OPEN = "open"
+    MEDIATING = "mediating"
+    RESOLVED = "resolved"
+
+
+class DisputeResolution(StrEnum):
+    RELEASE = "release"
+    REFUND = "refund"

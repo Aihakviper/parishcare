@@ -1,20 +1,15 @@
 import { cn } from '../../lib/cn'
 
 export function EmptyState({
-  children,
+  message,
   className,
 }: {
-  children: React.ReactNode
+  message: string
   className?: string
 }) {
   return (
-    <p
-      className={cn(
-        'italic-serif text-lg sm:text-xl text-ink text-center py-10 sm:py-14 px-4 leading-relaxed',
-        className,
-      )}
-    >
-      {children}
+    <p className={cn('italic-serif text-slate text-center py-12 px-4', className)}>
+      {message}
     </p>
   )
 }

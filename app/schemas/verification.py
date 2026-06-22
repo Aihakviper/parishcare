@@ -41,3 +41,9 @@ class VerificationOutcomeResponse(BaseModel):
     beneficiary_id: UUID
     beneficiary_verification_status: VerificationStatus
     responded_at: datetime
+
+
+class WhatsAppWebhookResponse(BaseModel):
+    received: bool = True
+    processed_commands: int
+    failed_commands: int

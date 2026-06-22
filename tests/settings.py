@@ -49,9 +49,17 @@ def build_test_settings(**overrides: object) -> Settings:
         "verification_voucher_issuer": "test-verification-issuer",
         "verification_voucher_audience": "test-verification-audience",
         "verification_delivery_channel": "mock",
+        "whatsapp_graph_api_base_url": "https://graph.example.test/v23.0",
+        "whatsapp_phone_number_id": "",
+        "whatsapp_access_token": "",
+        "whatsapp_webhook_verify_token": "",
+        "whatsapp_app_secret": "",
+        "whatsapp_public_base_url": "https://api.example.test",
+        "whatsapp_request_timeout_seconds": 10,
         "maker_checker_threshold_kobo": 500_000,
         "mock_payment_provider_name": "mercyflow-mock",
         "mock_payment_receipt_base_url": "https://mock.invalid/receipts",
+        "marketplace_platform_fee_bps": 500,
     }
     values.update(overrides)
     return Settings(_env_file=None, **values)

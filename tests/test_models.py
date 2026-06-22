@@ -17,6 +17,13 @@ def test_phase_two_tables_are_registered() -> None:
         "verification_requests",
         "verification_vouchers",
         "welfare_requests",
+        "artisan_profiles",
+        "resident_profiles",
+        "jobs",
+        "job_events",
+        "escrow_transactions",
+        "reviews",
+        "disputes",
     }
 
 
@@ -57,6 +64,10 @@ def test_role_and_verification_values_match_sdd() -> None:
         "pastor",
         "hq",
         "auditor",
+        "resident",
+        "artisan",
+        "camp_admin",
+        "mediator",
     }
     assert {status.value for status in VerificationStatus} == {
         "unverified",

@@ -11,6 +11,22 @@ from app.models.enums import (
     VerificationOutcome,
     WelfareRequestStatus,
     WelfareRequestType,
+    ArtisanTier,
+    DisputeResolution,
+    DisputeStatus,
+    EscrowStatus,
+    JobEventType,
+    JobStatus,
+    Trade,
+)
+from app.models.marketplace import (
+    ArtisanProfile,
+    Dispute,
+    EscrowTransaction,
+    Job,
+    JobEvent,
+    ResidentProfile,
+    Review,
 )
 from app.models.parish import Parish
 from app.models.user import User
@@ -36,4 +52,18 @@ __all__ = [
     "WelfareRequest",
     "WelfareRequestStatus",
     "WelfareRequestType",
+    "ArtisanProfile",
+    "ArtisanTier",
+    "Dispute",
+    "DisputeResolution",
+    "DisputeStatus",
+    "EscrowStatus",
+    "EscrowTransaction",
+    "Job",
+    "JobEvent",
+    "JobEventType",
+    "JobStatus",
+    "ResidentProfile",
+    "Review",
+    "Trade",
 ]

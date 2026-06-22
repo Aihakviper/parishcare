@@ -1,66 +1,94 @@
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
-import { AppLayout } from './layout'
-import type { StewardRole } from '../lib/roles'
+import { ResidentLayout } from './layout-resident'
+import { ArtisanLayout } from './layout-artisan'
+import { ConsoleLayout } from './layout-console'
+import { MarketingLanding } from '../surfaces/marketing/Landing'
+import { ResidentHome } from '../surfaces/resident/Home'
+import { ResidentDiscover } from '../surfaces/resident/Discover'
+import { ResidentArtisanProfile } from '../surfaces/resident/ArtisanProfile'
+import { ResidentBookJob } from '../surfaces/resident/BookJob'
+import { ResidentMyJobs } from '../surfaces/resident/MyJobs'
+import { ResidentJobTracking } from '../surfaces/resident/JobTracking'
+import { ResidentJobPay } from '../surfaces/resident/JobPay'
+import { ResidentJobReview } from '../surfaces/resident/JobReview'
+import { ResidentProfile } from '../surfaces/resident/Profile'
+import { ArtisanHome } from '../surfaces/artisan/Home'
+import { ArtisanActiveJob } from '../surfaces/artisan/ActiveJob'
+import { ArtisanEarnings } from '../surfaces/artisan/Earnings'
+import { ArtisanStanding } from '../surfaces/artisan/Standing'
+import { ArtisanProfile } from '../surfaces/artisan/Profile'
+import { ConsoleOverview } from '../surfaces/console/Overview'
+import { ConsoleArtisans } from '../surfaces/console/ArtisansRegistry'
+import { ConsoleArtisanDetail } from '../surfaces/console/ArtisanDetail'
+import { ConsoleJobs } from '../surfaces/console/Jobs'
+import { ConsoleDisputes } from '../surfaces/console/Disputes'
+import { ConsoleDisputeDetail } from '../surfaces/console/DisputeDetail'
+import { ConsolePatterns } from '../surfaces/console/Patterns'
 import { useSessionStore } from '../store/session'
-import { OfficerRoutes } from '../surfaces/officer/routes'
-import { PastorRoutes } from '../surfaces/pastor/routes'
-import { ProvincialRoutes } from '../surfaces/provincial/routes'
-import { AuditorRoutes } from '../surfaces/auditor/routes'
-import { usesBackendApi } from '../lib/api/config'
-import { getRole } from '../lib/roles'
+import type { StewardRole } from '../lib/roles'
 
 function roleFromPath(pathname: string): StewardRole | null {
-  if (pathname.startsWith('/officer')) return 'officer'
-  if (pathname.startsWith('/pastor')) return 'pastor'
-  if (pathname.startsWith('/provincial')) return 'provincial'
-  if (pathname.startsWith('/auditor')) return 'auditor'
+  if (pathname.startsWith('/resident')) return 'resident'
+  if (pathname.startsWith('/artisan')) return 'artisan'
+  if (pathname.startsWith('/console')) return 'console'
   return null
 }
 
 function RoleSync() {
   const location = useLocation()
-  const navigate = useNavigate()
-  const setRole = useSessionStore((s) => s.setRole)
-  const role = useSessionStore((s) => s.role)
+  const syncRole = useSessionStore((s) => s.syncRole)
 
   useEffect(() => {
     const fromPath = roleFromPath(location.pathname)
     if (!fromPath) return
-    if (usesBackendApi) {
-      if (fromPath !== role) {
-        navigate(getRole(role).homePath, { replace: true })
-      }
-      return
+    if (fromPath !== useSessionStore.getState().role) {
+      syncRole(fromPath)
     }
-    const current = useSessionStore.getState().role
-    if (fromPath !== current) {
-      setRole(fromPath)
-    }
-  }, [location.pathname, navigate, role, setRole])
+  }, [location.pathname, syncRole])
 
   return null
 }
+
 export function AppRoutes() {
-  const homePath = getRole(useSessionStore((state) => state.role)).homePath
   return (
     <>
       <RoleSync />
       <Routes>
-        <Route path="/" element={<Navigate to={homePath} replace />} />
-        <Route element={<AppLayout />}>
-          <Route path="officer/*" element={<OfficerRoutes />} />
-          <Route path="pastor/*" element={<PastorRoutes />} />
-          <Route path="provincial/*" element={<ProvincialRoutes />} />
-          <Route path="auditor/*" element={<AuditorRoutes />} />
+        <Route path="/" element={<Navigate to="/marketing" replace />} />
+        <Route path="/marketing" element={<MarketingLanding />} />
+
+        <Route element={<ResidentLayout />}>
+          <Route path="resident" element={<ResidentHome />} />
+          <Route path="resident/discover" element={<ResidentDiscover />} />
+          <Route path="resident/artisan/:id" element={<ResidentArtisanProfile />} />
+          <Route path="resident/book/:artisanId" element={<ResidentBookJob />} />
+          <Route path="resident/jobs" element={<ResidentMyJobs />} />
+          <Route path="resident/jobs/:id" element={<ResidentJobTracking />} />
+          <Route path="resident/jobs/:id/pay" element={<ResidentJobPay />} />
+          <Route path="resident/jobs/:id/review" element={<ResidentJobReview />} />
+          <Route path="resident/me" element={<ResidentProfile />} />
         </Route>
-        <Route path="*" element={<Navigate to={homePath} replace />} />
+
+        <Route element={<ArtisanLayout />}>
+          <Route path="artisan" element={<ArtisanHome />} />
+          <Route path="artisan/jobs/:id" element={<ArtisanActiveJob />} />
+          <Route path="artisan/earnings" element={<ArtisanEarnings />} />
+          <Route path="artisan/standing" element={<ArtisanStanding />} />
+          <Route path="artisan/profile" element={<ArtisanProfile />} />
+        </Route>
+
+        <Route element={<ConsoleLayout />}>
+          <Route path="console" element={<ConsoleOverview />} />
+          <Route path="console/artisans" element={<ConsoleArtisans />} />
+          <Route path="console/artisans/:id" element={<ConsoleArtisanDetail />} />
+          <Route path="console/jobs" element={<ConsoleJobs />} />
+          <Route path="console/disputes" element={<ConsoleDisputes />} />
+          <Route path="console/disputes/:id" element={<ConsoleDisputeDetail />} />
+          <Route path="console/patterns" element={<ConsolePatterns />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/marketing" replace />} />
       </Routes>
     </>
   )

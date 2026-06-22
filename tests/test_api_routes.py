@@ -37,6 +37,7 @@ from app.services.verification import (
     VerificationResponseResult,
     VerificationStartResult,
 )
+from app.services.whatsapp import WhatsAppCommand
 from app.services.disbursement import DisbursementResult
 from app.utils.crypto import PIICipher
 
@@ -88,6 +89,16 @@ def test_openapi_exposes_auth_and_management_routes() -> None:
     assert "/api/v1/welfare-requests/{request_id}/verify" in paths
     assert "/api/v1/verification-vouchers/respond" in paths
     assert "/api/v1/disbursements" in paths
+    assert "/api/v1/artisans/profile" in paths
+    assert "/api/v1/jobs" in paths
+    assert "/api/v1/jobs/{job_id}" in paths
+    assert "/api/v1/jobs/{job_id}/quote" in paths
+    assert "/api/v1/jobs/{job_id}/transition" in paths
+    assert "/api/v1/jobs/{job_id}/escrow/fund" in paths
+    assert "/api/v1/jobs/{job_id}/escrow/release" in paths
+    assert "/api/v1/jobs/{job_id}/reviews" in paths
+    assert "/api/v1/jobs/{job_id}/disputes" in paths
+    assert "/api/v1/disputes/{dispute_id}/resolve" in paths
 
 
 def test_login_returns_token_pair() -> None:
@@ -559,6 +570,79 @@ def test_public_voucher_confirmation_response() -> None:
     assert response.status_code == 200
     assert response.json()["outcome"] == "confirmed"
     assert response.json()["welfare_request_status"] == "verified"
+
+
+def test_whatsapp_webhook_challenge() -> None:
+    service = MagicMock()
+    service.verify_webhook_challenge.return_value = True
+    with patch(
+        "app.api.v1.routes.verification.WhatsAppService",
+        return_value=service,
+    ):
+        response = client.get(
+            "/api/v1/webhooks/whatsapp",
+            params={
+                "hub.mode": "subscribe",
+                "hub.verify_token": "verify-token",
+                "hub.challenge": "challenge-value",
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.text == "challenge-value"
+
+
+def test_signed_whatsapp_reply_processes_voucher() -> None:
+    whatsapp = MagicMock()
+    whatsapp.verify_webhook_signature.return_value = True
+    whatsapp.extract_commands.return_value = [
+        WhatsAppCommand(
+            outcome=VerificationOutcome.CONFIRMED,
+            token="signed-token",
+        )
+    ]
+    with (
+        patch(
+            "app.api.v1.routes.verification.WhatsAppService",
+            return_value=whatsapp,
+        ),
+        patch(
+            "app.api.v1.routes.verification.VerificationService.respond",
+            new=AsyncMock(),
+        ) as respond,
+    ):
+        response = client.post(
+            "/api/v1/webhooks/whatsapp",
+            headers={"X-Hub-Signature-256": "sha256=signed"},
+            json={
+                "entry": [
+                    {
+                        "changes": [
+                            {
+                                "value": {
+                                    "messages": [
+                                        {
+                                            "text": {
+                                                "body": (
+                                                    "CONFIRM signed-token"
+                                                )
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json()["processed_commands"] == 1
+    respond.assert_awaited_once_with(
+        token="signed-token",
+        outcome=VerificationOutcome.CONFIRMED,
+    )
 
 
 def build_disbursement(
