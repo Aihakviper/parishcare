@@ -4,6 +4,7 @@ from app.services.auth import (
     AuthenticationService,
     MFARequiredError,
 )
+from app.services.bootstrap import BootstrapService
 from app.services.errors import (
     ResourceConflictError,
     ResourceNotFoundError,
@@ -17,6 +18,7 @@ __all__ = [
     "AuthenticationError",
     "AuthenticationService",
     "AuditService",
+    "BootstrapService",
     "MFARequiredError",
     "ParishService",
     "ResourceConflictError",
