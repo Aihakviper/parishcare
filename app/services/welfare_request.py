@@ -143,6 +143,33 @@ class WelfareRequestService:
         require_parish_scope(actor, parish_id)
         return request
 
+    async def list_requests(
+        self,
+        *,
+        actor: User,
+        status: WelfareRequestStatus | None = None,
+    ) -> list[WelfareRequest]:
+        require_permission(actor, Permission.WELFARE_REQUEST_VIEW)
+        query = (
+            select(WelfareRequest)
+            .join(
+                Beneficiary,
+                Beneficiary.id == WelfareRequest.beneficiary_id,
+            )
+            .where(Beneficiary.deleted_at.is_(None))
+            .order_by(WelfareRequest.created_at.desc())
+        )
+        if actor.role != UserRole.HQ:
+            if actor.parish_id is None:
+                return []
+            query = query.where(
+                Beneficiary.home_parish_id == actor.parish_id
+            )
+        if status is not None:
+            query = query.where(WelfareRequest.status == status)
+        result = await self._session.execute(query)
+        return list(result.scalars().all())
+
     async def transition(
         self,
         *,

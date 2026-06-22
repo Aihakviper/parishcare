@@ -1,3 +1,4 @@
+import hashlib
 from uuid import uuid4
 
 import pytest
@@ -10,6 +11,7 @@ from app.core.security import (
     create_token_pair,
     decode_token,
     hash_password,
+    verify_demo_mfa_code,
     verify_password,
 )
 from app.models.enums import UserRole
@@ -37,6 +39,25 @@ def test_argon2_password_hashing() -> None:
 def test_password_minimum_length() -> None:
     with pytest.raises(ValueError):
         hash_password("short")
+
+
+def test_demo_mfa_uses_environment_hash_and_is_not_production_safe() -> None:
+    code = "246810"
+    code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
+    config = build_test_settings(
+        mfa_demo_enabled=True,
+        mfa_demo_code_hash=code_hash,
+    )
+
+    assert verify_demo_mfa_code(code, config=config)
+    assert not verify_demo_mfa_code("wrong-code", config=config)
+
+    with pytest.raises(ValueError, match="Demo MFA"):
+        build_test_settings(
+            app_env="production",
+            mfa_demo_enabled=True,
+            mfa_demo_code_hash=code_hash,
+        )
 
 
 def test_create_and_decode_token_pair() -> None:

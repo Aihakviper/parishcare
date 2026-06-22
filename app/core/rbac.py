@@ -14,6 +14,7 @@ class Permission(StrEnum):
     WELFARE_REQUEST_RISK_REVIEW = "welfare_request:risk_review"
     VERIFICATION_START = "verification:start"
     DISBURSEMENT_EXECUTE = "disbursement:execute"
+    PARISH_VIEW = "parish:view"
     PARISH_CREATE = "parish:create"
     PARISH_UPDATE = "parish:update"
     USER_CREATE = "user:create"
@@ -31,6 +32,7 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
             Permission.WELFARE_REQUEST_TRANSITION,
             Permission.VERIFICATION_START,
             Permission.DISBURSEMENT_EXECUTE,
+            Permission.PARISH_VIEW,
         }
     ),
     UserRole.PASTOR: frozenset(
@@ -43,6 +45,7 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
             Permission.WELFARE_REQUEST_RISK_REVIEW,
             Permission.VERIFICATION_START,
             Permission.DISBURSEMENT_EXECUTE,
+            Permission.PARISH_VIEW,
             Permission.PARISH_UPDATE,
             Permission.USER_CREATE,
             Permission.USER_UPDATE,
@@ -51,6 +54,7 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
     UserRole.HQ: frozenset(
         {
             Permission.PARISH_CREATE,
+            Permission.PARISH_VIEW,
             Permission.PARISH_UPDATE,
             Permission.USER_CREATE,
             Permission.USER_UPDATE,

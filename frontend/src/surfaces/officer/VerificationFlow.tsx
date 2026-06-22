@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SlideOver } from './components/SlideOver'
 import { Button } from '../../components/ui/Button'
-import { mockApi } from '../../lib/mock-api'
+import { operationalApi } from '../../lib/api/operational'
 import { useCaseDetail } from './hooks/useOfficerCases'
 import { redactPhone } from '../../lib/officer/format'
 import { getParishById, PARISH_YABA } from '../../lib/seed/parishes'
@@ -36,7 +36,7 @@ export function VerificationFlow() {
   const handleContinue = async () => {
     if (step === 1) {
       if (sendVouch) {
-        await mockApi.requestVouch(welfareCase.id)
+        await operationalApi.requestVouch(welfareCase.id)
         setStep(2)
       } else {
         setStep(3)

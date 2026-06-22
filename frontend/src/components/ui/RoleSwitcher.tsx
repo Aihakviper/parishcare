@@ -3,11 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import { getRole, nextRole, ROLES } from '../../lib/roles'
 import { useSessionStore } from '../../store/session'
 import { cn } from '../../lib/cn'
+import { usesBackendApi } from '../../lib/api/config'
 
 export function RoleSwitcher({ className }: { className?: string }) {
   const { role, setRole } = useSessionStore()
   const navigate = useNavigate()
   const current = getRole(role)
+
+  if (usesBackendApi) {
+    return (
+      <span
+        className={cn(
+          'inline-flex items-center px-4 py-2.5 bg-seafoam text-bone rounded-pill text-sm font-semibold',
+          className,
+        )}
+      >
+        {current.label}
+      </span>
+    )
+  }
 
   const cycle = () => {
     const next = nextRole(role)

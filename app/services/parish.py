@@ -67,6 +67,11 @@ class ParishService:
             await self._session.rollback()
             raise
 
+    async def get(self, *, actor: User, parish_id: UUID) -> Parish:
+        require_permission(actor, Permission.PARISH_VIEW)
+        require_parish_scope(actor, parish_id)
+        return await self._get_active(parish_id)
+
     async def update(
         self,
         *,

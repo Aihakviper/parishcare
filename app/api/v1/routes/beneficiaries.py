@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +13,7 @@ from app.schemas.beneficiary import (
     BeneficiaryCreate,
     BeneficiaryLookupRequest,
     BeneficiaryLookupResponse,
+    BeneficiaryResponse,
     BeneficiaryRegistrationResponse,
 )
 from app.schemas.errors import ErrorResponse
@@ -26,6 +28,27 @@ ERROR_RESPONSES = {
     409: {"model": ErrorResponse},
     422: {"model": ErrorResponse},
 }
+
+
+@router.get(
+    "/{beneficiary_id}",
+    response_model=BeneficiaryResponse,
+    responses=ERROR_RESPONSES,
+    summary="Get a parish-scoped beneficiary",
+)
+async def get_beneficiary(
+    beneficiary_id: UUID,
+    actor: Annotated[
+        User,
+        Depends(require_permissions(Permission.BENEFICIARY_LOOKUP)),
+    ],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+) -> BeneficiaryResponse:
+    beneficiary = await BeneficiaryService(session).get(
+        actor=actor,
+        beneficiary_id=beneficiary_id,
+    )
+    return present_beneficiary(beneficiary)
 
 
 @router.post(

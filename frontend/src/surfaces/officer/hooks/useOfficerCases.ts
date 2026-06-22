@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Beneficiary, Parish, WelfareCase } from '../../../lib/types/domain'
-import { mockApi } from '../../../lib/mock-api'
+import { operationalApi } from '../../../lib/api/operational'
 import { useSessionStore } from '../../../store/session'
 
 export type CaseWithBeneficiary = WelfareCase & {
@@ -23,8 +23,8 @@ const ACTIVE_STATUSES = new Set([
 
 async function fetchOfficerQueue(parishId: string) {
   const [caseList, parishes] = await Promise.all([
-    mockApi.listCases({ parishId }),
-    mockApi.listParishes(),
+    operationalApi.listCases({ parishId }),
+    operationalApi.listParishes(),
   ])
   const parish = parishes.find((x) => x.id === parishId) ?? null
 
@@ -32,7 +32,7 @@ async function fetchOfficerQueue(parishId: string) {
   const withPeople: CaseWithBeneficiary[] = []
 
   for (const c of active) {
-    const beneficiary = await mockApi.getBeneficiary(c.beneficiaryId)
+    const beneficiary = await operationalApi.getBeneficiary(c.beneficiaryId)
     if (beneficiary) {
       withPeople.push({ ...c, beneficiary })
     }
@@ -85,13 +85,13 @@ export function useOfficerCases(): OfficerQueueData {
 }
 
 async function fetchCaseDetail(caseId: string) {
-  const welfareCase = await mockApi.getCase(caseId)
+  const welfareCase = await operationalApi.getCase(caseId)
   if (!welfareCase) {
     return { welfareCase: null, beneficiary: null, parish: null }
   }
   const [beneficiary, parishes] = await Promise.all([
-    mockApi.getBeneficiary(welfareCase.beneficiaryId),
-    mockApi.listParishes(),
+    operationalApi.getBeneficiary(welfareCase.beneficiaryId),
+    operationalApi.listParishes(),
   ])
   const parish = parishes.find((p) => p.id === welfareCase.parishId) ?? null
   return { welfareCase, beneficiary, parish }

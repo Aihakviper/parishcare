@@ -178,6 +178,25 @@ class BeneficiaryService:
             await self._session.rollback()
             raise
 
+    async def get(
+        self,
+        *,
+        actor: User,
+        beneficiary_id: UUID,
+    ) -> Beneficiary:
+        require_permission(actor, Permission.BENEFICIARY_LOOKUP)
+        result = await self._session.execute(
+            select(Beneficiary).where(
+                Beneficiary.id == beneficiary_id,
+                Beneficiary.deleted_at.is_(None),
+            )
+        )
+        beneficiary = result.scalar_one_or_none()
+        if beneficiary is None:
+            raise ResourceNotFoundError("Beneficiary not found")
+        require_parish_scope(actor, beneficiary.home_parish_id)
+        return beneficiary
+
     async def _find_by_phone_hash(
         self,
         phone_hash: str,

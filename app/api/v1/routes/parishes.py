@@ -24,6 +24,27 @@ MUTATION_RESPONSES = {
 }
 
 
+@router.get(
+    "/{parish_id}",
+    response_model=ParishResponse,
+    responses=MUTATION_RESPONSES,
+    summary="Get a role-scoped parish",
+)
+async def get_parish(
+    parish_id: UUID,
+    actor: Annotated[
+        User,
+        Depends(require_permissions(Permission.PARISH_VIEW)),
+    ],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+) -> ParishResponse:
+    parish = await ParishService(session).get(
+        actor=actor,
+        parish_id=parish_id,
+    )
+    return present_parish(parish)
+
+
 @router.post(
     "",
     response_model=ParishResponse,

@@ -10,6 +10,8 @@ import { StewardMark } from '../components/ui/StewardMark'
 import { StoryTour, StoryTourButton } from '../components/tour/StoryTour'
 import { RoleToast } from '../components/ui/RoleToast'
 import { cn } from '../lib/cn'
+import { usesBackendApi } from '../lib/api/config'
+import { useAuthStore } from '../store/auth'
 
 const ANCHOR_VERSE =
   'Look ye out among you seven men of honest report. — Acts 6:3'
@@ -19,8 +21,12 @@ export function AppLayout() {
   const location = useLocation()
   const current = getRole(role)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const logout = useAuthStore((state) => state.logout)
 
-  const navItems = ROLES.map((r) => ({
+  const visibleRoles = usesBackendApi
+    ? ROLES.filter((item) => item.id === role)
+    : ROLES
+  const navItems = visibleRoles.map((r) => ({
     to: r.homePath,
     label: r.navLabel,
     short: r.label,
@@ -34,7 +40,7 @@ export function AppLayout() {
       <header className="sticky top-0 z-50 bg-bone/95 backdrop-blur-md shadow-card border-b border-hairline/60">
         <div className="max-w-content mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between gap-4 py-4 sm:py-5">
-            <NavLink to="/officer" className="flex items-center gap-3 min-w-0 group">
+            <NavLink to={current.homePath} className="flex items-center gap-3 min-w-0 group">
               <StewardMark />
               <span className="display-tight text-lg sm:text-xl font-semibold text-ink tracking-tight group-hover:text-verdigris transition-colors">
                 Steward
@@ -69,6 +75,15 @@ export function AppLayout() {
 
             <div className="flex items-center gap-2 shrink-0">
               <RoleSwitcher className="hidden sm:flex" />
+              {usesBackendApi && (
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="hidden sm:inline-flex text-sm text-slate hover:text-ink"
+                >
+                  Sign out
+                </button>
+              )}
               <button
                 type="button"
                 className="md:hidden p-2.5 rounded-pill border border-hairline bg-bone text-ink min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
@@ -164,8 +179,8 @@ export function AppLayout() {
       </footer>
 
       <RoleToast />
-      <StoryTourButton />
-      <StoryTour />
+      {!usesBackendApi && <StoryTourButton />}
+      {!usesBackendApi && <StoryTour />}
     </div>
   )
 }

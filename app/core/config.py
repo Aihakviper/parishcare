@@ -1,4 +1,5 @@
 import base64
+import re
 from binascii import Error as Base64Error
 from functools import lru_cache
 from typing import Literal
@@ -12,6 +13,7 @@ class Settings(BaseSettings):
     app_env: Literal["development", "testing", "staging", "production"]
     debug: bool
     api_v1_prefix: str
+    cors_allowed_origins: str
 
     database_url: str
 
@@ -21,6 +23,8 @@ class Settings(BaseSettings):
     jwt_audience: str
     access_token_expire_minutes: int = Field(gt=0)
     refresh_token_expire_days: int = Field(gt=0)
+    mfa_demo_enabled: bool
+    mfa_demo_code_hash: str = Field(min_length=64, max_length=64)
 
     pii_encryption_key: str
     pii_lookup_key: str
@@ -80,13 +84,31 @@ class Settings(BaseSettings):
             raise ValueError("Key must decode to exactly 32 bytes")
         return value
 
+    @field_validator("mfa_demo_code_hash")
+    @classmethod
+    def validate_sha256_hash(cls, value: str) -> str:
+        normalized = value.lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", normalized):
+            raise ValueError("MFA demo code hash must be a SHA-256 hex digest")
+        return normalized
+
     @model_validator(mode="after")
     def validate_scoring_thresholds(self) -> "Settings":
         if self.scoring_medium_threshold > self.scoring_high_threshold:
             raise ValueError(
                 "Scoring medium threshold cannot exceed high threshold"
             )
+        if self.app_env == "production" and self.mfa_demo_enabled:
+            raise ValueError("Demo MFA cannot be enabled in production")
         return self
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.cors_allowed_origins.split(",")
+            if origin.strip()
+        ]
 
 
 @lru_cache

@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../components/ui/Button'
-import { mockApi } from '../../../lib/mock-api'
+import { operationalApi } from '../../../lib/api/operational'
 import { canDo, LIMITS } from '../../../lib/roles'
 import { formatNaira } from '../../../lib/formatters'
 import type { Parish, WelfareCase } from '../../../lib/types/domain'
 import { useSessionStore } from '../../../store/session'
 import { useTourStore } from '../../../store/tour'
 import { cn } from '../../../lib/cn'
+import { usesBackendApi } from '../../../lib/api/config'
 
 interface CaseActionBarProps {
   welfareCase: WelfareCase
@@ -30,15 +31,19 @@ export function CaseActionBar({
   const [declineReason, setDeclineReason] = useState('')
 
   const amount = welfareCase.amountRequestedKobo
-  const approveCheck = canDo(role, 'approve', { amountKobo: amount })
+  const approveCheck = usesBackendApi
+    ? { allowed: role === 'officer', reason: 'Backend policy applies.' }
+    : canDo(role, 'approve', { amountKobo: amount })
   const canApproveNow =
     approveCheck.allowed &&
-    (welfareCase.status === 'verified' || welfareCase.status === 'pending')
+    (usesBackendApi
+      ? welfareCase.status === 'verified'
+      : welfareCase.status === 'verified' || welfareCase.status === 'pending')
 
   const handleEscalate = useCallback(async () => {
     setBusy(true)
     try {
-      await mockApi.decideCase({
+      await operationalApi.decideCase({
         caseId: welfareCase.id,
         decision: 'escalate',
         reason: 'Amount exceeds officer approval limit — pastor review requested.',
@@ -70,7 +75,7 @@ export function CaseActionBar({
     if (!canApproveNow) return
     setBusy(true)
     try {
-      await mockApi.decideCase({
+      await operationalApi.decideCase({
         caseId: welfareCase.id,
         decision: 'approve',
         reason: 'Approved within officer limit after verification.',
@@ -86,7 +91,7 @@ export function CaseActionBar({
     if (!declineReason.trim()) return
     setBusy(true)
     try {
-      await mockApi.decideCase({
+      await operationalApi.decideCase({
         caseId: welfareCase.id,
         decision: 'reject',
         reason: declineReason,
@@ -101,7 +106,7 @@ export function CaseActionBar({
 
   const showDisburse =
     welfareCase.status === 'approved' &&
-    amount <= LIMITS.OFFICER_DISBURSE_MAX
+    (usesBackendApi || amount <= LIMITS.OFFICER_DISBURSE_MAX)
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-hairline bg-bone/95 backdrop-blur-sm" data-tour="escalate-bar">
@@ -148,14 +153,16 @@ export function CaseActionBar({
               )}
             </div>
 
-            <Button
-              variant="secondary"
-              onClick={handleEscalate}
-              disabled={busy || welfareCase.status === 'escalated'}
-              className="border-verdigris/40 text-verdigris hover:bg-verdigris/5"
-            >
-              Escalate to Pastor
-            </Button>
+            {!usesBackendApi && (
+              <Button
+                variant="secondary"
+                onClick={handleEscalate}
+                disabled={busy || welfareCase.status === 'escalated'}
+                className="border-verdigris/40 text-verdigris hover:bg-verdigris/5"
+              >
+                Escalate to Pastor
+              </Button>
+            )}
 
             <Button variant="ghost" onClick={() => setShowDecline(true)} disabled={busy}>
               Decline with reason

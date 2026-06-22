@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import require_permissions
@@ -9,6 +9,7 @@ from app.api.presenters import present_welfare_request
 from app.core.rbac import Permission
 from app.db.session import get_db_session
 from app.models.user import User
+from app.models.enums import WelfareRequestStatus
 from app.schemas.errors import ErrorResponse
 from app.schemas.welfare_request import (
     WelfareRequestCreate,
@@ -26,6 +27,30 @@ ERROR_RESPONSES = {
     404: {"model": ErrorResponse},
     422: {"model": ErrorResponse},
 }
+
+
+@router.get(
+    "",
+    response_model=list[WelfareRequestResponse],
+    responses=ERROR_RESPONSES,
+    summary="List role-scoped welfare requests",
+)
+async def list_welfare_requests(
+    actor: Annotated[
+        User,
+        Depends(require_permissions(Permission.WELFARE_REQUEST_VIEW)),
+    ],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    request_status: Annotated[
+        WelfareRequestStatus | None,
+        Query(alias="status"),
+    ] = None,
+) -> list[WelfareRequestResponse]:
+    requests = await WelfareRequestService(session).list_requests(
+        actor=actor,
+        status=request_status,
+    )
+    return [present_welfare_request(request) for request in requests]
 
 
 @router.post(

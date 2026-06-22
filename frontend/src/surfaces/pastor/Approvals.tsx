@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { EyebrowLabel } from '../../components/ui/EyebrowLabel'
 import { Button } from '../../components/ui/Button'
 import { PriorityGauge } from '../officer/components/PriorityGauge'
 import { FactorBreakdown } from '../officer/components/FactorBreakdown'
-import { mockApi, HERO_CASE_ID } from '../../lib/mock-api'
+import { HERO_CASE_ID } from '../../lib/mock-api'
+import { operationalApi } from '../../lib/api/operational'
+import { usesBackendApi } from '../../lib/api/config'
 import { formatNaira } from '../../lib/formatters'
 import { needCategoryLabel, riskFlagMessage } from '../../lib/officer/format'
 import type { Beneficiary, Parish, WelfareCase } from '../../lib/types/domain'
@@ -26,33 +28,43 @@ export function PastorApprovals() {
   const clearPendingAction = useTourStore((s) => s.clearPendingAction)
   const tourActive = useTourStore((s) => s.active)
 
-  const load = async () => {
+  const getReviewCase = useCallback(async () => {
+    if (!usesBackendApi) return operationalApi.getCase(HERO_CASE_ID)
+    const cases = await operationalApi.listCases()
+    return (
+      cases
+        .filter((item) => item.status === 'verified')
+        .sort((a, b) => b.priorityScore - a.priorityScore)[0] ?? null
+    )
+  }, [])
+
+  const load = useCallback(async () => {
     setLoading(true)
     try {
-      const c = await mockApi.getCase(HERO_CASE_ID)
+      const c = await getReviewCase()
       if (!c) return
       setWelfareCase(c)
       const [b, parishes] = await Promise.all([
-        mockApi.getBeneficiary(c.beneficiaryId),
-        mockApi.listParishes(),
+        operationalApi.getBeneficiary(c.beneficiaryId),
+        operationalApi.listParishes(),
       ])
       setBeneficiary(b)
       setParish(parishes.find((p) => p.id === c.parishId) ?? null)
     } finally {
       setLoading(false)
     }
-  }
+  }, [getReviewCase])
 
   useEffect(() => {
     let cancelled = false
     void (async () => {
       try {
-        const c = await mockApi.getCase(HERO_CASE_ID)
+        const c = await getReviewCase()
         if (!c || cancelled) return
         setWelfareCase(c)
         const [b, parishes] = await Promise.all([
-          mockApi.getBeneficiary(c.beneficiaryId),
-          mockApi.listParishes(),
+          operationalApi.getBeneficiary(c.beneficiaryId),
+          operationalApi.listParishes(),
         ])
         if (cancelled) return
         setBeneficiary(b)
@@ -64,7 +76,7 @@ export function PastorApprovals() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [getReviewCase])
 
   useEffect(() => {
     if (pendingAction !== 'approve-pastor' || !welfareCase || !parish) return
@@ -80,7 +92,7 @@ export function PastorApprovals() {
       void (async () => {
         setBusy(true)
         try {
-          await mockApi.decideCase({
+          await operationalApi.decideCase({
             caseId: welfareCase.id,
             decision: 'approve',
             reason: SAMPLE_REASON,
@@ -97,13 +109,13 @@ export function PastorApprovals() {
       window.clearTimeout(prep)
       window.clearTimeout(approve)
     }
-  }, [pendingAction, welfareCase, parish, clearPendingAction])
+  }, [pendingAction, welfareCase, parish, clearPendingAction, load])
 
   const handleApprove = async () => {
     if (!welfareCase || !parish || !reason.trim() || !acknowledged) return
     setBusy(true)
     try {
-      await mockApi.decideCase({
+      await operationalApi.decideCase({
         caseId: welfareCase.id,
         decision: 'approve',
         reason: reason.trim(),
@@ -135,7 +147,9 @@ export function PastorApprovals() {
       : undefined
 
   const canApprove =
-    welfareCase.status === 'escalated' &&
+    (usesBackendApi
+      ? welfareCase.status === 'verified'
+      : welfareCase.status === 'escalated') &&
     reason.trim().length > 0 &&
     acknowledged &&
     !busy
@@ -208,7 +222,12 @@ export function PastorApprovals() {
                 onChange={(e) => setReason(e.target.value)}
                 rows={4}
                 placeholder="Why are you approving or declining?"
-                disabled={welfareCase.status !== 'escalated' || (tourActive && busy)}
+                disabled={
+                  (usesBackendApi
+                    ? welfareCase.status !== 'verified'
+                    : welfareCase.status !== 'escalated') ||
+                  (tourActive && busy)
+                }
                 className="mt-1.5 w-full border border-hairline bg-bone rounded-xl px-3 py-2.5 text-sm resize-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-seafoam"
               />
             </label>
@@ -217,7 +236,11 @@ export function PastorApprovals() {
                 type="checkbox"
                 checked={acknowledged}
                 onChange={(e) => setAcknowledged(e.target.checked)}
-                disabled={welfareCase.status !== 'escalated'}
+                disabled={
+                  usesBackendApi
+                    ? welfareCase.status !== 'verified'
+                    : welfareCase.status !== 'escalated'
+                }
                 className="mt-1 accent-oxblood"
               />
               <span>

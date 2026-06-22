@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
+import hashlib
+import hmac
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -32,6 +34,17 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, password_hash: str) -> bool:
     return password_hasher.verify(password, password_hash)
+
+
+def verify_demo_mfa_code(
+    code: str | None,
+    *,
+    config: Settings = settings,
+) -> bool:
+    if not config.mfa_demo_enabled or not code:
+        return False
+    digest = hashlib.sha256(code.encode("utf-8")).hexdigest()
+    return hmac.compare_digest(digest, config.mfa_demo_code_hash)
 
 
 def _create_token(

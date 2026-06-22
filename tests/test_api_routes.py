@@ -135,6 +135,34 @@ def test_login_maps_mfa_required_consistently() -> None:
     assert response.json()["error"]["code"] == "mfa_required"
 
 
+def test_login_accepts_environment_verified_demo_mfa_code() -> None:
+    tokens = TokenPair(
+        access_token="access-token",
+        refresh_token="refresh-token",
+        expires_in=900,
+    )
+    with patch(
+        "app.api.v1.routes.auth.AuthenticationService."
+        "authenticate_and_issue_tokens",
+        new=AsyncMock(return_value=tokens),
+    ) as authenticate:
+        response = client.post(
+            "/api/v1/auth/login",
+            headers={"X-MFA-Code": "246810"},
+            data={
+                "username": "officer@example.com",
+                "password": "strong-password",
+            },
+        )
+
+    assert response.status_code == 200
+    authenticate.assert_awaited_once_with(
+        "officer@example.com",
+        "strong-password",
+        mfa_verified=True,
+    )
+
+
 def test_missing_bearer_token_uses_consistent_error_shape() -> None:
     response = client.get("/api/v1/auth/me")
 

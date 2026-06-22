@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import get_current_user
 from app.api.presenters import present_user
+from app.core.security import verify_demo_mfa_code
 from app.db.session import get_db_session
 from app.models.user import User
 from app.schemas.auth import RefreshTokenRequest, TokenPair
@@ -31,7 +32,16 @@ ERROR_RESPONSES = {
 async def login(
     form: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[AsyncSession, Depends(get_db_session)],
+    mfa_code: Annotated[str | None, Header(alias="X-MFA-Code")] = None,
 ) -> TokenPair:
+    if verify_demo_mfa_code(mfa_code):
+        return await AuthenticationService(
+            session
+        ).authenticate_and_issue_tokens(
+            form.username,
+            form.password,
+            mfa_verified=True,
+        )
     return await AuthenticationService(session).authenticate_and_issue_tokens(
         form.username,
         form.password,

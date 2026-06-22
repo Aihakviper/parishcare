@@ -4,11 +4,12 @@ import { PAGE_TRANSITION } from '../../lib/motion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SlideOver } from './components/SlideOver'
 import { Button } from '../../components/ui/Button'
-import { mockApi } from '../../lib/mock-api'
+import { operationalApi } from '../../lib/api/operational'
 import { useCaseDetail } from './hooks/useOfficerCases'
 import { formatNaira } from '../../lib/formatters'
 import { LIMITS } from '../../lib/roles'
 import { truncateHash } from '../../lib/officer/format'
+import { usesBackendApi } from '../../lib/api/config'
 
 type PaymentMethod = 'bank' | 'ussd' | 'inkind' | 'cash'
 
@@ -19,12 +20,13 @@ export function DisbursementFlow() {
   const { welfareCase } = useCaseDetail(id)
   const [method, setMethod] = useState<PaymentMethod>('bank')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<{
     hash: string
     amount: number
   } | null>(null)
 
-  const [idempotencyKey] = useState(() => `idem-${id}-${crypto.randomUUID()}`)
+  const [idempotencyKey] = useState(() => crypto.randomUUID())
 
   if (!welfareCase) return null
 
@@ -34,22 +36,28 @@ export function DisbursementFlow() {
   const payerId = `checker-${welfareCase.parishId}`
   const isOwnApproval = approverId === welfareCase.assignedOfficerId
   const blockedByMakerChecker =
-    isOwnApproval && amount > LIMITS.MAKER_CHECKER_THRESHOLD
+    !usesBackendApi &&
+    isOwnApproval &&
+    amount > LIMITS.MAKER_CHECKER_THRESHOLD
 
   const execute = async () => {
     setLoading(true)
+    setError(null)
     try {
-      const result = await mockApi.executeDisbursement({
+      const result = await operationalApi.executeDisbursement({
         caseId: welfareCase.id,
         payingOfficerId: payerId,
         idempotencyKey,
+        amountKobo: amount,
       })
-      const chain = await mockApi.getAuditChain()
-      const last = chain[chain.length - 1]
       setSuccess({
-        hash: last?.entryHash ?? 'unknown',
-        amount: result.amountDisbursedKobo ?? amount,
+        hash: result.reference,
+        amount: result.welfareCase.amountDisbursedKobo ?? amount,
       })
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : 'Disbursement failed',
+      )
     } finally {
       setLoading(false)
     }
@@ -92,6 +100,11 @@ export function DisbursementFlow() {
           </p>
         ) : (
           <div className="space-y-5">
+            {error && (
+              <p className="text-sm text-oxblood border border-oxblood/30 bg-oxblood/5 rounded-xl p-3">
+                {error}
+              </p>
+            )}
             <div className="p-4 border border-hairline rounded-xl">
               <p className="mono-tag">Amount</p>
               <p className="display-tight text-2xl font-semibold mt-1">

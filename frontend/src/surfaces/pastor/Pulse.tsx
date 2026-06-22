@@ -3,7 +3,9 @@ import { EyebrowLabel } from '../../components/ui/EyebrowLabel'
 import { BudgetDonut } from '../../components/charts/BudgetDonut'
 import { formatNaira } from '../../lib/formatters'
 import { useSessionStore } from '../../store/session'
-import { mockApi, HERO_CASE_ID } from '../../lib/mock-api'
+import { HERO_CASE_ID } from '../../lib/mock-api'
+import { operationalApi } from '../../lib/api/operational'
+import { usesBackendApi } from '../../lib/api/config'
 import { useEffect, useState } from 'react'
 import type { Parish, WelfareCase } from '../../lib/types/domain'
 
@@ -14,9 +16,16 @@ export function PastorPulse() {
 
   useEffect(() => {
     void (async () => {
-      const parishes = await mockApi.listParishes()
+      const parishes = await operationalApi.listParishes()
       setParish(parishes.find((p) => p.id === parishId) ?? parishes[0] ?? null)
-      setHeroCase(await mockApi.getCase(HERO_CASE_ID))
+      if (usesBackendApi) {
+        const cases = await operationalApi.listCases({ parishId })
+        setHeroCase(
+          cases.sort((a, b) => b.priorityScore - a.priorityScore)[0] ?? null,
+        )
+      } else {
+        setHeroCase(await operationalApi.getCase(HERO_CASE_ID))
+      }
     })()
   }, [parishId])
 
@@ -26,7 +35,11 @@ export function PastorPulse() {
 
   const pctUsed = Math.min(
     100,
-    Math.round((parish.currentMonthDisbursedKobo / parish.monthlyBudgetKobo) * 100),
+    parish.monthlyBudgetKobo > 0
+      ? Math.round(
+          (parish.currentMonthDisbursedKobo / parish.monthlyBudgetKobo) * 100,
+        )
+      : 0,
   )
   const remaining = parish.monthlyBudgetKobo - parish.currentMonthDisbursedKobo
   const awaitingPastor = heroCase?.status === 'escalated'
