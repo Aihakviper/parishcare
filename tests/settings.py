@@ -42,6 +42,10 @@ def build_test_settings(**overrides: object) -> Settings:
         "anti_fraud_recent_support_days": 7,
         "anti_fraud_duplicate_request_days": 30,
         "anti_fraud_high_amount_kobo": 1_000_000,
+        "verification_voucher_expire_hours": 24,
+        "verification_voucher_issuer": "test-verification-issuer",
+        "verification_voucher_audience": "test-verification-audience",
+        "verification_delivery_channel": "mock",
     }
     values.update(overrides)
     return Settings(_env_file=None, **values)

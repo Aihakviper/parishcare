@@ -31,6 +31,7 @@ from app.models.types import database_enum
 if TYPE_CHECKING:
     from app.models.beneficiary import Beneficiary
     from app.models.user import User
+    from app.models.verification import VerificationRequest
 
 
 class WelfareRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -150,4 +151,7 @@ class WelfareRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     risk_reviewer: Mapped[Optional[User]] = relationship(
         foreign_keys=[risk_reviewed_by],
+    )
+    verification_requests: Mapped[list[VerificationRequest]] = relationship(
+        back_populates="welfare_request"
     )

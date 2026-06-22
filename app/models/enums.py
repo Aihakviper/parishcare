@@ -35,3 +35,15 @@ class PriorityBand(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
+
+
+class VerificationOutcome(StrEnum):
+    CONFIRMED = "confirmed"
+    REJECTED = "rejected"
+    EXPIRED = "expired"
+
+
+class VerificationChannel(StrEnum):
+    MOCK = "mock"
+    WHATSAPP = "whatsapp"
+    SMS = "sms"

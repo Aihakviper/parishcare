@@ -48,6 +48,11 @@ class Settings(BaseSettings):
     anti_fraud_duplicate_request_days: int = Field(gt=0)
     anti_fraud_high_amount_kobo: int = Field(gt=0)
 
+    verification_voucher_expire_hours: int = Field(gt=0)
+    verification_voucher_issuer: str = Field(min_length=1)
+    verification_voucher_audience: str = Field(min_length=1)
+    verification_delivery_channel: Literal["mock"]
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

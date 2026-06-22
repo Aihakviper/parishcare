@@ -12,3 +12,15 @@ class ResourceConflictError(ServiceError):
 
 class ServiceValidationError(ServiceError):
     """Raised when a requested state transition is invalid."""
+
+
+class VoucherInvalidError(ServiceError):
+    """Raised when a voucher token is malformed or cannot be resolved."""
+
+
+class VoucherExpiredError(ServiceError):
+    """Raised when a voucher has expired."""
+
+
+class VoucherUsedError(ServiceError):
+    """Raised when a voucher has already been consumed."""

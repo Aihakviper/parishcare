@@ -11,10 +11,14 @@ from app.services.errors import (
     ResourceNotFoundError,
     ServiceValidationError,
     ServiceError,
+    VoucherExpiredError,
+    VoucherInvalidError,
+    VoucherUsedError,
 )
 from app.services.parish import ParishService
 from app.services.user import UserService
 from app.services.welfare_request import WelfareRequestService
+from app.services.verification import VerificationService
 
 __all__ = [
     "AuthenticationError",
@@ -27,7 +31,11 @@ __all__ = [
     "ResourceConflictError",
     "ResourceNotFoundError",
     "ServiceValidationError",
+    "VoucherExpiredError",
+    "VoucherInvalidError",
+    "VoucherUsedError",
     "ServiceError",
     "UserService",
     "WelfareRequestService",
+    "VerificationService",
 ]

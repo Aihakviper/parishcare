@@ -10,6 +10,9 @@ from app.services.errors import (
     ResourceConflictError,
     ResourceNotFoundError,
     ServiceValidationError,
+    VoucherExpiredError,
+    VoucherInvalidError,
+    VoucherUsedError,
 )
 
 
@@ -38,6 +41,9 @@ def register_exception_handlers(application: FastAPI) -> None:
         ServiceValidationError,
         _service_validation_handler,
     )
+    application.add_exception_handler(VoucherInvalidError, _voucher_invalid_handler)
+    application.add_exception_handler(VoucherExpiredError, _voucher_expired_handler)
+    application.add_exception_handler(VoucherUsedError, _voucher_used_handler)
     application.add_exception_handler(
         RequestValidationError,
         _request_validation_handler,
@@ -108,6 +114,39 @@ async def _service_validation_handler(
     return _error_response(
         status.HTTP_422_UNPROCESSABLE_ENTITY,
         "invalid_operation",
+        str(exc),
+    )
+
+
+async def _voucher_invalid_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    return _error_response(
+        status.HTTP_400_BAD_REQUEST,
+        "invalid_voucher",
+        str(exc),
+    )
+
+
+async def _voucher_expired_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    return _error_response(
+        status.HTTP_410_GONE,
+        "voucher_expired",
+        str(exc),
+    )
+
+
+async def _voucher_used_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    return _error_response(
+        status.HTTP_409_CONFLICT,
+        "voucher_used",
         str(exc),
     )
 

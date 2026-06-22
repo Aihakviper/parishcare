@@ -16,6 +16,11 @@ from app.schemas.welfare_request import (
     WelfareRequestTransition,
     WelfareRiskReview,
 )
+from app.schemas.verification import (
+    VerificationOutcomeResponse,
+    VerificationStartResponse,
+    VerificationVoucherResponse,
+)
 
 __all__ = [
     "AuditVerificationResult",
@@ -39,4 +44,7 @@ __all__ = [
     "WelfareRequestResponse",
     "WelfareRequestTransition",
     "WelfareRiskReview",
+    "VerificationOutcomeResponse",
+    "VerificationStartResponse",
+    "VerificationVoucherResponse",
 ]

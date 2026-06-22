@@ -14,6 +14,7 @@ from app.models.beneficiary import Beneficiary
 from app.models.parish import Parish
 from app.models.user import User
 from app.models.welfare_request import WelfareRequest
+from app.models.verification import VerificationRequest, VerificationVoucher
 from app.schemas.auth import TokenPair
 from app.services.auth import MFARequiredError
 from app.services.errors import ResourceConflictError
@@ -26,6 +27,12 @@ from app.models.enums import (
     VerificationStatus,
     WelfareRequestStatus,
     WelfareRequestType,
+    VerificationChannel,
+    VerificationOutcome,
+)
+from app.services.verification import (
+    VerificationResponseResult,
+    VerificationStartResult,
 )
 from app.utils.crypto import PIICipher
 
@@ -74,6 +81,8 @@ def test_openapi_exposes_auth_and_management_routes() -> None:
     assert "/api/v1/welfare-requests/{request_id}" in paths
     assert "/api/v1/welfare-requests/{request_id}/transition" in paths
     assert "/api/v1/welfare-requests/{request_id}/risk-review" in paths
+    assert "/api/v1/welfare-requests/{request_id}/verify" in paths
+    assert "/api/v1/verification-vouchers/respond" in paths
 
 
 def test_login_returns_token_pair() -> None:
@@ -420,3 +429,100 @@ def test_officer_cannot_clear_welfare_risk_flags() -> None:
 
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "forbidden"
+
+
+def test_start_verification_returns_mock_token_once() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+    request = build_welfare_request(parish_id)
+    beneficiary = Beneficiary(
+        id=request.beneficiary_id,
+        name_encrypted="encrypted-name",
+        name_normalised="amina ibrahim",
+        phone_encrypted="encrypted-phone",
+        phone_hash="d" * 64,
+        home_parish_id=parish_id,
+        dependents_count=2,
+        verification_status=VerificationStatus.PENDING,
+    )
+    now = datetime.now(timezone.utc)
+    verification_request = VerificationRequest(
+        id=uuid4(),
+        welfare_request_id=request.id,
+        sent_to_phone_encrypted="encrypted-phone",
+        sent_to_parish_id=parish_id,
+    )
+    voucher = VerificationVoucher(
+        id=uuid4(),
+        verification_request_id=verification_request.id,
+        token_hash="e" * 64,
+        channel=VerificationChannel.MOCK,
+        issued_at=now,
+        expires_at=now.replace(microsecond=0),
+    )
+    with patch(
+        "app.api.v1.routes.verification.VerificationService.start",
+        new=AsyncMock(
+            return_value=VerificationStartResult(
+                mode="voucher_issued",
+                welfare_request=request,
+                beneficiary=beneficiary,
+                verification_request=verification_request,
+                voucher=voucher,
+                raw_token="signed-token",
+            )
+        ),
+    ):
+        response = client.post(
+            f"/api/v1/welfare-requests/{request.id}/verify"
+        )
+
+    assert response.status_code == 200
+    assert response.json()["mode"] == "voucher_issued"
+    assert response.json()["voucher_token"] == "signed-token"
+
+
+def test_public_voucher_confirmation_response() -> None:
+    parish_id = uuid4()
+    request = build_welfare_request(parish_id)
+    request.status = WelfareRequestStatus.VERIFIED
+    beneficiary = Beneficiary(
+        id=request.beneficiary_id,
+        name_encrypted="encrypted-name",
+        name_normalised="amina ibrahim",
+        phone_encrypted="encrypted-phone",
+        phone_hash="f" * 64,
+        home_parish_id=parish_id,
+        dependents_count=2,
+        verification_status=VerificationStatus.VERIFIED,
+    )
+    now = datetime.now(timezone.utc)
+    verification_request = VerificationRequest(
+        id=uuid4(),
+        welfare_request_id=request.id,
+        sent_to_phone_encrypted="encrypted-phone",
+        sent_to_parish_id=parish_id,
+        outcome=VerificationOutcome.CONFIRMED,
+        responded_at=now,
+    )
+    with patch(
+        "app.api.v1.routes.verification.VerificationService.respond",
+        new=AsyncMock(
+            return_value=VerificationResponseResult(
+                verification_request=verification_request,
+                welfare_request=request,
+                beneficiary=beneficiary,
+            )
+        ),
+    ):
+        response = client.post(
+            "/api/v1/verification-vouchers/respond",
+            json={"token": "signed-token", "outcome": "confirmed"},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["outcome"] == "confirmed"
+    assert response.json()["welfare_request_status"] == "verified"
