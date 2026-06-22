@@ -1,1 +1,3 @@
-"""Pydantic request and response schemas."""
+from app.schemas.auth import TokenClaims, TokenPair
+
+__all__ = ["TokenClaims", "TokenPair"]
