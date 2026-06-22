@@ -8,6 +8,10 @@ from app.models.user import User
 class Permission(StrEnum):
     BENEFICIARY_CREATE = "beneficiary:create"
     BENEFICIARY_LOOKUP = "beneficiary:lookup"
+    WELFARE_REQUEST_CREATE = "welfare_request:create"
+    WELFARE_REQUEST_VIEW = "welfare_request:view"
+    WELFARE_REQUEST_TRANSITION = "welfare_request:transition"
+    WELFARE_REQUEST_RISK_REVIEW = "welfare_request:risk_review"
     PARISH_CREATE = "parish:create"
     PARISH_UPDATE = "parish:update"
     USER_CREATE = "user:create"
@@ -20,12 +24,19 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
         {
             Permission.BENEFICIARY_CREATE,
             Permission.BENEFICIARY_LOOKUP,
+            Permission.WELFARE_REQUEST_CREATE,
+            Permission.WELFARE_REQUEST_VIEW,
+            Permission.WELFARE_REQUEST_TRANSITION,
         }
     ),
     UserRole.PASTOR: frozenset(
         {
             Permission.BENEFICIARY_CREATE,
             Permission.BENEFICIARY_LOOKUP,
+            Permission.WELFARE_REQUEST_CREATE,
+            Permission.WELFARE_REQUEST_VIEW,
+            Permission.WELFARE_REQUEST_TRANSITION,
+            Permission.WELFARE_REQUEST_RISK_REVIEW,
             Permission.PARISH_UPDATE,
             Permission.USER_CREATE,
             Permission.USER_UPDATE,

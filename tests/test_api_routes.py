@@ -13,12 +13,19 @@ from app.models.enums import UserRole
 from app.models.beneficiary import Beneficiary
 from app.models.parish import Parish
 from app.models.user import User
+from app.models.welfare_request import WelfareRequest
 from app.schemas.auth import TokenPair
 from app.services.auth import MFARequiredError
 from app.services.errors import ResourceConflictError
 from app.services.beneficiary import (
     BeneficiaryLookupResult,
     BeneficiaryRegistrationResult,
+)
+from app.models.enums import (
+    PriorityBand,
+    VerificationStatus,
+    WelfareRequestStatus,
+    WelfareRequestType,
 )
 from app.utils.crypto import PIICipher
 
@@ -63,6 +70,10 @@ def test_openapi_exposes_auth_and_management_routes() -> None:
     assert "/api/v1/parishes/{parish_id}" in paths
     assert "/api/v1/users" in paths
     assert "/api/v1/users/{user_id}" in paths
+    assert "/api/v1/welfare-requests" in paths
+    assert "/api/v1/welfare-requests/{request_id}" in paths
+    assert "/api/v1/welfare-requests/{request_id}/transition" in paths
+    assert "/api/v1/welfare-requests/{request_id}/risk-review" in paths
 
 
 def test_login_returns_token_pair() -> None:
@@ -289,3 +300,123 @@ def test_cross_parish_lookup_route_returns_no_identity() -> None:
     assert response.status_code == 200
     assert response.json()["outcome"] == "restricted_match"
     assert response.json()["beneficiary"] is None
+
+
+def build_welfare_request(parish_id) -> WelfareRequest:
+    cipher = PIICipher(settings.pii_encryption_key)
+    now = datetime.now(timezone.utc)
+    return WelfareRequest(
+        id=uuid4(),
+        beneficiary_id=uuid4(),
+        created_by=uuid4(),
+        request_type=WelfareRequestType.MEDICAL,
+        amount_requested_kobo=1_500_000,
+        reason_encrypted=cipher.encrypt(
+            "Urgent surgery and hospital treatment required",
+            context="welfare_requests.reason",
+        ),
+        is_urgent=True,
+        deadline_at=now.replace(microsecond=0),
+        status=WelfareRequestStatus.PENDING,
+        priority_score=60,
+        priority_band=PriorityBand.MEDIUM,
+        scoring_version="v1",
+        score_breakdown={
+            "version": "v1",
+            "factors": {"need_severity": 30},
+        },
+        risk_flags=[
+            {"code": "recent_support", "severity": "high"},
+        ],
+        created_at=now,
+        updated_at=now,
+    )
+
+
+def test_create_welfare_request_returns_score_and_risk_flags() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+    request = build_welfare_request(parish_id)
+    with patch(
+        "app.api.v1.routes.welfare_requests.WelfareRequestService.create",
+        new=AsyncMock(return_value=request),
+    ):
+        response = client.post(
+            "/api/v1/welfare-requests",
+            json={
+                "beneficiary_id": str(request.beneficiary_id),
+                "request_type": "medical",
+                "amount_requested_kobo": 1_500_000,
+                "reason": "Urgent surgery and hospital treatment required",
+                "is_urgent": True,
+            },
+        )
+
+    assert response.status_code == 201
+    assert response.json()["amount_requested_kobo"] == 1_500_000
+    assert response.json()["priority_score"] == 60
+    assert response.json()["risk_flags"][0]["code"] == "recent_support"
+
+
+def test_welfare_request_amount_rejects_float() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+
+    response = client.post(
+        "/api/v1/welfare-requests",
+        json={
+            "beneficiary_id": str(uuid4()),
+            "request_type": "food",
+            "amount_requested_kobo": 1500.50,
+            "reason": "Emergency household food support required",
+            "is_urgent": False,
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+
+
+def test_welfare_request_amount_rejects_numeric_string() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+
+    response = client.post(
+        "/api/v1/welfare-requests",
+        json={
+            "beneficiary_id": str(uuid4()),
+            "request_type": "food",
+            "amount_requested_kobo": "150000",
+            "reason": "Emergency household food support required",
+            "is_urgent": False,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_officer_cannot_clear_welfare_risk_flags() -> None:
+    parish_id = uuid4()
+    app.dependency_overrides[get_current_user] = lambda: build_actor(
+        UserRole.OFFICER,
+        parish_id,
+    )
+
+    response = client.post(
+        f"/api/v1/welfare-requests/{uuid4()}/risk-review",
+        json={
+            "reason": "Supporting documents reviewed with parish committee"
+        },
+    )
+
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "forbidden"

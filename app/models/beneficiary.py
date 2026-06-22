@@ -13,6 +13,7 @@ from app.models.types import database_enum
 
 if TYPE_CHECKING:
     from app.models.parish import Parish
+    from app.models.welfare_request import WelfareRequest
 
 
 class Beneficiary(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -53,6 +54,9 @@ class Beneficiary(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         back_populates="beneficiary",
         cascade="all, delete-orphan",
         order_by="PhoneHistory.active_from.desc()",
+    )
+    welfare_requests: Mapped[list[WelfareRequest]] = relationship(
+        back_populates="beneficiary"
     )
 
 

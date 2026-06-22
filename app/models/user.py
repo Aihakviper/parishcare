@@ -23,6 +23,7 @@ from app.models.types import database_enum
 if TYPE_CHECKING:
     from app.models.audit import AuditLog
     from app.models.parish import Parish
+    from app.models.welfare_request import WelfareRequest
 
 
 class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -65,3 +66,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
 
     parish: Mapped[Optional[Parish]] = relationship(back_populates="users")
     audit_logs: Mapped[list[AuditLog]] = relationship(back_populates="actor")
+    created_welfare_requests: Mapped[list[WelfareRequest]] = relationship(
+        foreign_keys="WelfareRequest.created_by",
+        back_populates="creator",
+    )

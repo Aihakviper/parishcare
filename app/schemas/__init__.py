@@ -10,6 +10,12 @@ from app.schemas.beneficiary import (
 from app.schemas.errors import ErrorDetail, ErrorResponse
 from app.schemas.parish import ParishCreate, ParishResponse, ParishUpdate
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.welfare_request import (
+    WelfareRequestCreate,
+    WelfareRequestResponse,
+    WelfareRequestTransition,
+    WelfareRiskReview,
+)
 
 __all__ = [
     "AuditVerificationResult",
@@ -29,4 +35,8 @@ __all__ = [
     "UserCreate",
     "UserResponse",
     "UserUpdate",
+    "WelfareRequestCreate",
+    "WelfareRequestResponse",
+    "WelfareRequestTransition",
+    "WelfareRiskReview",
 ]

@@ -13,6 +13,7 @@ def test_phase_two_tables_are_registered() -> None:
         "parishes",
         "phone_history",
         "users",
+        "welfare_requests",
     }
 
 

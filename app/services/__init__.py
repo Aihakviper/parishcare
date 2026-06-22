@@ -14,6 +14,7 @@ from app.services.errors import (
 )
 from app.services.parish import ParishService
 from app.services.user import UserService
+from app.services.welfare_request import WelfareRequestService
 
 __all__ = [
     "AuthenticationError",
@@ -28,4 +29,5 @@ __all__ = [
     "ServiceValidationError",
     "ServiceError",
     "UserService",
+    "WelfareRequestService",
 ]
