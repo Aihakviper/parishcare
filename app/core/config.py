@@ -73,6 +73,7 @@ class Settings(BaseSettings):
     mock_payment_provider_name: str = Field(min_length=1, max_length=50)
     mock_payment_receipt_base_url: str = Field(min_length=1, max_length=500)
     marketplace_platform_fee_bps: int = Field(ge=0, le=10_000)
+    camp_mock_auth_bypass: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",
