@@ -89,7 +89,7 @@ export function ResidentJobTracking() {
       </div>
 
       {job.status === 'completed' && (
-        <Link to={`/resident/jobs/${job.id}/pay`} className="block mt-6">
+        <Link to={`/member/jobs/${job.id}/pay`} className="block mt-6">
           <Button className="w-full">Review & release payment</Button>
         </Link>
       )}

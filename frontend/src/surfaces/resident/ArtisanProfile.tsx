@@ -1,17 +1,21 @@
 import { Link, useParams } from 'react-router-dom'
+import { useState } from 'react'
 import { FaPlay, FaStar } from 'react-icons/fa6'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { TierPill } from '../../components/ui/TierPill'
 import { Button } from '../../components/ui/Button'
+import { TrustPillars } from '../../components/ui/TrustPillars'
+import { VouchModal } from '../../components/ui/VouchModal'
 import { ProgressBar } from '../../components/charts/ProgressBar'
 import { useArtisan } from '../../hooks/useCampData'
 import { TRADE_LABELS } from '../../lib/types/camp'
-import { nextTierRequirement } from '../../lib/trust-engine'
+import { nextTierRequirement, getPillarBreakdown } from '../../lib/trust-engine'
 import { formatNaira } from '../../lib/formatters'
 
 export function ResidentArtisanProfile() {
   const { id } = useParams()
   const { data: artisan, isLoading } = useArtisan(id)
+  const [vouchOpen, setVouchOpen] = useState(false)
 
   if (isLoading || !artisan) {
     return <p className="text-slate italic-serif py-12">Loading profile…</p>
@@ -20,6 +24,7 @@ export function ResidentArtisanProfile() {
   const tier = artisan.tier === 'unverified' ? 'verified' : artisan.tier
   const next = nextTierRequirement(artisan)
   const progress = Math.min(100, (artisan.completedJobs / 50) * 100)
+  const pillars = getPillarBreakdown(artisan)
 
   return (
     <div className="pb-24">
@@ -35,6 +40,7 @@ export function ResidentArtisanProfile() {
           <TierPill tier={tier} jobsCompleted={artisan.completedJobs} />
         </div>
         <p className="text-slate mt-1">{TRADE_LABELS[artisan.trade]} · {artisan.serviceArea}</p>
+        <TrustPillars pillars={pillars} className="mt-3" />
 
         <div className="grid grid-cols-2 gap-3 mt-5">
           {[
@@ -94,6 +100,9 @@ export function ResidentArtisanProfile() {
               ))}
             </ul>
           )}
+          <Button variant="secondary" className="w-full mt-4" onClick={() => setVouchOpen(true)}>
+            Vouch for {artisan.name.split(' ')[0]}
+          </Button>
         </div>
 
         <div className="mt-6 frame p-4">
@@ -118,10 +127,18 @@ export function ResidentArtisanProfile() {
       </div>
 
       <div className="fixed bottom-20 left-0 right-0 px-4 max-w-lg mx-auto z-30">
-        <Link to={`/resident/book/${artisan.id}`}>
+        <Link to={`/member/book/${artisan.id}`}>
           <Button className="w-full">Request a quote</Button>
         </Link>
       </div>
+
+      {vouchOpen && (
+        <VouchModal
+          artisanId={artisan.id}
+          artisanName={artisan.name}
+          onClose={() => setVouchOpen(false)}
+        />
+      )}
     </div>
   )
 }

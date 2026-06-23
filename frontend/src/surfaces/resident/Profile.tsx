@@ -36,7 +36,7 @@ export function ResidentProfile() {
         <h2 className="eyebrow">Trusted Stewards</h2>
         <div className="mt-3 space-y-2">
           {trusted.map((a) => (
-            <Link key={a.id} to={`/resident/artisan/${a.id}`} className="frame p-4 flex items-center gap-3 hover:shadow-lift transition-shadow block">
+            <Link key={a.id} to={`/member/artisan/${a.id}`} className="frame p-4 flex items-center gap-3 hover:shadow-lift transition-shadow block">
               <img src={a.photoUrl} alt="" className="w-10 h-10 rounded-frame object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-ink truncate">{a.name}</p>

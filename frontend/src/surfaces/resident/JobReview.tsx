@@ -18,7 +18,7 @@ export function ResidentJobReview() {
     if (!id) return
     await submitReview.mutateAsync({ id, rating, text })
     setDone(true)
-    setTimeout(() => navigate('/resident'), 1500)
+    setTimeout(() => navigate('/member'), 1500)
   }
 
   if (done) {

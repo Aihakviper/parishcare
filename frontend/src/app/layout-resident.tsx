@@ -9,10 +9,10 @@ import { PAGE_TRANSITION } from '../lib/motion'
 import { cn } from '../lib/cn'
 
 const nav = [
-  { to: '/resident', icon: FaHouse, label: 'Home' },
-  { to: '/resident/jobs', icon: FaBriefcase, label: 'Jobs' },
-  { to: '/resident/discover', icon: FaStar, label: 'Saved' },
-  { to: '/resident/me', icon: FaUser, label: 'Me' },
+  { to: '/member', icon: FaHouse, label: 'Home' },
+  { to: '/member/jobs', icon: FaBriefcase, label: 'Jobs' },
+  { to: '/member/discover', icon: FaStar, label: 'Saved' },
+  { to: '/member/me', icon: FaUser, label: 'Me' },
 ]
 
 export function ResidentLayout() {
@@ -43,7 +43,7 @@ export function ResidentLayout() {
       </main>
 
       <nav
-        aria-label="Resident navigation"
+        aria-label="Member navigation"
         className="fixed bottom-0 left-0 right-0 z-40 bg-parchment-soft border-t border-hairline max-w-lg mx-auto"
       >
         <ul className="flex justify-around">
@@ -51,7 +51,7 @@ export function ResidentLayout() {
             <li key={to} className="flex-1">
               <NavLink
                 to={to}
-                end={to === '/resident'}
+                end={to === '/member'}
                 className={({ isActive }) =>
                   cn(
                     'flex flex-col items-center gap-0.5 py-3 min-h-[56px] text-xs font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-gilt',

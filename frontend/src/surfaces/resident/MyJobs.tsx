@@ -43,7 +43,7 @@ export function ResidentMyJobs() {
                 <p className="text-xs text-slate mt-1">
                   {formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true })}
                 </p>
-                <Link to={`/resident/jobs/${job.id}`} className="text-sm text-oxblood font-semibold mt-2 inline-block">
+                <Link to={`/member/jobs/${job.id}`} className="text-sm text-oxblood font-semibold mt-2 inline-block">
                   View
                 </Link>
               </Card>
@@ -74,7 +74,7 @@ function ActiveJobCard({ jobId }: { jobId: string }) {
       <p className="text-sm text-slate mt-2 line-clamp-2">{job.description}</p>
       <div className="flex items-center justify-between mt-3">
         <span className="font-semibold text-ink">{formatNaira(job.priceKobo)}</span>
-        <Link to={`/resident/jobs/${job.id}`} className="text-sm font-semibold text-oxblood">
+        <Link to={`/member/jobs/${job.id}`} className="text-sm font-semibold text-oxblood">
           View
         </Link>
       </div>

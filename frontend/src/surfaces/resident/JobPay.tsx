@@ -3,7 +3,9 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { Button } from '../../components/ui/Button'
+import { PaymentSplitReceipt } from '../../components/ui/PaymentSplitReceipt'
 import { useJob, useArtisan, useJobMutations } from '../../hooks/useCampData'
+import { computePaymentSplit } from '../../lib/types/camp'
 import { formatNaira } from '../../lib/formatters'
 
 export function ResidentJobPay() {
@@ -16,8 +18,7 @@ export function ResidentJobPay() {
 
   if (!job || !artisan) return <p className="italic-serif text-slate py-12">Loading…</p>
 
-  const fee = Math.round(job.priceKobo * 0.05)
-  const net = job.priceKobo - fee
+  const split = computePaymentSplit(job.priceKobo)
 
   const handleRelease = async () => {
     setAnimating(true)
@@ -33,18 +34,15 @@ export function ResidentJobPay() {
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="frame p-8 max-w-sm mx-auto"
+          className="frame p-8 max-w-sm mx-auto space-y-4"
         >
           <p className="display-tight text-2xl font-semibold text-verdigris">Payment released</p>
-          <p className="text-ink mt-4">
-            {formatNaira(net)} released to {artisan.name}.
+          <p className="text-ink">
+            {formatNaira(split.artisanKobo)} released to {artisan.name}.
           </p>
-          <p className="text-sm text-slate mt-2">
-            Steward&apos;s 5% service fee: {formatNaira(fee)}
-          </p>
-          <p className="mono-tag mt-4">{job.releaseRef ?? 'STW-RLS-2026-001847'}</p>
-          <Link to={`/resident/jobs/${job.id}/review`}>
-            <Button className="w-full mt-6">Leave a review</Button>
+          <PaymentSplitReceipt split={split} reference={job.releaseRef ?? 'STW-RLS-2026-001847'} />
+          <Link to={`/member/jobs/${job.id}/review`}>
+            <Button className="w-full mt-2">Leave a review</Button>
           </Link>
         </motion.div>
       </div>
@@ -72,6 +70,8 @@ export function ResidentJobPay() {
         ))}
       </div>
 
+      <PaymentSplitReceipt split={split} className="mt-6" />
+
       <p className="display-tight text-lg font-semibold text-ink mt-8">Is the job done well?</p>
 
       {animating ? (
@@ -93,7 +93,7 @@ export function ResidentJobPay() {
           </motion.span>
           <div className="frame p-4 flex-1 text-center border-verdigris/30">
             <p className="mono-tag">Tunde</p>
-            <p className="font-semibold text-verdigris">{formatNaira(net)}</p>
+            <p className="font-semibold text-verdigris">{formatNaira(split.artisanKobo)}</p>
           </div>
         </motion.div>
       ) : (

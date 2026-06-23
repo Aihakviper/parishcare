@@ -1,25 +1,49 @@
 import type {
+  Apprenticeship,
   Artisan,
   CampPattern,
   CampStats,
   Dispute,
+  GenerosityAct,
   Job,
+  LineageNode,
+  Parish,
+  PastoralConfirmation,
   Resident,
+  StewardsFund,
   Trade,
+  VoucherRequest,
 } from '../types/camp'
+import { computePaymentSplit } from '../types/camp'
+import { seedApprenticeships } from '../seed/apprenticeships'
 import { seedArtisans } from '../seed/artisans'
 import { seedDisputes } from '../seed/disputes'
+import { seedGenerosity } from '../seed/generosity'
 import { seedJobs } from '../seed/jobs'
+import { seedParishes } from '../seed/parishes'
+import { seedPastoralConfirmations } from '../seed/pastoral-confirmations'
 import { seedResidents } from '../seed/residents'
-import { HERO_ARTISAN_ID, HERO_JOB_ID, HERO_RESIDENT_ID } from '../types/camp'
+import { seedStewardsFund } from '../seed/stewards-fund'
+import {
+  HERO_ARTISAN_ID,
+  HERO_JOB_ID,
+  HERO_MEMBER_ID,
+  HERO_RESIDENT_ID,
+} from '../types/camp'
 
-const STORAGE_KEY = 'steward_camp_v1'
+const STORAGE_KEY = 'steward_camp_v2'
 
 interface CampState {
   artisans: Artisan[]
   residents: Resident[]
   jobs: Job[]
   disputes: Dispute[]
+  parishes: Parish[]
+  apprenticeships: Apprenticeship[]
+  pastoralConfirmations: PastoralConfirmation[]
+  generosity: GenerosityAct[]
+  stewardsFund: StewardsFund
+  voucherRequests: VoucherRequest[]
 }
 
 function clone<T>(value: T): T {
@@ -32,6 +56,12 @@ function initialState(): CampState {
     residents: clone(seedResidents),
     jobs: clone(seedJobs),
     disputes: clone(seedDisputes),
+    parishes: clone(seedParishes),
+    apprenticeships: clone(seedApprenticeships),
+    pastoralConfirmations: clone(seedPastoralConfirmations),
+    generosity: clone(seedGenerosity),
+    stewardsFund: clone(seedStewardsFund),
+    voucherRequests: [],
   }
 }
 
@@ -111,7 +141,12 @@ export const campApi = {
     status?: Job['status']
   } = {}): Promise<Job[]> {
     let list = [...state.jobs]
-    if (filters.residentId) list = list.filter((j) => j.residentId === filters.residentId)
+    if (filters.residentId) {
+      const id = filters.residentId
+      list = list.filter(
+        (j) => j.residentId === id || (id === HERO_MEMBER_ID && j.residentId === HERO_RESIDENT_ID),
+      )
+    }
     if (filters.artisanId) list = list.filter((j) => j.artisanId === filters.artisanId)
     if (filters.status) list = list.filter((j) => j.status === filters.status)
     list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -228,6 +263,17 @@ export const campApi = {
     job.escrowStatus = 'held'
     job.escrowRef = `STW-ESC-2026-${Date.now().toString().slice(-6)}`
     job.updatedAt = new Date().toISOString()
+    const split = computePaymentSplit(job.priceKobo)
+    state.stewardsFund.balanceKobo += split.fundKobo
+    state.stewardsFund.monthlyInflowKobo += split.fundKobo
+    state.stewardsFund.entries.unshift({
+      id: `fnd-${Date.now()}`,
+      type: 'contribution',
+      amountKobo: split.fundKobo,
+      sourceJobId: job.id,
+      note: 'Escrow funded',
+      at: new Date().toISOString(),
+    })
     saveState(state)
     return delay(job)
   },
@@ -314,9 +360,99 @@ export const campApi = {
 
   getHeroIds() {
     return {
-      residentId: HERO_RESIDENT_ID,
+      memberId: HERO_MEMBER_ID,
+      residentId: HERO_MEMBER_ID,
       artisanId: HERO_ARTISAN_ID,
       jobId: HERO_JOB_ID,
     }
+  },
+
+  async listParishes(): Promise<Parish[]> {
+    return delay([...state.parishes])
+  },
+
+  async listApprenticeships(filters: { masterId?: string; memberId?: string } = {}) {
+    let list = [...state.apprenticeships]
+    if (filters.masterId) list = list.filter((a) => a.masterArtisanId === filters.masterId)
+    if (filters.memberId) {
+      list = list.filter((a) => a.supportedByMemberIds.includes(filters.memberId!))
+    }
+    return delay(list)
+  },
+
+  async listPastoralConfirmations() {
+    return delay([...state.pastoralConfirmations])
+  },
+
+  async confirmStanding(id: string, note: string) {
+    const row = state.pastoralConfirmations.find((c) => c.id === id)
+    if (!row) throw new Error('Not found')
+    row.status = 'confirmed'
+    row.note = note
+    row.confirmedAt = new Date().toISOString()
+    saveState(state)
+    return delay(row)
+  },
+
+  async listGenerosity(actorId?: string): Promise<GenerosityAct[]> {
+    let list = [...state.generosity]
+    if (actorId) list = list.filter((g) => g.actorId === actorId)
+    return delay(list)
+  },
+
+  async getStewardsFund(): Promise<StewardsFund> {
+    return delay({ ...state.stewardsFund, entries: [...state.stewardsFund.entries] })
+  },
+
+  async requestVouch(artisanId: string): Promise<VoucherRequest> {
+    const req: VoucherRequest = {
+      id: `vouch-${Date.now()}`,
+      artisanId,
+      voucherName: 'Mama Iyabo Adewale',
+      voucherPhone: '+2348035567821',
+      status: 'pending',
+      message:
+        'Good afternoon Mama Iyabo. Tunde Akinwale listed you as someone who can speak for his work. Reply YES or NO.',
+    }
+    state.voucherRequests.push(req)
+    saveState(state)
+    return delay(req)
+  },
+
+  async confirmVouch(requestId: string): Promise<VoucherRequest> {
+    const req = state.voucherRequests.find((v) => v.id === requestId)
+    if (!req) throw new Error('Not found')
+    req.status = 'confirmed'
+    req.response =
+      'YES. I know Tunde from Phase 2 church. He fixed my neighbour generator last year. He is honest.'
+    saveState(state)
+    return delay(req)
+  },
+
+  async enrollMentor(artisanId: string, trade: Trade) {
+    const row: PastoralConfirmation = {
+      id: `mentor-${Date.now()}`,
+      subjectType: 'artisan',
+      subjectId: artisanId,
+      subjectName: state.artisans.find((a) => a.id === artisanId)?.name ?? 'Artisan',
+      confirmingPastorId: 'admin-adekunle',
+      parishId: 'parish-camp-mowe',
+      status: 'pending',
+      note: `Mentor enrollment · ${trade}`,
+    }
+    state.pastoralConfirmations.unshift(row)
+    saveState(state)
+    return delay(row)
+  },
+
+  async getLineage(artisanId: string): Promise<LineageNode[]> {
+    if (artisanId !== HERO_ARTISAN_ID) {
+      return delay([{ id: artisanId, name: 'Artisan', tier: 'verified', role: 'self' }])
+    }
+    return delay([
+      { id: 'master-adebayo', name: 'Chief Adebayo', tier: 'steward', role: 'master' },
+      { id: HERO_ARTISAN_ID, name: 'Tunde Akinwale', tier: 'trusted', role: 'self' },
+      { id: 'apprentice-emeka-001', name: 'Emeka Okonkwo', tier: 'verified', role: 'apprentice' },
+    ])
   },
 }
