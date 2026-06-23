@@ -32,6 +32,7 @@ from app.models.parish import Parish
 from app.models.user import User
 from app.models.welfare_request import WelfareRequest
 from app.models.verification import VerificationRequest, VerificationVoucher
+from app.models.whatsapp import WhatsAppConversation, WhatsAppInboundEvent
 
 __all__ = [
     "AuditLog",
@@ -66,4 +67,6 @@ __all__ = [
     "ResidentProfile",
     "Review",
     "Trade",
+    "WhatsAppConversation",
+    "WhatsAppInboundEvent",
 ]

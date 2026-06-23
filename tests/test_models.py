@@ -24,6 +24,8 @@ def test_phase_two_tables_are_registered() -> None:
         "escrow_transactions",
         "reviews",
         "disputes",
+        "whatsapp_conversations",
+        "whatsapp_inbound_events",
     }
 
 

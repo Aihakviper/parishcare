@@ -21,6 +21,13 @@ class WhatsAppCommand:
     token: str
 
 
+@dataclass(frozen=True)
+class WhatsAppInboundMessage:
+    message_id: str
+    sender_phone: str
+    body: str
+
+
 class WhatsAppDeliveryError(ServiceValidationError):
     """Raised when WhatsApp Cloud API rejects voucher delivery."""
 
@@ -91,6 +98,62 @@ class WhatsAppService:
             if owns_client:
                 await client.aclose()
 
+    async def send_text_message(
+        self,
+        *,
+        recipient_phone: str,
+        body: str,
+    ) -> str:
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_phone.lstrip("+"),
+            "type": "text",
+            "text": {"preview_url": False, "body": body},
+        }
+        response = await self._post_message(payload)
+        messages = response.get("messages", [])
+        if not messages or not messages[0].get("id"):
+            raise WhatsAppDeliveryError(
+                "WhatsApp did not return a message identifier"
+            )
+        return str(messages[0]["id"])
+
+    async def _post_message(
+        self, payload: dict[str, object]
+    ) -> dict[str, object]:
+        headers = {
+            "Authorization": (
+                "Bearer "
+                + self._config.whatsapp_access_token.get_secret_value()
+            ),
+            "Content-Type": "application/json",
+        }
+        url = (
+            f"{self._config.whatsapp_graph_api_base_url.rstrip('/')}/"
+            f"{self._config.whatsapp_phone_number_id}/messages"
+        )
+        owns_client = self._client is None
+        client = self._client or httpx.AsyncClient(
+            timeout=self._config.whatsapp_request_timeout_seconds
+        )
+        try:
+            response = await client.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            body = response.json()
+            if not isinstance(body, dict):
+                raise WhatsAppDeliveryError(
+                    "WhatsApp returned an invalid response"
+                )
+            return body
+        except httpx.HTTPError as exc:
+            raise WhatsAppDeliveryError(
+                "WhatsApp message delivery failed"
+            ) from exc
+        finally:
+            if owns_client:
+                await client.aclose()
+
     def verify_webhook_challenge(
         self,
         *,
@@ -126,45 +189,83 @@ class WhatsAppService:
     @staticmethod
     def extract_commands(payload: dict[str, object]) -> list[WhatsAppCommand]:
         commands: list[WhatsAppCommand] = []
-        entries = payload.get("entry", [])
-        if not isinstance(entries, list):
-            return commands
-        for entry in entries:
-            if not isinstance(entry, dict):
+        for _, _, body in _extract_text_entries(payload):
+            match = WHATSAPP_COMMAND_PATTERN.match(body)
+            if match is None:
                 continue
-            changes = entry.get("changes", [])
-            if not isinstance(changes, list):
-                continue
-            for change in changes:
-                if not isinstance(change, dict):
-                    continue
-                value = change.get("value", {})
-                if not isinstance(value, dict):
-                    continue
-                messages = value.get("messages", [])
-                if not isinstance(messages, list):
-                    continue
-                for message in messages:
-                    if not isinstance(message, dict):
-                        continue
-                    text = message.get("text", {})
-                    if not isinstance(text, dict):
-                        continue
-                    body = text.get("body")
-                    if not isinstance(body, str):
-                        continue
-                    match = WHATSAPP_COMMAND_PATTERN.match(body)
-                    if match is None:
-                        continue
-                    outcome = (
-                        VerificationOutcome.CONFIRMED
-                        if match.group(1).upper() == "CONFIRM"
-                        else VerificationOutcome.REJECTED
-                    )
-                    commands.append(
-                        WhatsAppCommand(
-                            outcome=outcome,
-                            token=match.group(2),
-                        )
-                    )
+            outcome = (
+                VerificationOutcome.CONFIRMED
+                if match.group(1).upper() == "CONFIRM"
+                else VerificationOutcome.REJECTED
+            )
+            commands.append(
+                WhatsAppCommand(
+                    outcome=outcome,
+                    token=match.group(2),
+                )
+            )
         return commands
+
+    @staticmethod
+    def extract_messages(
+        payload: dict[str, object],
+    ) -> list[WhatsAppInboundMessage]:
+        extracted: list[WhatsAppInboundMessage] = []
+        for message_id, sender_phone, body in _extract_text_entries(payload):
+            if not message_id or not sender_phone:
+                continue
+            extracted.append(
+                WhatsAppInboundMessage(
+                    message_id=message_id,
+                    sender_phone=sender_phone,
+                    body=body,
+                )
+            )
+        return extracted
+
+
+def _extract_text_entries(
+    payload: dict[str, object],
+) -> list[tuple[str, str, str]]:
+    extracted: list[tuple[str, str, str]] = []
+    entries = payload.get("entry", [])
+    if not isinstance(entries, list):
+        return extracted
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        changes = entry.get("changes", [])
+        if not isinstance(changes, list):
+            continue
+        for change in changes:
+            if not isinstance(change, dict):
+                continue
+            value = change.get("value", {})
+            if not isinstance(value, dict):
+                continue
+            messages = value.get("messages", [])
+            if not isinstance(messages, list):
+                continue
+            for message in messages:
+                if not isinstance(message, dict):
+                    continue
+                message_id = message.get("id")
+                sender_phone = message.get("from")
+                text = message.get("text", {})
+                if not isinstance(text, dict):
+                    continue
+                body = text.get("body")
+                if not isinstance(body, str) or not body:
+                    continue
+                extracted.append(
+                    (
+                        message_id if isinstance(message_id, str) else "",
+                        (
+                            sender_phone
+                            if isinstance(sender_phone, str)
+                            else ""
+                        ),
+                        body,
+                    )
+                )
+    return extracted

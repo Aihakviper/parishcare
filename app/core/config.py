@@ -64,6 +64,10 @@ class Settings(BaseSettings):
     whatsapp_app_secret: SecretStr
     whatsapp_public_base_url: str = Field(min_length=1, max_length=500)
     whatsapp_request_timeout_seconds: float = Field(gt=0, le=60)
+    whatsapp_marketplace_enabled: bool
+    whatsapp_demo_resident_phone: str
+    whatsapp_demo_resident_email: str
+    whatsapp_marketplace_result_limit: int = Field(gt=0, le=10)
 
     maker_checker_threshold_kobo: int = Field(gt=0)
     mock_payment_provider_name: str = Field(min_length=1, max_length=50)
@@ -109,7 +113,10 @@ class Settings(BaseSettings):
             )
         if self.app_env == "production" and self.mfa_demo_enabled:
             raise ValueError("Demo MFA cannot be enabled in production")
-        if self.verification_delivery_channel == "whatsapp":
+        if (
+            self.verification_delivery_channel == "whatsapp"
+            or self.whatsapp_marketplace_enabled
+        ):
             required = {
                 "whatsapp_phone_number_id": self.whatsapp_phone_number_id,
                 "whatsapp_access_token": (
@@ -127,6 +134,16 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "WhatsApp delivery requires: " + ", ".join(missing)
                 )
+        has_demo_phone = bool(self.whatsapp_demo_resident_phone.strip())
+        has_demo_email = bool(self.whatsapp_demo_resident_email.strip())
+        if has_demo_phone != has_demo_email:
+            raise ValueError(
+                "WhatsApp demo resident phone and email must be configured together"
+            )
+        if has_demo_phone:
+            from app.utils.crypto import normalize_phone
+
+            normalize_phone(self.whatsapp_demo_resident_phone)
         return self
 
     @property

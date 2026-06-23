@@ -1,11 +1,17 @@
 import hashlib
 import hmac
+from unittest.mock import AsyncMock
 
 import httpx
 import pytest
 
-from app.models.enums import VerificationOutcome
+from app.models.enums import Trade, VerificationOutcome
+from app.models.whatsapp import WhatsAppConversation
 from app.services.whatsapp import WhatsAppService
+from app.services.whatsapp_marketplace import (
+    WhatsAppMarketplaceService,
+    _parse_user_trade,
+)
 from tests.settings import build_test_settings
 
 
@@ -104,3 +110,89 @@ def test_extracts_confirm_and_reject_commands() -> None:
             token="token-two",
         ),
     ]
+
+
+def test_extracts_marketplace_message_identity() -> None:
+    payload = {
+        "entry": [
+            {
+                "changes": [
+                    {
+                        "value": {
+                            "messages": [
+                                {
+                                    "id": "wamid.inbound-1",
+                                    "from": "2348012345678",
+                                    "text": {"body": "FIND plumber"},
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+    messages = WhatsAppService.extract_messages(payload)
+
+    assert len(messages) == 1
+    assert messages[0].message_id == "wamid.inbound-1"
+    assert messages[0].sender_phone == "2348012345678"
+    assert messages[0].body == "FIND plumber"
+
+
+@pytest.mark.asyncio
+async def test_sends_marketplace_text_reply() -> None:
+    captured: dict[str, str] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["body"] = request.content.decode("utf-8")
+        return httpx.Response(
+            200,
+            json={"messages": [{"id": "wamid.reply-1"}]},
+        )
+
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(handler)
+    ) as client:
+        message_id = await WhatsAppService(
+            config=whatsapp_settings(),
+            client=client,
+        ).send_text_message(
+            recipient_phone="+2348012345678",
+            body="Welcome to Steward",
+        )
+
+    assert message_id == "wamid.reply-1"
+    assert "Welcome to Steward" in captured["body"]
+
+
+@pytest.mark.asyncio
+async def test_discovery_conversation_accepts_numbered_trade() -> None:
+    service = WhatsAppMarketplaceService.__new__(
+        WhatsAppMarketplaceService
+    )
+    service._artisan_results = AsyncMock(return_value="artisan results")
+    conversation = WhatsAppConversation(
+        state="menu",
+        context={},
+        user_id=None,
+    )
+
+    command, _ = await service._route(
+        conversation=conversation,
+        body="1",
+    )
+    result_command, response = await service._route(
+        conversation=conversation,
+        body="2",
+    )
+
+    assert command == "find_prompt"
+    assert result_command == "find"
+    assert response == "artisan results"
+    service._artisan_results.assert_awaited_once_with(Trade.ELECTRICIAN)
+
+
+def test_trade_parser_accepts_generator_alias() -> None:
+    assert _parse_user_trade("generator tech") == Trade.GENERATOR_TECHNICIAN

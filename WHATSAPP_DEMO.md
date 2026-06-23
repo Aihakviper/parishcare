@@ -1,6 +1,7 @@
 # WhatsApp presentation setup
 
-The integration uses Meta WhatsApp Cloud API for verification vouchers.
+The integration uses Meta WhatsApp Cloud API for verification vouchers and
+the Steward artisan marketplace presentation flow.
 
 ## Environment
 
@@ -15,6 +16,10 @@ PARISHCARE_WHATSAPP_WEBHOOK_VERIFY_TOKEN=
 PARISHCARE_WHATSAPP_APP_SECRET=
 PARISHCARE_WHATSAPP_PUBLIC_BASE_URL=https://your-public-api.example
 PARISHCARE_WHATSAPP_REQUEST_TIMEOUT_SECONDS=10
+PARISHCARE_WHATSAPP_MARKETPLACE_ENABLED=true
+PARISHCARE_WHATSAPP_DEMO_RESIDENT_PHONE=+2348012345678
+PARISHCARE_WHATSAPP_DEMO_RESIDENT_EMAIL=resident00@demo.steward.local
+PARISHCARE_WHATSAPP_MARKETPLACE_RESULT_LIMIT=3
 ```
 
 Do not put these credentials in the frontend or commit the backend `.env`.
@@ -31,7 +36,53 @@ Use the same value configured in
 `PARISHCARE_WHATSAPP_WEBHOOK_VERIFY_TOKEN` as Meta's verification token.
 Subscribe the WhatsApp Business Account webhook to the `messages` field.
 
-## Demo flow
+Run the database migration and seed data before the presentation:
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m app.cli.seed_demo
+```
+
+`PARISHCARE_WHATSAPP_DEMO_RESIDENT_PHONE` must be the E.164 number sending
+messages to WhatsApp. The configured email must belong to an active resident
+account. The demo seed creates `resident00@demo.steward.local`.
+
+## Marketplace demo flow
+
+Send `HI` to receive the menu:
+
+```text
+1. Find a verified artisan
+2. View open job feed
+3. Create a job request
+```
+
+Artisan discovery accepts a menu number or commands such as:
+
+```text
+FIND plumber
+FIND generator tech
+```
+
+Job feed commands:
+
+```text
+JOBS
+JOBS electrician
+```
+
+Linked demo residents can create a job through the guided `BOOK` flow or one
+message:
+
+```text
+BOOK plumber | Camp Phase 2 | Kitchen pipe is leaking badly
+```
+
+Inbound Meta message IDs are stored for idempotency. Conversation phone
+numbers and prepared replies are encrypted, and state changes and job
+creation are audit logged.
+
+## Verification voucher flow
 
 1. Send a WhatsApp message from the recipient phone to the Meta test/business
    number first. This opens the customer-service conversation window required

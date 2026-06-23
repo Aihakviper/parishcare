@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import require_permissions
 from app.core.rbac import Permission
+from app.core.config import settings
 from app.db.session import get_db_session
 from app.models.enums import VerificationOutcome
 from app.models.user import User
@@ -18,7 +19,8 @@ from app.schemas.verification import (
     WhatsAppWebhookResponse,
 )
 from app.services.verification import VerificationService
-from app.services.whatsapp import WhatsAppService
+from app.services.whatsapp import WHATSAPP_COMMAND_PATTERN, WhatsAppService
+from app.services.whatsapp_marketplace import WhatsAppMarketplaceService
 
 router = APIRouter()
 
@@ -160,6 +162,20 @@ async def receive_whatsapp_webhook(
             processed += 1
         except Exception:
             failed += 1
+    if settings.whatsapp_marketplace_enabled:
+        marketplace = WhatsAppMarketplaceService(
+            session,
+            whatsapp=whatsapp,
+        )
+        for message in whatsapp.extract_messages(payload):
+            if WHATSAPP_COMMAND_PATTERN.match(message.body):
+                continue
+            try:
+                result = await marketplace.handle(message)
+                if result.processed:
+                    processed += 1
+            except Exception:
+                failed += 1
     return WhatsAppWebhookResponse(
         processed_commands=processed,
         failed_commands=failed,
