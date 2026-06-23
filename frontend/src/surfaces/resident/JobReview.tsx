@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { FaStar } from 'react-icons/fa6'
+import { IconStar } from '../../lib/icons'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { Button } from '../../components/ui/Button'
 import { useJobMutations } from '../../hooks/useCampData'
@@ -43,7 +43,7 @@ export function ResidentJobReview() {
             className="p-2 min-h-[44px] min-w-[44px]"
             aria-label={`Rate ${n} stars`}
           >
-            <FaStar className={`w-8 h-8 ${n <= rating ? 'text-gilt' : 'text-hairline'}`} />
+            <IconStar className={`w-8 h-8 ${n <= rating ? 'text-gilt' : 'text-hairline'}`} />
           </button>
         ))}
       </div>

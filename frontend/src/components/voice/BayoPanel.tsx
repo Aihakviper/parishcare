@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { FaMicrophone, FaXmark } from 'react-icons/fa6'
+import { IconMicrophone, IconClose } from '../../lib/icons'
 import { BayoOrb } from './BayoOrb'
 import { TranscriptBubble } from './TranscriptBubble'
 import { useVoiceStore } from '../../store/voice'
@@ -52,7 +52,7 @@ export function BayoPanel() {
                 className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-frame text-slate hover:text-ink"
                 aria-label="Close panel"
               >
-                <FaXmark aria-hidden />
+                <IconClose aria-hidden />
               </button>
             </header>
 
@@ -91,7 +91,7 @@ export function BayoPanel() {
                 }`}
                 aria-label="Hold to talk to Bayo"
               >
-                <FaMicrophone className="w-6 h-6" aria-hidden />
+                <IconMicrophone className="w-6 h-6" aria-hidden />
               </button>
               <p className="text-center text-xs text-slate mt-2">Hold to talk</p>
             </div>
@@ -112,7 +112,7 @@ export function BayoFab() {
       className="fixed bottom-20 right-4 z-[50] w-14 h-14 rounded-full bg-oxblood text-bone shadow-lift flex items-center justify-center hover:bg-oxblood-deep transition-colors md:bottom-6"
       aria-label="Talk to Bayo"
     >
-      <FaMicrophone className="w-5 h-5" aria-hidden />
+      <IconMicrophone className="w-5 h-5" aria-hidden />
     </button>
   )
 }

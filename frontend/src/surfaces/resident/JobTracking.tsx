@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
-import { FaPlay } from 'react-icons/fa6'
+import { IconPlay } from '../../lib/icons'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { JobStatusPill } from '../../components/ui/JobStatusPill'
 import { EscrowBadge } from '../../components/ui/EscrowBadge'
@@ -52,7 +52,7 @@ export function ResidentJobTracking() {
               <p className="text-sm text-ink mt-0.5">{ev.label}</p>
               {ev.voiceNote && (
                 <button type="button" className="mt-2 inline-flex items-center gap-1 text-xs text-oxblood font-semibold">
-                  <FaPlay aria-hidden /> Play voice note
+                  <IconPlay aria-hidden /> Play voice note
                 </button>
               )}
               {ev.photoUrl && (

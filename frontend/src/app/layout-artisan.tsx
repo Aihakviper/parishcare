@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { FaBriefcase, FaChartLine, FaHouse, FaUser, FaWallet } from 'react-icons/fa6'
-import { StewardMark } from '../components/ui/StewardMark'
+import { IconBriefcase, IconChartLine, IconHouse, IconUser, IconWallet } from '../lib/icons'
+import { StewardLogo } from '../components/ui/StewardLogo'
 import { RoleSwitcher } from '../components/ui/RoleSwitcher'
 import { RoleToast } from '../components/ui/RoleToast'
 import { BayoFab, BayoPanel } from '../components/voice/BayoPanel'
@@ -10,11 +10,11 @@ import { HERO_IDS } from '../hooks/useCampData'
 import { cn } from '../lib/cn'
 
 const nav = [
-  { to: '/artisan', icon: FaHouse, label: 'Home' },
-  { to: `/artisan/jobs/${HERO_IDS.jobId}`, icon: FaBriefcase, label: 'Active' },
-  { to: '/artisan/earnings', icon: FaWallet, label: 'Earnings' },
-  { to: '/artisan/standing', icon: FaChartLine, label: 'Standing' },
-  { to: '/artisan/profile', icon: FaUser, label: 'Me' },
+  { to: '/artisan', icon: IconHouse, label: 'Home' },
+  { to: `/artisan/jobs/${HERO_IDS.jobId}`, icon: IconBriefcase, label: 'Active' },
+  { to: '/artisan/earnings', icon: IconWallet, label: 'Earnings' },
+  { to: '/artisan/standing', icon: IconChartLine, label: 'Standing' },
+  { to: '/artisan/profile', icon: IconUser, label: 'Me' },
 ]
 
 export function ArtisanLayout() {
@@ -23,10 +23,7 @@ export function ArtisanLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-parchment pb-24 max-w-lg mx-auto w-full">
       <header className="sticky top-0 z-40 bg-parchment/95 backdrop-blur border-b border-hairline px-4 py-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <StewardMark />
-          <span className="display-tight text-lg font-semibold text-ink">Steward</span>
-        </div>
+        <StewardLogo markSize={28} />
         <RoleSwitcher />
       </header>
 

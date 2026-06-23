@@ -1,30 +1,31 @@
-import { FaCheck, FaClock, FaLock, FaRotateLeft } from 'react-icons/fa6'
+import type { IconType } from 'react-icons'
+import { IconCheck, IconClock, IconLock, IconUndo } from '../../lib/icons'
 import type { EscrowStatus } from '../../lib/types/camp'
 import { formatNaira } from '../../lib/formatters'
 import { cn } from '../../lib/cn'
 
 const config: Record<
   EscrowStatus,
-  { label: string; icon: typeof FaLock; className: string }
+  { label: string; icon: IconType; className: string }
 > = {
   pending: {
     label: 'Awaiting payment',
-    icon: FaClock,
+    icon: IconClock,
     className: 'bg-slate/10 text-slate border-slate/30',
   },
   held: {
     label: 'held in escrow',
-    icon: FaLock,
+    icon: IconLock,
     className: 'bg-gilt/15 text-ink border-gilt/40',
   },
   released: {
     label: 'released',
-    icon: FaCheck,
+    icon: IconCheck,
     className: 'bg-verdigris/10 text-verdigris border-verdigris/30',
   },
   refunded: {
     label: 'refunded',
-    icon: FaRotateLeft,
+    icon: IconUndo,
     className: 'bg-oxblood/10 text-oxblood border-oxblood/30',
   },
 }
@@ -46,9 +47,7 @@ export function EscrowBadge({
   const text =
     status === 'released' && recipient
       ? `${formatNaira(amountKobo)} released to ${recipient}`
-      : status === 'held'
-        ? `${formatNaira(amountKobo)} ${label}`
-        : `${formatNaira(amountKobo)} ${label}`
+      : `${formatNaira(amountKobo)} ${label}`
 
   return (
     <div

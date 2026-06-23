@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { FaBars, FaXmark } from 'react-icons/fa6'
-import { StewardMark } from '../components/ui/StewardMark'
+import { IconList, IconClose } from '../lib/icons'
+import { StewardLogo } from '../components/ui/StewardLogo'
 import { RoleSwitcher } from '../components/ui/RoleSwitcher'
 import { RoleToast } from '../components/ui/RoleToast'
 import { PAGE_TRANSITION } from '../lib/motion'
@@ -26,9 +26,8 @@ export function ConsoleLayout() {
   return (
     <div className="min-h-screen flex bg-parchment">
       <aside className="hidden lg:flex w-[220px] shrink-0 flex-col border-r border-hairline bg-bone">
-        <div className="p-5 border-b border-hairline flex items-center gap-2">
-          <StewardMark />
-          <span className="display-tight font-semibold text-ink">Steward</span>
+        <div className="p-5 border-b border-hairline">
+          <StewardLogo markSize={28} />
         </div>
         <nav aria-label="Console" className="flex-1 p-3 space-y-0.5">
           {nav.map((item) => (
@@ -64,7 +63,7 @@ export function ConsoleLayout() {
               aria-expanded={mobileOpen}
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileOpen ? <FaXmark aria-hidden /> : <FaBars aria-hidden />}
+              {mobileOpen ? <IconClose aria-hidden /> : <IconList aria-hidden />}
             </button>
             <p className="display-tight text-lg font-semibold text-ink">Parish Console</p>
           </div>
