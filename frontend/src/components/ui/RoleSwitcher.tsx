@@ -1,4 +1,4 @@
-import { FaChevronRight } from 'react-icons/fa6'
+import { IconCaretRight } from '../../lib/icons'
 import { useNavigate } from 'react-router-dom'
 import { getRole, nextRole, ROLES } from '../../lib/roles'
 import { useSessionStore } from '../../store/session'
@@ -50,7 +50,7 @@ export function RoleSwitcher({ className }: { className?: string }) {
       >
         <span className="text-bone/85 text-xs font-medium">View as</span>
         <span>{current.label}</span>
-        <FaChevronRight className="w-3.5 h-3.5 opacity-80" aria-hidden />
+        <IconCaretRight className="w-4 h-4 opacity-80" aria-hidden />
       </button>
 
       <div

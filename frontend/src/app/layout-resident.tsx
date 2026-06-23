@@ -1,18 +1,18 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { FaBriefcase, FaHouse, FaStar, FaUser } from 'react-icons/fa6'
+import { IconBriefcase, IconHouse, IconStar, IconUser } from '../lib/icons'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
-import { StewardMark } from '../components/ui/StewardMark'
+import { StewardLogo } from '../components/ui/StewardLogo'
 import { RoleSwitcher } from '../components/ui/RoleSwitcher'
 import { RoleToast } from '../components/ui/RoleToast'
 import { PAGE_TRANSITION } from '../lib/motion'
 import { cn } from '../lib/cn'
 
 const nav = [
-  { to: '/member', icon: FaHouse, label: 'Home' },
-  { to: '/member/jobs', icon: FaBriefcase, label: 'Jobs' },
-  { to: '/member/discover', icon: FaStar, label: 'Saved' },
-  { to: '/member/me', icon: FaUser, label: 'Me' },
+  { to: '/member', icon: IconHouse, label: 'Home' },
+  { to: '/member/jobs', icon: IconBriefcase, label: 'Jobs' },
+  { to: '/member/discover', icon: IconStar, label: 'Saved' },
+  { to: '/member/me', icon: IconUser, label: 'Me' },
 ]
 
 export function ResidentLayout() {
@@ -21,10 +21,7 @@ export function ResidentLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-parchment pb-20 max-w-lg mx-auto w-full">
       <header className="sticky top-0 z-40 bg-parchment/95 backdrop-blur border-b border-hairline px-4 py-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <StewardMark />
-          <span className="display-tight text-lg font-semibold text-ink">Steward</span>
-        </div>
+        <StewardLogo markSize={28} />
         <RoleSwitcher />
       </header>
 

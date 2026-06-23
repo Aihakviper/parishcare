@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useState } from 'react'
-import { FaPlay, FaStar } from 'react-icons/fa6'
+import { IconPlay, IconStar } from '../../lib/icons'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { TierPill } from '../../components/ui/TierPill'
 import { Button } from '../../components/ui/Button'
@@ -65,7 +65,7 @@ export function ResidentArtisanProfile() {
               aria-label="Play voice introduction"
             >
               <span className="w-12 h-12 rounded-full bg-oxblood text-bone flex items-center justify-center shrink-0">
-                <FaPlay aria-hidden />
+                <IconPlay aria-hidden />
               </span>
               <span>
                 <span className="font-semibold text-ink block">Hear from {artisan.name.split(' ')[0]}</span>
@@ -121,7 +121,7 @@ export function ResidentArtisanProfile() {
         </div>
 
         <div className="mt-4 flex items-center gap-1 text-sm text-slate">
-          <FaStar className="text-gilt" aria-hidden />
+          <IconStar className="text-gilt" aria-hidden />
           <span>4.8 average from 28 reviews</span>
         </div>
       </div>

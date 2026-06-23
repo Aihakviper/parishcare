@@ -4,17 +4,23 @@ import { backendApi } from '../lib/api/backend'
 import { clearTokens, hasAccessToken } from '../lib/api/client'
 import { usesBackendApi } from '../lib/api/config'
 import type { StewardRole } from '../lib/roles'
+import { getRole, roleToastMessage } from '../lib/roles'
 import { useSessionStore } from './session'
 
-function frontendRole(role: BackendUser['role']): StewardRole {
-  if (role === 'officer') return 'resident'
-  if (role === 'pastor') return 'artisan'
+function stewardRoleFromUser(user: BackendUser): StewardRole {
+  if (user.camp_role === 'artisan') return 'artisan'
+  if (user.camp_role === 'pastor' || user.camp_role === 'camp_admin') return 'console'
+  if (user.camp_role === 'member') return 'resident'
+  // Legacy welfare roles — map pastor to console, officer to member until camp roles ship
+  if (user.role === 'pastor') return 'console'
+  if (user.role === 'officer') return 'resident'
   return 'console'
 }
 
 function applyUserContext(user: BackendUser): void {
   const session = useSessionStore.getState()
-  session.setRole(frontendRole(user.role))
+  const stewardRole = stewardRoleFromUser(user)
+  session.setRole(stewardRole, roleToastMessage(stewardRole))
   if (user.parish_id) {
     session.setParishId(user.parish_id)
   }
@@ -78,5 +84,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     clearTokens()
     set({ user: null, error: null })
+    const session = useSessionStore.getState()
+    session.setDemoMode(true)
+    session.setRole('resident', roleToastMessage('resident'))
   },
 }))
+
+/** Display name for greetings — API user or demo persona */
+export function useAuthDisplayName(): string {
+  const user = useAuthStore((s) => s.user)
+  if (user) return user.name.split(' ')[0]
+  return getRole(useSessionStore.getState().role).persona.split(' ')[0]
+}

@@ -3,15 +3,16 @@ import { RomanSection } from '../../components/ui/RomanSection'
 import { TierPill } from '../../components/ui/TierPill'
 import { Button } from '../../components/ui/Button'
 import { TrustPillars } from '../../components/ui/TrustPillars'
-import { useArtisan, useLineage, useGenerosity, HERO_IDS } from '../../hooks/useCampData'
+import { useArtisan, useLineage, useGenerosity, useCampSession } from '../../hooks/useCampData'
 import { TRADE_LABELS } from '../../lib/types/camp'
 import { getPillarBreakdown } from '../../lib/trust-engine'
 import { formatPhone } from '../../lib/formatters'
 
 export function ArtisanProfile() {
-  const { data: artisan } = useArtisan(HERO_IDS.artisanId)
-  const { data: lineage = [] } = useLineage(HERO_IDS.artisanId)
-  const { data: generosity = [] } = useGenerosity(HERO_IDS.artisanId)
+  const { artisanId } = useCampSession()
+  const { data: artisan } = useArtisan(artisanId ?? undefined)
+  const { data: lineage = [] } = useLineage(artisanId ?? undefined)
+  const { data: generosity = [] } = useGenerosity(artisanId ?? undefined)
   if (!artisan) return null
 
   const pillars = getPillarBreakdown(artisan)

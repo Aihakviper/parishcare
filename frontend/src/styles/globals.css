@@ -159,4 +159,20 @@
     background-size: 32px 32px;
     pointer-events: none;
   }
+
+  .persona-card {
+    @apply rounded-card bg-bone border border-hairline/80 p-6 sm:p-7 shadow-frame h-full flex flex-col;
+  }
+
+  .persona-icon {
+    @apply flex items-center justify-center w-11 h-11 rounded-full text-bone shrink-0;
+  }
+
+  .persona-value {
+    @apply rounded-2xl bg-verdigris/10 border border-verdigris/15 p-4 mt-auto;
+  }
+
+  .persona-value-label {
+    @apply text-[0.65rem] font-bold uppercase tracking-wider-em text-verdigris;
+  }
 }

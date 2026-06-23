@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaArrowRight, FaCheck, FaPlay } from 'react-icons/fa6'
-import { StewardMark } from '../../components/ui/StewardMark'
+import { PersonaCard } from '../../components/marketing/PersonaCard'
+import { StewardLogo } from '../../components/ui/StewardLogo'
+import {
+  IconArrowRight,
+  IconBriefcase,
+  IconCheck,
+  IconHammer,
+  IconPlay,
+  IconUsers,
+} from '../../lib/icons'
 import { cn } from '../../lib/cn'
 
 type Audience = 'resident' | 'artisan' | 'console'
@@ -9,15 +17,60 @@ type Audience = 'resident' | 'artisan' | 'console'
 const AUDIENCES: { id: Audience; label: string; path: string }[] = [
   { id: 'resident', label: 'Members', path: '/member' },
   { id: 'artisan', label: 'Artisans', path: '/artisan' },
-  { id: 'console', label: 'Camp admin', path: '/console' },
+  { id: 'console', label: 'Parish', path: '/console' },
 ]
+
+const PERSONAS = [
+  {
+    role: 'Member',
+    icon: IconUsers,
+    iconTone: 'bg-verdigris',
+    name: 'Bisi, 34',
+    subtitle: 'Homeowner · Phase 2',
+    story:
+      'Generator failed on Service Sunday. She used to call three numbers and hope someone honest would show. Cash payments left no proof when work went wrong.',
+    benefits: [
+      'A steward directory sorted by trust tier and vouchers from people she knows.',
+      'Escrow holds payment until she confirms the job is done well.',
+      'Every receipt trains apprentices through the Stewards Fund.',
+    ],
+  },
+  {
+    role: 'Artisan',
+    icon: IconHammer,
+    iconTone: 'bg-gilt text-ink',
+    name: 'Tunde, 32',
+    subtitle: 'Generator tech · Mowe',
+    story:
+      'Works four to six days a week. Has no formal CV — his reputation is what Mama Iyabo and Phase 2 neighbours say about him. Gets paid in cash when clients trust him.',
+    benefits: [
+      'Bayo reads new jobs aloud in Pidgin so he never misses a lead.',
+      'Proof photos and standing score replace word-of-mouth alone.',
+      'Same-day escrow release when the member confirms completion.',
+    ],
+  },
+  {
+    role: 'Parish',
+    icon: IconBriefcase,
+    iconTone: 'bg-ink',
+    name: 'Pastor Adekunle, 48',
+    subtitle: 'Camp administrator · RCCG Mowe',
+    story:
+      'Contractors and middlemen made it hard to know who was actually on site. Disputes landed on his desk with no timeline, no photos, and two different stories.',
+    benefits: [
+      'Parish Console shows jobs, disputes, and lineage in one place.',
+      'Standing queue for pastoral confirmations and mentor enrollments.',
+      'Pattern alerts before the same trade keeps failing across phases.',
+    ],
+  },
+] as const
 
 const FEATURES: Record<
   Audience,
   { eyebrow: string; title: string; subtitle: string; bullets: string[]; path: string; cta: string }
 > = {
   resident: {
-    eyebrow: 'For residents',
+    eyebrow: 'For members',
     title: 'Find a Trusted Steward near you',
     subtitle:
       'Search by trade, book with escrow, and track every step until the work is done well.',
@@ -27,7 +80,7 @@ const FEATURES: Record<
       'Live timeline with photos and voice notes from your artisan',
     ],
     path: '/member',
-    cta: 'Open resident app',
+    cta: 'Open member app',
   },
   artisan: {
     eyebrow: 'For artisans',
@@ -43,17 +96,17 @@ const FEATURES: Record<
     cta: 'Open artisan app',
   },
   console: {
-    eyebrow: 'For camp leadership',
+    eyebrow: 'For parish leadership',
     title: 'See the whole service economy at a glance',
     subtitle:
       'Pastor Adekunle and the facilities team resolve disputes and spot patterns before they spread.',
     bullets: [
       'Weekly pulse: jobs, artisans, disputes, disbursements',
-      'Phase heat map and trade activity charts',
+      'Hands in training and standing confirmation queues',
       'Dispute queue with both sides visible',
     ],
     path: '/console',
-    cta: 'Open camp console',
+    cta: 'Open parish console',
   },
 }
 
@@ -86,16 +139,12 @@ export function MarketingLanding() {
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col">
-      {/* Floating pill nav — Guild-style */}
       <div className="sticky top-0 z-50 px-4 pt-4 pb-2">
         <header className="nav-pill mx-auto max-w-3xl flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
-          <Link to="/marketing" className="flex items-center gap-2 shrink-0">
-            <StewardMark />
-            <span className="display-tight text-lg font-semibold text-ink">Steward</span>
-          </Link>
+          <StewardLogo markSize={28} to="/marketing" />
           <nav className="hidden sm:flex items-center gap-5 text-sm font-medium text-slate">
-            <a href="#how" className="hover:text-ink transition-colors">
-              How it works
+            <a href="#people" className="hover:text-ink transition-colors">
+              Who it&apos;s for
             </a>
             <a href="#views" className="hover:text-ink transition-colors">
               Three views
@@ -107,10 +156,9 @@ export function MarketingLanding() {
         </header>
       </div>
 
-      {/* Hero */}
-      <section className="flex-1 px-4 pt-8 pb-20 sm:pt-16 text-center max-w-3xl mx-auto w-full">
+      <section className="flex-1 px-4 pt-8 pb-16 sm:pt-16 text-center max-w-3xl mx-auto w-full">
         <div className="trust-badge mx-auto">
-          <FaCheck className="w-3 h-3 text-verdigris shrink-0" aria-hidden />
+          <IconCheck className="w-3.5 h-3.5 text-verdigris shrink-0" aria-hidden />
           <span>Built for RCCG Camp Smart City · Kingdom Hackathon 2026</span>
         </div>
 
@@ -121,7 +169,7 @@ export function MarketingLanding() {
         </h1>
 
         <p className="text-slate text-base sm:text-lg mt-6 max-w-xl mx-auto leading-relaxed">
-          Steward gives residents, artisans, and camp leadership a simple way to hire with escrow,
+          Steward gives members, artisans, and parish leadership a simple way to hire with escrow,
           prove honest work, and see the Camp&apos;s service economy — on phone, through Bayo, and
           on the web.
         </p>
@@ -129,16 +177,33 @@ export function MarketingLanding() {
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center mt-10">
           <Link to="/member" className="btn-pill btn-pill-primary px-7 py-3.5 text-base">
             Get started
-            <FaArrowRight className="w-4 h-4" aria-hidden />
+            <IconArrowRight className="w-4 h-4" aria-hidden />
           </Link>
           <Link to="/artisan" className="btn-pill btn-pill-secondary px-7 py-3.5 text-base">
-            <FaPlay className="w-3.5 h-3.5" aria-hidden />
+            <IconPlay className="w-4 h-4" aria-hidden />
             See Bayo in action
           </Link>
         </div>
       </section>
 
-      {/* Three views — Guild role tabs */}
+      <section id="people" className="px-4 py-16 sm:py-20 border-t border-hairline/80 bg-bone/40">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-center mono-tag">Real people at the Camp</p>
+          <h2 className="display-tight text-2xl sm:text-3xl font-semibold text-ink text-center mt-3">
+            Built for how Nigeria actually works
+          </h2>
+          <p className="text-slate text-center mt-3 max-w-2xl mx-auto">
+            Three doors into the same trust network — members hire, artisans earn with proof, parish
+            leadership sees everything.
+          </p>
+          <div className="mt-10 grid md:grid-cols-3 gap-5 lg:gap-6">
+            {PERSONAS.map((persona) => (
+              <PersonaCard key={persona.role} {...persona} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="views" className="px-4 py-16 sm:py-24 border-t border-hairline/80">
         <div className="max-w-5xl mx-auto">
           <p className="text-center mono-tag">One platform · three views</p>
@@ -172,7 +237,7 @@ export function MarketingLanding() {
                 {feature.bullets.map((b) => (
                   <li key={b} className="flex gap-3 text-sm text-ink leading-relaxed">
                     <span className="check-circle shrink-0 mt-0.5" aria-hidden>
-                      <FaCheck className="w-3 h-3" />
+                      <IconCheck className="w-3.5 h-3.5" />
                     </span>
                     {b}
                   </li>
@@ -180,7 +245,7 @@ export function MarketingLanding() {
               </ul>
               <Link to={feature.path} className="btn-pill btn-pill-primary mt-8 inline-flex">
                 {feature.cta}
-                <FaArrowRight className="w-3.5 h-3.5" aria-hidden />
+                <IconArrowRight className="w-4 h-4" aria-hidden />
               </Link>
             </div>
             <div className="frame p-8 sm:p-10 bg-parchment-soft/40">
@@ -190,18 +255,17 @@ export function MarketingLanding() {
         </div>
       </section>
 
-      {/* Testimonial card — Guild split-card feel */}
       <section id="how" className="px-4 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-6 items-stretch">
           <div className="frame p-8 sm:p-10 flex flex-col justify-center">
             <p className="mono-tag text-verdigris">The demo story</p>
             <h2 className="display-tight text-2xl font-semibold text-ink mt-3">
-              Tell us a little about you — then pick your door.
+              Bisi&apos;s generator. Tunde&apos;s hands. Pastor&apos;s oversight.
             </h2>
             <p className="text-slate mt-4 leading-relaxed">
-              Saturday morning. Funmi&apos;s generator stops. She finds Tunde, funds ₦18,500 in
-              escrow, and tracks the repair live. Bayo reads the job to Tunde in Pidgin. Pastor
-              Adekunle sees it all on the console.
+              Saturday morning. Bisi&apos;s generator stops. She finds Tunde, funds ₦18,500 in
+              escrow, and tracks the repair live. Bayo reads the job to Tunde in Pidgin. Mama Iyabo
+              vouches on WhatsApp. Pastor Adekunle sees it all on the console.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               {AUDIENCES.map(({ id, label, path }) => (
@@ -236,28 +300,24 @@ export function MarketingLanding() {
         </div>
       </section>
 
-      {/* CTA band */}
       <section className="px-4 py-16 bg-parchment-soft border-y border-hairline">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="display-tight text-2xl sm:text-3xl font-semibold text-ink">
             Pick your door. Let&apos;s get going.
           </h2>
           <p className="text-slate mt-3">
-            Use the role switcher inside the demo to move between Funmi, Tunde, and Pastor
-            Adekunle in one click.
+            Use the role switcher inside the demo to move between Bisi, Tunde, and Pastor Adekunle in
+            one click.
           </p>
           <Link to="/member" className="btn-pill btn-pill-primary mt-8 inline-flex px-8 py-3.5">
             Start the demo
-            <FaArrowRight className="w-4 h-4" aria-hidden />
+            <IconArrowRight className="w-4 h-4" aria-hidden />
           </Link>
         </div>
       </section>
 
       <footer className="py-10 px-4 text-center border-t border-hairline">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <StewardMark />
-          <span className="display-tight font-semibold text-ink">Steward</span>
-        </div>
+        <StewardLogo markSize={28} className="justify-center mb-4" />
         <p className="mono-tag mb-3">Kingdom Hackathon 2026 · RCCG Camp Smart City</p>
         <p className="italic-serif text-sm text-slate max-w-md mx-auto">
           Seest thou a man diligent in his business? He shall stand before kings. — Proverbs 22:29

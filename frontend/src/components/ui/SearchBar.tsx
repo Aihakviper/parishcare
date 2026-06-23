@@ -1,4 +1,4 @@
-import { FaMicrophone } from 'react-icons/fa6'
+import { IconMicrophone } from '../../lib/icons'
 import { cn } from '../../lib/cn'
 
 export function SearchBar({
@@ -30,7 +30,7 @@ export function SearchBar({
           className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-oxblood text-bone flex items-center justify-center hover:bg-oxblood-deep transition-colors"
           aria-label="Search by voice"
         >
-          <FaMicrophone className="w-4 h-4" aria-hidden />
+          <IconMicrophone className="w-4 h-4" aria-hidden />
         </button>
       )}
     </div>

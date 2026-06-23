@@ -1,16 +1,22 @@
+import logo from '../../assets/steward-logo.png'
 import { cn } from '../../lib/cn'
 
-/** Steward logomark — Fraunces "S" */
-export function StewardMark({ className }: { className?: string }) {
+type StewardMarkProps = {
+  className?: string
+  size?: number
+}
+
+/** RCCG handshake mark — stewardship, partnership, diligent hands. */
+export function StewardMark({ className, size = 36 }: StewardMarkProps) {
   return (
-    <span
-      className={cn(
-        'display-tight text-2xl font-semibold text-oxblood leading-none select-none',
-        className,
-      )}
+    <img
+      src={logo}
+      alt=""
+      width={size}
+      height={size}
+      className={cn('shrink-0 object-contain', className)}
+      style={{ width: size, height: size }}
       aria-hidden
-    >
-      S
-    </span>
+    />
   )
 }

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaStar } from 'react-icons/fa6'
+import { IconStar } from '../../lib/icons'
 import type { Artisan } from '../../lib/types/camp'
 import { TRADE_LABELS } from '../../lib/types/camp'
 import { TierPill } from './TierPill'
@@ -37,7 +37,7 @@ export function ArtisanCard({
           </p>
           <div className="flex items-center gap-2 mt-1.5 text-xs text-slate">
             <span className="inline-flex items-center gap-0.5 text-ink font-medium">
-              <FaStar className="text-gilt w-3 h-3" aria-hidden />
+              <IconStar className="text-gilt w-3 h-3" aria-hidden />
               {artisan.averageRating.toFixed(1)}
             </span>
             {artisan.availableNow ? (

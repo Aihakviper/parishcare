@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { Button } from '../../components/ui/Button'
 import { PaymentSplitReceipt } from '../../components/ui/PaymentSplitReceipt'
-import { useArtisan, useJobMutations, HERO_IDS } from '../../hooks/useCampData'
+import { useArtisan, useJobMutations, useCampSession } from '../../hooks/useCampData'
 import { computePaymentSplit } from '../../lib/types/camp'
 import { formatNaira } from '../../lib/formatters'
 
@@ -11,6 +11,7 @@ export function ResidentBookJob() {
   const { artisanId } = useParams()
   const navigate = useNavigate()
   const { data: artisan } = useArtisan(artisanId)
+  const { memberId } = useCampSession()
   const { createJob, fundEscrow } = useJobMutations()
   const [step, setStep] = useState(1)
   const [description, setDescription] = useState(
@@ -25,8 +26,9 @@ export function ResidentBookJob() {
   const handleBook = async () => {
     setLoading(true)
     try {
+      if (!memberId) throw new Error('Member profile required')
       const job = await createJob.mutateAsync({
-        residentId: HERO_IDS.residentId,
+        residentId: memberId,
         artisanId: artisan.id,
         trade: artisan.trade,
         description,

@@ -5,7 +5,7 @@ import { BayoOrb } from '../../components/voice/BayoOrb'
 import { TierPill } from '../../components/ui/TierPill'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
-import { useJobs, useArtisan, HERO_IDS } from '../../hooks/useCampData'
+import { useJobs, useArtisan, useCampSession } from '../../hooks/useCampData'
 import { formatNaira } from '../../lib/formatters'
 import { useVoiceStore } from '../../store/voice'
 import { LIST_ITEM, LIST_STAGGER } from '../../lib/motion'
@@ -13,11 +13,17 @@ import { TRADE_LABELS } from '../../lib/types/camp'
 
 export function ArtisanHome() {
   const openPanel = useVoiceStore((s) => s.openPanel)
-  const { data: jobs = [] } = useJobs({ artisanId: HERO_IDS.artisanId, status: 'requested' })
-  const { data: allJobs = [] } = useJobs({ artisanId: HERO_IDS.artisanId })
-  const { data: tunde } = useArtisan(HERO_IDS.artisanId)
+  const { artisanId, activeJobId } = useCampSession()
+  const { data: jobs = [] } = useJobs(
+    artisanId ? { artisanId, status: 'requested' } : {},
+  )
+  const { data: allJobs = [] } = useJobs(artisanId ? { artisanId } : {})
+  const { data: artisan } = useArtisan(artisanId ?? undefined)
 
-  const heroJob = allJobs.find((j) => j.isHero) ?? allJobs.find((j) => j.id === HERO_IDS.jobId)
+  const heroJob =
+    allJobs.find((j) => j.isHero) ??
+    allJobs.find((j) => activeJobId && j.id === activeJobId) ??
+    allJobs[0]
   const feed = heroJob ? [heroJob, ...jobs.filter((j) => j.id !== heroJob.id)] : jobs
   const pendingEscrow = allJobs
     .filter((j) => j.escrowStatus === 'held')
@@ -25,7 +31,7 @@ export function ArtisanHome() {
 
   return (
     <div>
-      <RomanSection index={0} title={`BAYO READY · TRUSTED ${tunde?.name.split(' ')[0]?.toUpperCase() ?? 'TUNDE'}`} />
+      <RomanSection index={0} title={`BAYO READY · TRUSTED ${artisan?.name.split(' ')[0]?.toUpperCase() ?? 'ARTISAN'}`} />
 
       <div className="grid grid-cols-3 gap-2 mt-4 text-center">
         <div className="frame p-2">

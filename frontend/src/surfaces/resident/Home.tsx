@@ -5,7 +5,8 @@ import { RomanSection } from '../../components/ui/RomanSection'
 import { SearchBar } from '../../components/ui/SearchBar'
 import { ArtisanCard } from '../../components/ui/ArtisanCard'
 import { EmptyState } from '../../components/ui/EmptyState'
-import { useArtisans, useApprenticeships, HERO_IDS } from '../../hooks/useCampData'
+import { useArtisans, useApprenticeships, useCampSession } from '../../hooks/useCampData'
+import { useAuthDisplayName } from '../../store/auth'
 import { HERO_ARTISAN_ID, TRADE_LABELS, type Trade } from '../../lib/types/camp'
 import { LIST_ITEM, LIST_STAGGER } from '../../lib/motion'
 
@@ -27,7 +28,11 @@ export function ResidentHome() {
   const [query, setQuery] = useState('')
   const [trade, setTrade] = useState<Trade | undefined>()
   const { data: artisans = [], isLoading } = useArtisans({ query, trade })
-  const { data: supportedApprentices = [] } = useApprenticeships({ memberId: HERO_IDS.memberId })
+  const { memberId } = useCampSession()
+  const firstName = useAuthDisplayName()
+  const { data: supportedApprentices = [] } = useApprenticeships(
+    memberId ? { memberId } : {},
+  )
 
   const trusted = artisans.filter((a) =>
     [HERO_ARTISAN_ID, 'artisan-emeka-okonkwo'].includes(a.id),
@@ -36,7 +41,7 @@ export function ResidentHome() {
 
   return (
     <div>
-      <RomanSection index={0} title="GOOD MORNING, BISI" />
+      <RomanSection index={0} title={`GOOD MORNING, ${firstName.toUpperCase()}`} />
       <h1 className="display-tight text-2xl font-semibold text-ink mt-3">
         Find a Trusted Steward
       </h1>
