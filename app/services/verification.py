@@ -33,6 +33,7 @@ from app.services.errors import (
     VoucherUsedError,
 )
 from app.services.parish import CONTACT_PHONE_CONTEXT
+from app.services.whatsapp import WhatsAppService
 from app.utils.crypto import PIICipher
 
 VERIFICATION_PHONE_CONTEXT = "verification_requests.sent_to_phone"
@@ -62,11 +63,13 @@ class VerificationService:
         session: AsyncSession,
         *,
         config: Settings = settings,
+        whatsapp: WhatsAppService | None = None,
     ) -> None:
         self._session = session
         self._config = config
         self._cipher = PIICipher(config.pii_encryption_key)
         self._audit = AuditService(session)
+        self._whatsapp = whatsapp or WhatsAppService(config=config)
 
     async def start(
         self,
@@ -120,13 +123,14 @@ class VerificationService:
             expires_at = now + timedelta(
                 hours=self._config.verification_voucher_expire_hours
             )
+            recipient_phone = self._cipher.decrypt(
+                parish.contact_phone_encrypted,
+                context=CONTACT_PHONE_CONTEXT,
+            )
             verification_request = VerificationRequest(
                 welfare_request_id=request.id,
                 sent_to_phone_encrypted=self._cipher.encrypt(
-                    self._cipher.decrypt(
-                        parish.contact_phone_encrypted,
-                        context=CONTACT_PHONE_CONTEXT,
-                    ),
+                    recipient_phone,
                     context=VERIFICATION_PHONE_CONTEXT,
                 ),
                 sent_to_parish_id=parish.id,
@@ -152,6 +156,14 @@ class VerificationService:
             beneficiary.verification_status = VerificationStatus.PENDING
             self._session.add(voucher)
             await self._session.flush()
+            delivery_message_id = None
+            if voucher.channel == VerificationChannel.WHATSAPP:
+                delivery_message_id = (
+                    await self._whatsapp.send_verification_voucher(
+                        recipient_phone=recipient_phone,
+                        token=raw_token,
+                    )
+                )
             await self._audit.record(
                 actor_id=actor.id,
                 action="verification.voucher_issued",
@@ -163,6 +175,7 @@ class VerificationService:
                     "sent_to_parish_id": parish.id,
                     "channel": voucher.channel.value,
                     "expires_at": expires_at,
+                    "delivery_message_id": delivery_message_id,
                 },
             )
             await self._session.commit()

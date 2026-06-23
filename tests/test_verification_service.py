@@ -174,6 +174,55 @@ async def test_start_issues_single_use_mock_token_without_storing_raw() -> None:
 
 
 @pytest.mark.asyncio
+async def test_start_delivers_whatsapp_token_without_returning_it() -> None:
+    base_config, request, beneficiary, parish = build_workflow()
+    config = build_test_settings(
+        verification_delivery_channel="whatsapp",
+        whatsapp_phone_number_id="123456789",
+        whatsapp_access_token="access-token",
+        whatsapp_webhook_verify_token="verify-token",
+        whatsapp_app_secret="app-secret",
+    )
+    session = build_session()
+    session.execute.side_effect = [
+        Result(row=(request, beneficiary, parish)),
+        Result(rows=[]),
+        Result(scalar=None),
+    ]
+
+    async def flush() -> None:
+        added = session.add.call_args.args[0]
+        if added.id is None:
+            added.id = uuid4()
+
+    session.flush.side_effect = flush
+    whatsapp = MagicMock()
+    whatsapp.send_verification_voucher = AsyncMock(
+        return_value="wamid.presentation"
+    )
+    service = VerificationService(
+        session,
+        config=config,
+        whatsapp=whatsapp,
+    )
+    service._audit.record = AsyncMock()
+
+    result = await service.start(
+        actor=build_actor(parish.id),
+        welfare_request_id=request.id,
+    )
+
+    assert result.voucher.channel == VerificationChannel.WHATSAPP
+    assert result.raw_token is None
+    whatsapp.send_verification_voucher.assert_awaited_once()
+    kwargs = whatsapp.send_verification_voucher.await_args.kwargs
+    assert kwargs["recipient_phone"] == "+2348012345678"
+    assert kwargs["token"]
+    audit_state = service._audit.record.await_args.kwargs["after_state"]
+    assert audit_state["delivery_message_id"] == "wamid.presentation"
+
+
+@pytest.mark.asyncio
 async def test_confirm_burns_token_and_verifies_request_and_beneficiary() -> None:
     config, request, beneficiary, parish = build_workflow()
     service = VerificationService(build_session(), config=config)

@@ -4,7 +4,7 @@ from binascii import Error as Base64Error
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -55,11 +55,20 @@ class Settings(BaseSettings):
     verification_voucher_expire_hours: int = Field(gt=0)
     verification_voucher_issuer: str = Field(min_length=1)
     verification_voucher_audience: str = Field(min_length=1)
-    verification_delivery_channel: Literal["mock"]
+    verification_delivery_channel: Literal["mock", "whatsapp"]
+
+    whatsapp_graph_api_base_url: str = Field(min_length=1, max_length=500)
+    whatsapp_phone_number_id: str
+    whatsapp_access_token: SecretStr
+    whatsapp_webhook_verify_token: SecretStr
+    whatsapp_app_secret: SecretStr
+    whatsapp_public_base_url: str = Field(min_length=1, max_length=500)
+    whatsapp_request_timeout_seconds: float = Field(gt=0, le=60)
 
     maker_checker_threshold_kobo: int = Field(gt=0)
     mock_payment_provider_name: str = Field(min_length=1, max_length=50)
     mock_payment_receipt_base_url: str = Field(min_length=1, max_length=500)
+    marketplace_platform_fee_bps: int = Field(ge=0, le=10_000)
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -100,6 +109,24 @@ class Settings(BaseSettings):
             )
         if self.app_env == "production" and self.mfa_demo_enabled:
             raise ValueError("Demo MFA cannot be enabled in production")
+        if self.verification_delivery_channel == "whatsapp":
+            required = {
+                "whatsapp_phone_number_id": self.whatsapp_phone_number_id,
+                "whatsapp_access_token": (
+                    self.whatsapp_access_token.get_secret_value()
+                ),
+                "whatsapp_webhook_verify_token": (
+                    self.whatsapp_webhook_verify_token.get_secret_value()
+                ),
+                "whatsapp_app_secret": (
+                    self.whatsapp_app_secret.get_secret_value()
+                ),
+            }
+            missing = [name for name, value in required.items() if not value]
+            if missing:
+                raise ValueError(
+                    "WhatsApp delivery requires: " + ", ".join(missing)
+                )
         return self
 
     @property

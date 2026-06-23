@@ -51,3 +51,18 @@ __all__ = [
     "VerificationStartResponse",
     "VerificationVoucherResponse",
 ]
+from app.schemas.marketplace import (
+    ArtisanProfileCreate,
+    ArtisanProfileResponse,
+    DisputeCreate,
+    DisputeResolve,
+    DisputeResponse,
+    EscrowResponse,
+    JobCreate,
+    JobQuote,
+    JobResponse,
+    JobTransition,
+    ReviewCreate,
+    PublicArtisanResponse,
+    PublicJobFeedResponse,
+)

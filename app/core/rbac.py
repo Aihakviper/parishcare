@@ -20,6 +20,14 @@ class Permission(StrEnum):
     USER_CREATE = "user:create"
     USER_UPDATE = "user:update"
     AUDIT_VERIFY = "audit:verify"
+    ARTISAN_PROFILE_CREATE = "artisan_profile:create"
+    JOB_CREATE = "job:create"
+    JOB_VIEW = "job:view"
+    JOB_MANAGE = "job:manage"
+    ESCROW_MANAGE = "escrow:manage"
+    REVIEW_CREATE = "review:create"
+    DISPUTE_CREATE = "dispute:create"
+    DISPUTE_RESOLVE = "dispute:resolve"
 
 
 ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
@@ -62,6 +70,33 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
         }
     ),
     UserRole.AUDITOR: frozenset({Permission.AUDIT_VERIFY}),
+    UserRole.RESIDENT: frozenset(
+        {
+            Permission.JOB_CREATE,
+            Permission.JOB_VIEW,
+            Permission.ESCROW_MANAGE,
+            Permission.REVIEW_CREATE,
+            Permission.DISPUTE_CREATE,
+        }
+    ),
+    UserRole.ARTISAN: frozenset(
+        {
+            Permission.ARTISAN_PROFILE_CREATE,
+            Permission.JOB_VIEW,
+            Permission.JOB_MANAGE,
+            Permission.DISPUTE_CREATE,
+        }
+    ),
+    UserRole.CAMP_ADMIN: frozenset(
+        {
+            Permission.JOB_VIEW,
+            Permission.DISPUTE_RESOLVE,
+            Permission.AUDIT_VERIFY,
+        }
+    ),
+    UserRole.MEDIATOR: frozenset(
+        {Permission.JOB_VIEW, Permission.DISPUTE_RESOLVE}
+    ),
 }
 
 

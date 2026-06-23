@@ -1,7 +1,8 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import require_permissions
@@ -14,8 +15,10 @@ from app.schemas.verification import (
     VerificationOutcomeResponse,
     VerificationStartResponse,
     VerificationVoucherResponse,
+    WhatsAppWebhookResponse,
 )
 from app.services.verification import VerificationService
+from app.services.whatsapp import WhatsAppService
 
 router = APIRouter()
 
@@ -92,4 +95,72 @@ async def respond_to_verification_voucher(
             result.beneficiary.verification_status
         ),
         responded_at=result.verification_request.responded_at,
+    )
+
+
+@router.get(
+    "/webhooks/whatsapp",
+    response_class=PlainTextResponse,
+    include_in_schema=False,
+)
+async def verify_whatsapp_webhook(
+    mode: Annotated[str | None, Query(alias="hub.mode")] = None,
+    verify_token: Annotated[
+        str | None,
+        Query(alias="hub.verify_token"),
+    ] = None,
+    challenge: Annotated[
+        str | None,
+        Query(alias="hub.challenge"),
+    ] = None,
+) -> PlainTextResponse:
+    if not WhatsAppService().verify_webhook_challenge(
+        mode=mode,
+        verify_token=verify_token,
+    ):
+        raise HTTPException(status_code=403, detail="Invalid webhook token")
+    return PlainTextResponse(challenge or "")
+
+
+@router.post(
+    "/webhooks/whatsapp",
+    response_model=WhatsAppWebhookResponse,
+    responses={403: {"model": ErrorResponse}},
+    summary="Receive signed WhatsApp verification replies",
+)
+async def receive_whatsapp_webhook(
+    request: Request,
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+    signature: Annotated[
+        str | None,
+        Header(alias="X-Hub-Signature-256"),
+    ] = None,
+) -> WhatsAppWebhookResponse:
+    body = await request.body()
+    whatsapp = WhatsAppService()
+    if not whatsapp.verify_webhook_signature(
+        body=body,
+        signature_header=signature,
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid webhook signature",
+        )
+    payload = await request.json()
+    commands = whatsapp.extract_commands(payload)
+    processed = 0
+    failed = 0
+    service = VerificationService(session)
+    for command in commands:
+        try:
+            await service.respond(
+                token=command.token,
+                outcome=command.outcome,
+            )
+            processed += 1
+        except Exception:
+            failed += 1
+    return WhatsAppWebhookResponse(
+        processed_commands=processed,
+        failed_commands=failed,
     )

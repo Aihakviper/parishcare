@@ -50,9 +50,16 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = await backendApi.me()
       applyUserContext(user)
       set({ user, loading: false, error: null })
-    } catch {
+    } catch (error) {
       clearTokens()
-      set({ user: null, loading: false })
+      set({
+        user: null,
+        loading: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Cannot connect to ParishCare API',
+      })
     }
   },
 
