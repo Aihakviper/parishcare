@@ -7,7 +7,7 @@ import { cn } from '../../lib/cn'
 type Audience = 'resident' | 'artisan' | 'console'
 
 const AUDIENCES: { id: Audience; label: string; path: string }[] = [
-  { id: 'resident', label: 'Residents', path: '/resident' },
+  { id: 'resident', label: 'Members', path: '/member' },
   { id: 'artisan', label: 'Artisans', path: '/artisan' },
   { id: 'console', label: 'Camp admin', path: '/console' },
 ]
@@ -26,7 +26,7 @@ const FEATURES: Record<
       'Escrow holds payment until you confirm completion',
       'Live timeline with photos and voice notes from your artisan',
     ],
-    path: '/resident',
+    path: '/member',
     cta: 'Open resident app',
   },
   artisan: {
@@ -101,7 +101,7 @@ export function MarketingLanding() {
               Three views
             </a>
           </nav>
-          <Link to="/resident" className="btn-pill btn-pill-primary text-xs sm:text-sm px-4 py-2 min-h-[40px]">
+          <Link to="/member" className="btn-pill btn-pill-primary text-xs sm:text-sm px-4 py-2 min-h-[40px]">
             Enter demo
           </Link>
         </header>
@@ -127,7 +127,7 @@ export function MarketingLanding() {
         </p>
 
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center mt-10">
-          <Link to="/resident" className="btn-pill btn-pill-primary px-7 py-3.5 text-base">
+          <Link to="/member" className="btn-pill btn-pill-primary px-7 py-3.5 text-base">
             Get started
             <FaArrowRight className="w-4 h-4" aria-hidden />
           </Link>
@@ -246,7 +246,7 @@ export function MarketingLanding() {
             Use the role switcher inside the demo to move between Funmi, Tunde, and Pastor
             Adekunle in one click.
           </p>
-          <Link to="/resident" className="btn-pill btn-pill-primary mt-8 inline-flex px-8 py-3.5">
+          <Link to="/member" className="btn-pill btn-pill-primary mt-8 inline-flex px-8 py-3.5">
             Start the demo
             <FaArrowRight className="w-4 h-4" aria-hidden />
           </Link>

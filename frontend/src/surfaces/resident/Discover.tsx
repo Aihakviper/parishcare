@@ -88,7 +88,7 @@ export function ResidentDiscover() {
         <motion.ul className="mt-6 space-y-3" variants={LIST_STAGGER} initial="hidden" animate="show">
           {artisans.map((a) => (
             <motion.li key={a.id} variants={LIST_ITEM}>
-              <ArtisanCard artisan={a} to={`/resident/artisan/${a.id}`} />
+              <ArtisanCard artisan={a} to={`/member/artisan/${a.id}`} />
             </motion.li>
           ))}
         </motion.ul>

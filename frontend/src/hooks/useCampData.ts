@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { campApi, type ArtisanFilters } from '../lib/mock-api/camp'
-import type { Job } from '../lib/types/camp'
+import type { Job, Trade } from '../lib/types/camp'
 
 export function useArtisans(filters: ArtisanFilters = {}) {
   return useQuery({
@@ -65,6 +65,42 @@ export function useDispute(id: string | undefined) {
   })
 }
 
+export function useApprenticeships(filters: { masterId?: string; memberId?: string } = {}) {
+  return useQuery({
+    queryKey: ['apprenticeships', filters],
+    queryFn: () => campApi.listApprenticeships(filters),
+  })
+}
+
+export function usePastoralConfirmations() {
+  return useQuery({
+    queryKey: ['pastoral-confirmations'],
+    queryFn: () => campApi.listPastoralConfirmations(),
+  })
+}
+
+export function useGenerosity(actorId?: string) {
+  return useQuery({
+    queryKey: ['generosity', actorId],
+    queryFn: () => campApi.listGenerosity(actorId),
+  })
+}
+
+export function useStewardsFund() {
+  return useQuery({
+    queryKey: ['stewards-fund'],
+    queryFn: () => campApi.getStewardsFund(),
+  })
+}
+
+export function useLineage(artisanId: string | undefined) {
+  return useQuery({
+    queryKey: ['lineage', artisanId],
+    queryFn: () => campApi.getLineage(artisanId!),
+    enabled: !!artisanId,
+  })
+}
+
 export function useJobMutations() {
   const qc = useQueryClient()
   const invalidate = () => {
@@ -112,7 +148,10 @@ export function useJobMutations() {
     }),
     fundEscrow: useMutation({
       mutationFn: campApi.fundEscrow,
-      onSuccess: invalidate,
+      onSuccess: () => {
+        invalidate()
+        void qc.invalidateQueries({ queryKey: ['stewards-fund'] })
+      },
     }),
     resolveDispute: useMutation({
       mutationFn: ({
@@ -127,6 +166,20 @@ export function useJobMutations() {
       onSuccess: () => {
         void qc.invalidateQueries({ queryKey: ['disputes'] })
         invalidate()
+      },
+    }),
+    confirmStanding: useMutation({
+      mutationFn: ({ id, note }: { id: string; note: string }) =>
+        campApi.confirmStanding(id, note),
+      onSuccess: () => {
+        void qc.invalidateQueries({ queryKey: ['pastoral-confirmations'] })
+      },
+    }),
+    enrollMentor: useMutation({
+      mutationFn: ({ artisanId, trade }: { artisanId: string; trade: Trade }) =>
+        campApi.enrollMentor(artisanId, trade),
+      onSuccess: () => {
+        void qc.invalidateQueries({ queryKey: ['pastoral-confirmations'] })
       },
     }),
   }

@@ -12,11 +12,11 @@ export interface RoleDefinition {
 export const ROLES: RoleDefinition[] = [
   {
     id: 'resident',
-    label: 'Resident',
-    navLabel: 'Resident app',
-    persona: 'Funmi Adebanjo',
+    label: 'Member',
+    navLabel: 'Member app',
+    persona: 'Bisi Oladipo',
     contextLabel: 'RCCG Camp · Phase 2',
-    homePath: '/resident',
+    homePath: '/member',
   },
   {
     id: 'artisan',
@@ -28,8 +28,8 @@ export const ROLES: RoleDefinition[] = [
   },
   {
     id: 'console',
-    label: 'Console',
-    navLabel: 'Camp console',
+    label: 'Parish Console',
+    navLabel: 'Parish Console',
     persona: 'Pastor Adekunle Olatunde',
     contextLabel: 'Camp Administrator · RCCG Mowe',
     homePath: '/console',
@@ -51,7 +51,7 @@ export function roleToastMessage(role: StewardRole): string {
     return `Now viewing as ${def.persona} — Artisan (Trusted)`
   }
   if (role === 'console') {
-    return `Now viewing as ${def.persona} — Camp Administrator`
+    return `Now viewing as ${def.persona} — Parish Administrator`
   }
-  return `Now viewing as ${def.persona} — Resident`
+  return `Now viewing as ${def.persona} — Member`
 }

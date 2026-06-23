@@ -1,5 +1,6 @@
 import type { Resident } from '../types/camp'
 import { HERO_ARTISAN_ID } from '../types/camp'
+import { heroBisi } from './bisi'
 import { heroResident } from './hero'
 
 const NAMES = [
@@ -37,6 +38,7 @@ function slug(name: string): string {
 
 export const seedResidents: Resident[] = [
   heroResident,
+  heroBisi,
   ...NAMES.map((name, i) => ({
     id: `resident-${slug(name)}`,
     name,

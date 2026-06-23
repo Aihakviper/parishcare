@@ -1,4 +1,4 @@
-import type { Artisan, TrustTier } from './types/camp'
+import type { Artisan, PillarBreakdown, TrustTier } from './types/camp'
 
 export interface TrustBreakdown {
   identity: number
@@ -76,5 +76,17 @@ export function nextTierRequirement(artisan: Artisan) {
     jobsNeeded: 3,
     ratingToMaintain: 4.0,
     timeNeeded: 'Complete NIN verification',
+  }
+}
+
+/** Five Trust Pillars (0–20 each) */
+export function getPillarBreakdown(artisan: Artisan): PillarBreakdown {
+  const vouchCount = artisan.vouchers.length
+  return {
+    identity: artisan.ninVerified ? 20 : 4,
+    vouch: Math.min(20, vouchCount * 8 + 4),
+    proof: Math.min(20, Math.round(Math.log(artisan.completedJobs + 1) * 5)),
+    generosity: artisan.completedJobs >= 20 ? 16 : 8,
+    standing: vouchCount >= 2 ? 18 : 10,
   }
 }

@@ -11,8 +11,11 @@ import { cn } from '../lib/cn'
 const nav = [
   { to: '/console', label: 'Overview', end: true },
   { to: '/console/artisans', label: 'Artisans' },
+  { to: '/console/hands', label: 'Hands' },
+  { to: '/console/standing', label: 'Standing' },
   { to: '/console/jobs', label: 'Jobs' },
   { to: '/console/disputes', label: 'Disputes' },
+  { to: '/console/lineage', label: 'Lineage' },
   { to: '/console/patterns', label: 'Patterns' },
 ]
 
@@ -63,7 +66,7 @@ export function ConsoleLayout() {
             >
               {mobileOpen ? <FaXmark aria-hidden /> : <FaBars aria-hidden />}
             </button>
-            <p className="display-tight text-lg font-semibold text-ink">Camp Console</p>
+            <p className="display-tight text-lg font-semibold text-ink">Parish Console</p>
           </div>
           <RoleSwitcher />
         </header>

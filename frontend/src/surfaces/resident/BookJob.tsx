@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { Button } from '../../components/ui/Button'
+import { PaymentSplitReceipt } from '../../components/ui/PaymentSplitReceipt'
 import { useArtisan, useJobMutations, HERO_IDS } from '../../hooks/useCampData'
+import { computePaymentSplit } from '../../lib/types/camp'
 import { formatNaira } from '../../lib/formatters'
 
 export function ResidentBookJob() {
@@ -31,7 +33,7 @@ export function ResidentBookJob() {
         priceKobo,
       })
       await fundEscrow.mutateAsync(job.id)
-      navigate(`/resident/jobs/${job.id}`)
+      navigate(`/member/jobs/${job.id}`)
     } finally {
       setLoading(false)
     }
@@ -103,12 +105,10 @@ export function ResidentBookJob() {
             <p><span className="text-slate">When:</span> {timing}</p>
             <p><span className="text-slate">Price:</span> {formatNaira(priceKobo)}</p>
           </div>
+          <PaymentSplitReceipt split={computePaymentSplit(priceKobo)} />
           <p className="text-sm text-slate leading-relaxed">
             By confirming, {formatNaira(priceKobo)} will be held in Steward escrow. It is released
             to {artisan.name.split(' ')[0]} only when you confirm the job is done well.
-          </p>
-          <p className="mono-tag text-xs">
-            Steward&apos;s 5% service fee ({formatNaira(Math.round(priceKobo * 0.05))}) protects this transaction.
           </p>
           <Button onClick={handleBook} disabled={loading} className="w-full">
             {loading ? 'Funding escrow…' : 'Fund escrow & book'}

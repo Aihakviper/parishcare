@@ -5,7 +5,7 @@ import { RomanSection } from '../../components/ui/RomanSection'
 import { SearchBar } from '../../components/ui/SearchBar'
 import { ArtisanCard } from '../../components/ui/ArtisanCard'
 import { EmptyState } from '../../components/ui/EmptyState'
-import { useArtisans } from '../../hooks/useCampData'
+import { useArtisans, useApprenticeships, HERO_IDS } from '../../hooks/useCampData'
 import { HERO_ARTISAN_ID, TRADE_LABELS, type Trade } from '../../lib/types/camp'
 import { LIST_ITEM, LIST_STAGGER } from '../../lib/motion'
 
@@ -27,6 +27,7 @@ export function ResidentHome() {
   const [query, setQuery] = useState('')
   const [trade, setTrade] = useState<Trade | undefined>()
   const { data: artisans = [], isLoading } = useArtisans({ query, trade })
+  const { data: supportedApprentices = [] } = useApprenticeships({ memberId: HERO_IDS.memberId })
 
   const trusted = artisans.filter((a) =>
     [HERO_ARTISAN_ID, 'artisan-emeka-okonkwo'].includes(a.id),
@@ -35,7 +36,7 @@ export function ResidentHome() {
 
   return (
     <div>
-      <RomanSection index={0} title="GOOD MORNING, FUNMI" />
+      <RomanSection index={0} title="GOOD MORNING, BISI" />
       <h1 className="display-tight text-2xl font-semibold text-ink mt-3">
         Find a Trusted Steward
       </h1>
@@ -67,13 +68,28 @@ export function ResidentHome() {
         ))}
       </div>
 
+      {supportedApprentices.length > 0 && (
+        <section className="mt-8">
+          <h2 className="eyebrow">Apprentices you support</h2>
+          <p className="text-xs text-slate mt-1">Your bookings help train the next pair of hands.</p>
+          <ul className="mt-3 space-y-2">
+            {supportedApprentices.map((a) => (
+              <li key={a.id} className="frame p-3 text-sm">
+                <span className="font-semibold text-ink">{a.apprenticeName}</span>
+                <span className="text-slate"> · training under Tunde · {a.monthsIn} months</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="mt-8">
         <h2 className="eyebrow">Your trusted Stewards</h2>
         <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
           {trusted.map((a) => (
             <Link
               key={a.id}
-              to={`/resident/artisan/${a.id}`}
+              to={`/member/artisan/${a.id}`}
               className="shrink-0 w-36 frame p-3 hover:shadow-lift transition-shadow"
             >
               <img
@@ -91,7 +107,7 @@ export function ResidentHome() {
       <section className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="eyebrow">Nearby and ready</h2>
-          <Link to="/resident/discover" className="text-xs font-semibold text-oxblood">
+          <Link to="/member/discover" className="text-xs font-semibold text-oxblood">
             See all
           </Link>
         </div>
@@ -109,7 +125,7 @@ export function ResidentHome() {
           >
             {nearby.map((a) => (
               <motion.li key={a.id} variants={LIST_ITEM}>
-                <ArtisanCard artisan={a} to={`/resident/artisan/${a.id}`} />
+                <ArtisanCard artisan={a} to={`/member/artisan/${a.id}`} />
               </motion.li>
             ))}
           </motion.ul>
