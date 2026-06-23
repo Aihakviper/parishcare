@@ -4,12 +4,13 @@ import { RomanSection } from '../../components/ui/RomanSection'
 import { Card } from '../../components/ui/Card'
 import { JobStatusPill } from '../../components/ui/JobStatusPill'
 import { EmptyState } from '../../components/ui/EmptyState'
-import { useJobs, useArtisan, HERO_IDS } from '../../hooks/useCampData'
+import { useJobs, useArtisan, useCampSession } from '../../hooks/useCampData'
 import { TRADE_LABELS } from '../../lib/types/camp'
 import { formatNaira } from '../../lib/formatters'
 
 export function ResidentMyJobs() {
-  const { data: jobs = [] } = useJobs({ residentId: HERO_IDS.residentId })
+  const { memberId } = useCampSession()
+  const { data: jobs = [] } = useJobs(memberId ? { residentId: memberId } : {})
   const active = jobs.filter((j) => !['completed', 'closed'].includes(j.status))
   const past = jobs.filter((j) => ['completed', 'closed'].includes(j.status))
 
@@ -56,7 +57,8 @@ export function ResidentMyJobs() {
 }
 
 function ActiveJobCard({ jobId }: { jobId: string }) {
-  const { data: jobs } = useJobs({ residentId: HERO_IDS.residentId })
+  const { memberId } = useCampSession()
+  const { data: jobs } = useJobs(memberId ? { residentId: memberId } : {})
   const job = jobs?.find((j) => j.id === jobId)
   const { data: artisan } = useArtisan(job?.artisanId)
 

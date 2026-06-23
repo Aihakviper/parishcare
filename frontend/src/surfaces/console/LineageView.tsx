@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { TierPill } from '../../components/ui/TierPill'
-import { useLineage, HERO_IDS } from '../../hooks/useCampData'
+import { useLineage, useCampSession } from '../../hooks/useCampData'
 
 export function ConsoleLineage() {
-  const [artisanId, setArtisanId] = useState(HERO_IDS.artisanId)
+  const { artisanId: sessionArtisanId } = useCampSession()
+  const [artisanId, setArtisanId] = useState(sessionArtisanId ?? '')
   const { data: nodes = [] } = useLineage(artisanId)
 
   return (

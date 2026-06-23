@@ -1,11 +1,12 @@
 import { RomanSection } from '../../components/ui/RomanSection'
 import { TierPill } from '../../components/ui/TierPill'
 import { ProgressBar } from '../../components/charts/ProgressBar'
-import { useArtisan, HERO_IDS } from '../../hooks/useCampData'
+import { useArtisan, useCampSession } from '../../hooks/useCampData'
 import { computeTrustScore, nextTierRequirement } from '../../lib/trust-engine'
 
 export function ArtisanStanding() {
-  const { data: artisan } = useArtisan(HERO_IDS.artisanId)
+  const { artisanId } = useCampSession()
+  const { data: artisan } = useArtisan(artisanId ?? undefined)
   if (!artisan) return null
 
   const breakdown = computeTrustScore(artisan)

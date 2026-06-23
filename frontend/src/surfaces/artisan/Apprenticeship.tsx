@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { RomanSection } from '../../components/ui/RomanSection'
 import { Button } from '../../components/ui/Button'
-import { useApprenticeships } from '../../hooks/useCampData'
-import { HERO_IDS } from '../../hooks/useCampData'
+import { useApprenticeships, useCampSession } from '../../hooks/useCampData'
 import { formatNaira } from '../../lib/formatters'
 
 export function ArtisanApprenticeship() {
-  const { data: list = [] } = useApprenticeships({ masterId: HERO_IDS.artisanId })
+  const { artisanId } = useCampSession()
+  const { data: list = [] } = useApprenticeships(artisanId ? { masterId: artisanId } : {})
 
   return (
     <div>

@@ -15,7 +15,14 @@ export interface BackendUser {
   parish_id: string | null
   mfa_enabled: boolean
   is_active: boolean
+  /** Camp Smart City profile — see BACKEND_CAMP_API.md */
+  camp_role?: CampUserRole
+  member_id?: string | null
+  artisan_id?: string | null
+  active_job_id?: string | null
 }
+
+export type CampUserRole = 'member' | 'artisan' | 'pastor' | 'camp_admin'
 
 interface BackendBeneficiary {
   id: string

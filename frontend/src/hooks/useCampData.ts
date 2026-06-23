@@ -1,18 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { campApi, type ArtisanFilters } from '../lib/mock-api/camp'
+import { campDataSource } from '../lib/api/camp-data-source'
+import type { ArtisanFilters } from '../lib/mock-api/camp'
 import type { Job, Trade } from '../lib/types/camp'
+
+export { useCampSession } from './useCampSession'
+export type { CampSession } from './useCampSession'
 
 export function useArtisans(filters: ArtisanFilters = {}) {
   return useQuery({
     queryKey: ['artisans', filters],
-    queryFn: () => campApi.listArtisans(filters),
+    queryFn: () => campDataSource.listArtisans(filters),
   })
 }
 
 export function useArtisan(id: string | undefined) {
   return useQuery({
     queryKey: ['artisan', id],
-    queryFn: () => campApi.getArtisan(id!),
+    queryFn: () => campDataSource.getArtisan(id!),
     enabled: !!id,
   })
 }
@@ -24,14 +28,14 @@ export function useJobs(filters: {
 } = {}) {
   return useQuery({
     queryKey: ['jobs', filters],
-    queryFn: () => campApi.listJobs(filters),
+    queryFn: () => campDataSource.listJobs(filters),
   })
 }
 
 export function useJob(id: string | undefined) {
   return useQuery({
     queryKey: ['job', id],
-    queryFn: () => campApi.getJob(id!),
+    queryFn: () => campDataSource.getJob(id!),
     enabled: !!id,
   })
 }
@@ -39,28 +43,28 @@ export function useJob(id: string | undefined) {
 export function useCampStats() {
   return useQuery({
     queryKey: ['camp-stats'],
-    queryFn: () => campApi.getCampStats(),
+    queryFn: () => campDataSource.getCampStats(),
   })
 }
 
 export function usePatterns() {
   return useQuery({
     queryKey: ['patterns'],
-    queryFn: () => campApi.getPatterns(),
+    queryFn: () => campDataSource.getPatterns(),
   })
 }
 
 export function useDisputes() {
   return useQuery({
     queryKey: ['disputes'],
-    queryFn: () => campApi.listDisputes(),
+    queryFn: () => campDataSource.listDisputes(),
   })
 }
 
 export function useDispute(id: string | undefined) {
   return useQuery({
     queryKey: ['dispute', id],
-    queryFn: () => campApi.getDispute(id!),
+    queryFn: () => campDataSource.getDispute(id!),
     enabled: !!id,
   })
 }
@@ -68,35 +72,35 @@ export function useDispute(id: string | undefined) {
 export function useApprenticeships(filters: { masterId?: string; memberId?: string } = {}) {
   return useQuery({
     queryKey: ['apprenticeships', filters],
-    queryFn: () => campApi.listApprenticeships(filters),
+    queryFn: () => campDataSource.listApprenticeships(filters),
   })
 }
 
 export function usePastoralConfirmations() {
   return useQuery({
     queryKey: ['pastoral-confirmations'],
-    queryFn: () => campApi.listPastoralConfirmations(),
+    queryFn: () => campDataSource.listPastoralConfirmations(),
   })
 }
 
 export function useGenerosity(actorId?: string) {
   return useQuery({
     queryKey: ['generosity', actorId],
-    queryFn: () => campApi.listGenerosity(actorId),
+    queryFn: () => campDataSource.listGenerosity(actorId),
   })
 }
 
 export function useStewardsFund() {
   return useQuery({
     queryKey: ['stewards-fund'],
-    queryFn: () => campApi.getStewardsFund(),
+    queryFn: () => campDataSource.getStewardsFund(),
   })
 }
 
 export function useLineage(artisanId: string | undefined) {
   return useQuery({
     queryKey: ['lineage', artisanId],
-    queryFn: () => campApi.getLineage(artisanId!),
+    queryFn: () => campDataSource.getLineage(artisanId!),
     enabled: !!artisanId,
   })
 }
@@ -111,7 +115,7 @@ export function useJobMutations() {
 
   return {
     acceptJob: useMutation({
-      mutationFn: campApi.acceptJob,
+      mutationFn: campDataSource.acceptJob,
       onSuccess: invalidate,
     }),
     updateStatus: useMutation({
@@ -123,11 +127,11 @@ export function useJobMutations() {
         id: string
         status: Job['status']
         extra?: { photo?: 'before' | 'during' | 'after'; photoUrl?: string }
-      }) => campApi.updateJobStatus(id, status, extra),
+      }) => campDataSource.updateJobStatus(id, status, extra),
       onSuccess: invalidate,
     }),
     releaseEscrow: useMutation({
-      mutationFn: campApi.releaseEscrow,
+      mutationFn: campDataSource.releaseEscrow,
       onSuccess: invalidate,
     }),
     submitReview: useMutation({
@@ -139,15 +143,15 @@ export function useJobMutations() {
         id: string
         rating: number
         text?: string
-      }) => campApi.submitReview(id, rating, text),
+      }) => campDataSource.submitReview(id, rating, text),
       onSuccess: invalidate,
     }),
     createJob: useMutation({
-      mutationFn: campApi.createJob,
+      mutationFn: campDataSource.createJob,
       onSuccess: invalidate,
     }),
     fundEscrow: useMutation({
-      mutationFn: campApi.fundEscrow,
+      mutationFn: campDataSource.fundEscrow,
       onSuccess: () => {
         invalidate()
         void qc.invalidateQueries({ queryKey: ['stewards-fund'] })
@@ -162,7 +166,7 @@ export function useJobMutations() {
         id: string
         outcome: 'release' | 'refund'
         note: string
-      }) => campApi.resolveDispute(id, outcome, note),
+      }) => campDataSource.resolveDispute(id, outcome, note),
       onSuccess: () => {
         void qc.invalidateQueries({ queryKey: ['disputes'] })
         invalidate()
@@ -170,19 +174,17 @@ export function useJobMutations() {
     }),
     confirmStanding: useMutation({
       mutationFn: ({ id, note }: { id: string; note: string }) =>
-        campApi.confirmStanding(id, note),
+        campDataSource.confirmStanding(id, note),
       onSuccess: () => {
         void qc.invalidateQueries({ queryKey: ['pastoral-confirmations'] })
       },
     }),
     enrollMentor: useMutation({
       mutationFn: ({ artisanId, trade }: { artisanId: string; trade: Trade }) =>
-        campApi.enrollMentor(artisanId, trade),
+        campDataSource.enrollMentor(artisanId, trade),
       onSuccess: () => {
         void qc.invalidateQueries({ queryKey: ['pastoral-confirmations'] })
       },
     }),
   }
 }
-
-export const HERO_IDS = campApi.getHeroIds()

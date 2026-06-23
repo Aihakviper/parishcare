@@ -6,19 +6,24 @@ import { RoleSwitcher } from '../components/ui/RoleSwitcher'
 import { RoleToast } from '../components/ui/RoleToast'
 import { BayoFab, BayoPanel } from '../components/voice/BayoPanel'
 import { PAGE_TRANSITION } from '../lib/motion'
-import { HERO_IDS } from '../hooks/useCampData'
+import { useCampSession } from '../hooks/useCampSession'
 import { cn } from '../lib/cn'
-
-const nav = [
-  { to: '/artisan', icon: IconHouse, label: 'Home' },
-  { to: `/artisan/jobs/${HERO_IDS.jobId}`, icon: IconBriefcase, label: 'Active' },
-  { to: '/artisan/earnings', icon: IconWallet, label: 'Earnings' },
-  { to: '/artisan/standing', icon: IconChartLine, label: 'Standing' },
-  { to: '/artisan/profile', icon: IconUser, label: 'Me' },
-]
 
 export function ArtisanLayout() {
   const location = useLocation()
+  const { activeJobId } = useCampSession()
+
+  const nav = [
+    { to: '/artisan', icon: IconHouse, label: 'Home' },
+    {
+      to: activeJobId ? `/artisan/jobs/${activeJobId}` : '/artisan',
+      icon: IconBriefcase,
+      label: 'Active',
+    },
+    { to: '/artisan/earnings', icon: IconWallet, label: 'Earnings' },
+    { to: '/artisan/standing', icon: IconChartLine, label: 'Standing' },
+    { to: '/artisan/profile', icon: IconUser, label: 'Me' },
+  ]
 
   return (
     <div className="min-h-screen flex flex-col bg-parchment pb-24 max-w-lg mx-auto w-full">

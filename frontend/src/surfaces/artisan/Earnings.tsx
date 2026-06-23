@@ -1,7 +1,7 @@
 import { RomanSection } from '../../components/ui/RomanSection'
 import { Button } from '../../components/ui/Button'
 import { Money } from '../../components/ui/Money'
-import { useJobs, HERO_IDS } from '../../hooks/useCampData'
+import { useJobs, useCampSession } from '../../hooks/useCampData'
 import { formatNaira } from '../../lib/formatters'
 import {
   Area,
@@ -22,7 +22,8 @@ const CHART = [
 ]
 
 export function ArtisanEarnings() {
-  const { data: jobs = [] } = useJobs({ artisanId: HERO_IDS.artisanId })
+  const { artisanId } = useCampSession()
+  const { data: jobs = [] } = useJobs(artisanId ? { artisanId } : {})
   const held = jobs.filter((j) => j.escrowStatus === 'held').reduce((s, j) => s + j.priceKobo, 0)
   const released = jobs
     .filter((j) => j.escrowStatus === 'released')
