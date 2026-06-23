@@ -178,7 +178,12 @@ def test_login_accepts_environment_verified_demo_mfa_code() -> None:
 
 
 def test_missing_bearer_token_uses_consistent_error_shape() -> None:
-    response = client.get("/api/v1/auth/me")
+    original = settings.camp_mock_auth_bypass
+    settings.camp_mock_auth_bypass = False
+    try:
+        response = client.get("/api/v1/auth/me")
+    finally:
+        settings.camp_mock_auth_bypass = original
 
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "authentication_failed"

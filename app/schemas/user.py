@@ -63,11 +63,11 @@ class UserResponse(BaseModel):
     name: str
     email: EmailStr
     role: UserRole
-    parish_id: UUID | None
+    parish_id: UUID | str | None
     camp_role: CampRole | None = None
-    member_id: UUID | None = None
-    artisan_id: UUID | None = None
-    active_job_id: UUID | None = None
+    member_id: UUID | str | None = None
+    artisan_id: UUID | str | None = None
+    active_job_id: UUID | str | None = None
     mfa_enabled: bool
     is_active: bool
     created_at: datetime

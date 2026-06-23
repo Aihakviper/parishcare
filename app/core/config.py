@@ -74,6 +74,7 @@ class Settings(BaseSettings):
     mock_payment_receipt_base_url: str = Field(min_length=1, max_length=500)
     marketplace_platform_fee_bps: int = Field(ge=0, le=10_000)
     camp_mock_auth_bypass: bool = False
+    camp_mock_default_profile: Literal["member", "artisan", "pastor", "camp_admin"] = "member"
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -114,6 +115,8 @@ class Settings(BaseSettings):
             )
         if self.app_env == "production" and self.mfa_demo_enabled:
             raise ValueError("Demo MFA cannot be enabled in production")
+        if self.app_env == "production" and self.camp_mock_auth_bypass:
+            raise ValueError("Camp mock auth bypass cannot be enabled in production")
         if (
             self.verification_delivery_channel == "whatsapp"
             or self.whatsapp_marketplace_enabled
