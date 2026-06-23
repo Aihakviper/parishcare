@@ -17,7 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
-from app.models.enums import UserRole
+from app.models.enums import CampRole, UserRole
 from app.models.types import database_enum
 
 if TYPE_CHECKING:
@@ -35,6 +35,9 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         ),
         Index("ix_users_parish_id", "parish_id"),
         Index("ix_users_role", "role"),
+        Index("ix_users_camp_role", "camp_role"),
+        Index("ix_users_member_id", "member_id"),
+        Index("ix_users_artisan_id", "artisan_id"),
     )
 
     name_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
@@ -47,6 +50,24 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     )
     parish_id: Mapped[Optional[UUID]] = mapped_column(
         ForeignKey("parishes.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    camp_role: Mapped[Optional[CampRole]] = mapped_column(
+        database_enum(CampRole, "camp_role"),
+        nullable=True,
+    )
+    member_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("members.id", ondelete="SET NULL"),
+        nullable=True,
+        unique=True,
+    )
+    artisan_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("artisan_profiles.id", ondelete="SET NULL"),
+        nullable=True,
+        unique=True,
+    )
+    active_job_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("jobs.id", ondelete="SET NULL"),
         nullable=True,
     )
     mfa_enabled: Mapped[bool] = mapped_column(

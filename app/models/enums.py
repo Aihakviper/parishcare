@@ -12,6 +12,14 @@ class UserRole(StrEnum):
     MEDIATOR = "mediator"
 
 
+class CampRole(StrEnum):
+    MEMBER = "member"
+    ARTISAN = "artisan"
+    PASTOR = "pastor"
+    CAMP_ADMIN = "camp_admin"
+    MEDIATOR = "mediator"
+
+
 class VerificationStatus(StrEnum):
     UNVERIFIED = "unverified"
     PENDING = "pending"
@@ -67,12 +75,18 @@ class Trade(StrEnum):
     PLUMBER = "plumber"
     ELECTRICIAN = "electrician"
     GENERATOR_TECHNICIAN = "generator_technician"
+    GENERATOR_TECH = "generator_tech"
     TAILOR = "tailor"
     MECHANIC = "mechanic"
     CARPENTER = "carpenter"
     PAINTER = "painter"
     CLEANER = "cleaner"
     SECURITY = "security"
+    HAIR_BRAIDER = "hair_braider"
+    WELDER = "welder"
+    MASON = "mason"
+    AC_TECH = "AC_tech"
+    VULCANIZER = "vulcanizer"
 
 
 class ArtisanTier(StrEnum):

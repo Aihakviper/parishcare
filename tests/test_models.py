@@ -3,7 +3,7 @@ from sqlalchemy.orm import configure_mappers
 
 import app.models  # noqa: F401
 from app.db.base import Base
-from app.models.enums import UserRole, VerificationStatus
+from app.models.enums import CampRole, Trade, UserRole, VerificationStatus
 
 
 def test_phase_two_tables_are_registered() -> None:
@@ -18,6 +18,7 @@ def test_phase_two_tables_are_registered() -> None:
         "verification_vouchers",
         "welfare_requests",
         "artisan_profiles",
+        "members",
         "resident_profiles",
         "jobs",
         "job_events",
@@ -60,6 +61,31 @@ def test_integrity_checks_are_registered() -> None:
     assert "ck_users_parish_required_for_parish_roles" in user_checks
 
 
+def test_camp_identity_links_are_registered() -> None:
+    users = Base.metadata.tables["users"]
+    members = Base.metadata.tables["members"]
+    artisan_profiles = Base.metadata.tables["artisan_profiles"]
+
+    assert {"camp_role", "member_id", "artisan_id", "active_job_id"}.issubset(
+        users.columns.keys()
+    )
+    assert {"user_id", "phone_encrypted", "phone_hash", "camp_phase"}.issubset(
+        members.columns.keys()
+    )
+    assert {
+        "phone_encrypted",
+        "phone_hash",
+        "parish_id",
+        "years_experience",
+        "languages",
+        "identity_score",
+        "craft_score",
+        "voice_score",
+        "lineage_score",
+        "generosity_score",
+    }.issubset(artisan_profiles.columns.keys())
+
+
 def test_role_and_verification_values_match_sdd() -> None:
     assert {role.value for role in UserRole} == {
         "officer",
@@ -76,3 +102,21 @@ def test_role_and_verification_values_match_sdd() -> None:
         "pending",
         "verified",
     }
+
+
+def test_camp_role_and_frontend_trade_values_are_registered() -> None:
+    assert {role.value for role in CampRole} == {
+        "member",
+        "artisan",
+        "pastor",
+        "camp_admin",
+        "mediator",
+    }
+    assert {
+        "generator_tech",
+        "hair_braider",
+        "welder",
+        "mason",
+        "AC_tech",
+        "vulcanizer",
+    }.issubset({trade.value for trade in Trade})

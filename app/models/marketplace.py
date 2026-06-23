@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -36,6 +37,21 @@ class ArtisanProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             "average_rating_milli BETWEEN 0 AND 5000",
             name="average_rating_milli",
         ),
+        CheckConstraint(
+            "identity_score BETWEEN 0 AND 15",
+            name="identity_score_range",
+        ),
+        CheckConstraint("craft_score BETWEEN 0 AND 25", name="craft_score_range"),
+        CheckConstraint("voice_score BETWEEN 0 AND 25", name="voice_score_range"),
+        CheckConstraint(
+            "lineage_score BETWEEN 0 AND 15",
+            name="lineage_score_range",
+        ),
+        CheckConstraint(
+            "generosity_score BETWEEN 0 AND 20",
+            name="generosity_score_range",
+        ),
+        Index("ix_artisan_profiles_parish_id", "parish_id"),
     )
 
     user_id: Mapped[UUID] = mapped_column(
@@ -45,6 +61,17 @@ class ArtisanProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         database_enum(Trade, "artisan_trade"), nullable=False
     )
     service_area: Mapped[str] = mapped_column(String(200), nullable=False)
+    parish_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("parishes.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    phone_encrypted: Mapped[Optional[str]] = mapped_column(Text)
+    phone_hash: Mapped[Optional[str]] = mapped_column(String(64), unique=True)
+    bio_encrypted: Mapped[Optional[str]] = mapped_column(Text)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(1000))
+    years_experience: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    languages: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    vouchers_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     tier: Mapped[ArtisanTier] = mapped_column(
         database_enum(ArtisanTier, "artisan_tier"),
         nullable=False,
@@ -67,10 +94,37 @@ class ArtisanProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sample_work_score: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0
     )
+    identity_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    craft_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    voice_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    lineage_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    generosity_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    last_active_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     voice_intro_url: Mapped[Optional[str]] = mapped_column(String(1000))
     sample_work_urls: Mapped[list[str]] = mapped_column(
         JSONB, nullable=False, default=list
     )
+
+
+class Member(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "members"
+    __table_args__ = (
+        Index("ix_members_parish_id", "parish_id"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    parish_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("parishes.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    phone_encrypted: Mapped[Optional[str]] = mapped_column(Text)
+    phone_hash: Mapped[Optional[str]] = mapped_column(String(64), unique=True)
+    address_encrypted: Mapped[Optional[str]] = mapped_column(Text)
+    camp_phase: Mapped[Optional[str]] = mapped_column(String(120))
+    zone: Mapped[Optional[str]] = mapped_column(String(120))
 
 
 class ResidentProfile(UUIDPrimaryKeyMixin, TimestampMixin, Base):

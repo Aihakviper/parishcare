@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
 
-from app.models.enums import UserRole
+from app.models.enums import CampRole, UserRole
 
 
 class UserCreate(BaseModel):
@@ -64,6 +64,10 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: UserRole
     parish_id: UUID | None
+    camp_role: CampRole | None = None
+    member_id: UUID | None = None
+    artisan_id: UUID | None = None
+    active_job_id: UUID | None = None
     mfa_enabled: bool
     is_active: bool
     created_at: datetime

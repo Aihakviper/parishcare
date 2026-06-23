@@ -26,8 +26,8 @@ PUBLIC_PHONE_PATTERN = re.compile(
     r"(?<!\d)(?:\+?234|0)[789]\d{9}(?!\d)"
 )
 BACKEND_TRADE_NAMES = {
-    "generator_tech": Trade.GENERATOR_TECHNICIAN,
     **{trade.value: trade for trade in Trade},
+    "generator_tech": Trade.GENERATOR_TECHNICIAN,
 }
 
 

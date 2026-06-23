@@ -370,6 +370,7 @@ class DemoSeedService:
 def _job_description(trade: Trade, index: int) -> str:
     descriptions = {
         Trade.GENERATOR_TECHNICIAN: "Generator does not start before Sunday service.",
+        Trade.GENERATOR_TECH: "Generator needs servicing before evening power changeover.",
         Trade.PLUMBER: "Kitchen pipe is leaking and needs urgent repair.",
         Trade.ELECTRICIAN: "Bedroom socket sparks whenever an appliance is connected.",
         Trade.TAILOR: "Choir uniform needs adjustment before the weekend service.",
@@ -378,5 +379,10 @@ def _job_description(trade: Trade, index: int) -> str:
         Trade.PAINTER: "Living room requires repainting before family arrives.",
         Trade.CLEANER: "Home needs a complete post-renovation cleanup.",
         Trade.SECURITY: "Temporary event gate security is required.",
+        Trade.HAIR_BRAIDER: "Children need neat braids before camp programme.",
+        Trade.WELDER: "Metal gate latch needs welding and reinforcement.",
+        Trade.MASON: "Small block wall repair is needed near the compound.",
+        Trade.AC_TECH: "Air conditioner is no longer cooling properly.",
+        Trade.VULCANIZER: "Tyre repair is needed before a camp supply trip.",
     }
     return f"{descriptions[trade]} Request {index + 1}."
